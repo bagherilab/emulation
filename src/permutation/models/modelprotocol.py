@@ -14,7 +14,9 @@ class Model(Protocol):
     algorithm_type: str
     hparams: Hyperparams
 
-    def crossval_hparams(self, x: Any, y: Any, stage_check: bool) -> list[float]:
+    def crossval_hparams(
+        self, x: Any, y: Any, hparams: Hyperparams, stage_check: bool
+    ) -> list[float]:
         ...
 
     def fit_model(self, x: Any, y: Any, stage_check: bool) -> float:
