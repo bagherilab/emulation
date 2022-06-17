@@ -9,6 +9,8 @@ import sklearn.model_selection
 
 class Loader(ABC):
     path: str | Path
+    features: list[str]
+    response: str
     _X: pd.DataFrame
     _y: pd.Series
     _X_train: pd.DataFrame
@@ -20,9 +22,14 @@ class Loader(ABC):
     def _load_data(self, subsample_n=None) -> None:
         ...
 
+    @abstractmethod
+    def _split_data(self):
+        ...
+
     def subsample(self, n) -> None:
         self._X_working = self._X.sample(n)
         self._y_working = self._y_working[self._X_working.index]
+        self._split_data()
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         return self._X_train, self._y_train
@@ -30,17 +37,12 @@ class Loader(ABC):
     def load_testing_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         return self._X_test, self._y_test
 
-    def load_all_data(self) -> Tuple[pd.DataFrame, pd.Series]:
+    def load_original_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         return self._X, self._y
 
     def _set_working(self) -> None:
         self._X_working, self._y_working = self._X.copy(deep=True), self._y.copy(
             deep=True
-        )
-
-    def _split_data(self):
-        self._X_train, self._X_test, self._y_train, self._y_test = stage_split(
-            self._X_working, self._y_working, self.test_size, self.seed
         )
 
     def unload_data(self) -> None:
@@ -88,6 +90,11 @@ class CSVLoader(Loader):
         data = pd.read_csv(self.path)
         self._X, self._y = features_response_split(data, self.features, self.response)
         self._set_working()
+
+    def _split_data(self):
+        self._X_train, self._X_test, self._y_train, self._y_test = stage_split(
+            self._X_working, self._y_working, self.test_size, self.seed
+        )
 
 
 def features_response_split(
