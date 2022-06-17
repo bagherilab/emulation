@@ -8,7 +8,7 @@ class SequentialMetricTests(unittest.TestCase):
         testSeqMetric = SequentialMetric("test")
 
         self.assertFalse(testSeqMetric.values)
-        self.assertFalse(testSeqMetric.n)
+        self.assertFalse(testSeqMetric.nums)
         self.assertEqual(testSeqMetric.name, "test")
 
     def test_update(self) -> None:
@@ -16,10 +16,10 @@ class SequentialMetricTests(unittest.TestCase):
         testSeqMetric.update(1.0, 1)
 
         expected_values = [1.0]
-        expected_n = [1]
+        expected_nums = [1]
 
         self.assertEqual(testSeqMetric.values, expected_values)
-        self.assertEqual(testSeqMetric.n, expected_n)
+        self.assertEqual(testSeqMetric.nums, expected_nums)
 
     def test_multiple_updates(self) -> None:
         testSeqMetric = SequentialMetric("test")
@@ -27,10 +27,10 @@ class SequentialMetricTests(unittest.TestCase):
         testSeqMetric.update(2.0, 2)
 
         expected_values = [1.0, 2.0]
-        expected_n = [1, 2]
+        expected_nums = [1, 2]
 
         self.assertEqual(testSeqMetric.values, expected_values)
-        self.assertEqual(testSeqMetric.n, expected_n)
+        self.assertEqual(testSeqMetric.nums, expected_nums)
 
     def test_mutability(self) -> None:
         """test for intializing empty lists correctly"""
@@ -39,17 +39,17 @@ class SequentialMetricTests(unittest.TestCase):
         testSeqMetric = SequentialMetric("test")
 
         self.assertFalse(testSeqMetric.values)
-        self.assertFalse(testSeqMetric.n)
+        self.assertFalse(testSeqMetric.nums)
 
     def test_batchupdate(self) -> None:
         testSeqMetric = SequentialMetric("test")
         testSeqMetric.batchupdate([1.0, 2.0, 3.0], [1, 2, 3])
 
         expected_values = [1.0, 2.0, 3.0]
-        expected_n = [1, 2, 3]
+        expected_nums = [1, 2, 3]
 
         self.assertEqual(testSeqMetric.values, expected_values)
-        self.assertEqual(testSeqMetric.n, expected_n)
+        self.assertEqual(testSeqMetric.nums, expected_nums)
 
     def test_backorder(self) -> None:
         """test for ensuring sequential n"""

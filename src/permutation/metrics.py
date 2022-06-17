@@ -1,4 +1,3 @@
-from typing import Generator
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
@@ -38,20 +37,20 @@ class BatchMetric(Metric):
 class SequentialMetric(Metric):
     name: str
     values: list[float] = field(default_factory=list)
-    n: list[int] = field(default_factory=list)
+    nums: list[int] = field(default_factory=list)
 
     def update(self, value: float, n: int) -> None:
         self._checkorder(n)
         self.values.append(value)
-        self.n.append(n)
+        self.nums.append(n)
 
-    def batchupdate(self, new_values: list[float], new_n: list[n]):
-        for value, n in zip(new_values, new_n):
-            self.update(value, n)
+    def batchupdate(self, new_values: list[float], new_n: list[int]) -> None:
+        for value, num in zip(new_values, new_n):
+            self.update(value, num)
 
     def zipped(self) -> Iterator[tuple[float, int]]:
-        return zip(self.values, self.n)
+        return zip(self.values, self.nums)
 
-    def _checkorder(self, n):
-        if self.n and n <= self.n[-1]:
+    def _checkorder(self, n: int) -> None:
+        if self.nums and n <= self.nums[-1]:
             raise ValueError("New n is smaller than largest value in sequential list.")
