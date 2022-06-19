@@ -37,6 +37,9 @@ class Loader(ABC):
     def load_testing_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         return self._X_test, self._y_test
 
+    def load_all_working_data(self) -> Tuple[pd.DataFrame, pd.Series]:
+        return self._X_working, self._y_working
+
     def load_original_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         return self._X, self._y
 

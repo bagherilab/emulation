@@ -13,44 +13,44 @@ from permutation.stage import Stage
 
 class Runner:
     """
-    Runner class to manage training, test data, alongside calls to the Model interface.
-    Runner contains the data from multiple runs of the same model with the same hyperparameters.
+    Runner class to manage training, alongside calls to the Model interface.
     """
 
     def __init__(self, model: Model, loader: Loader) -> None:
         self.model = model
         self.loader = loader
 
-        self.cv_metrics: BatchMetric = None
-        self.training_metrics: SequentialMetric = None
-        self.test_metrics: SequentialMetric = None
-        self.permutation_metrics: BatchMetric = None
+        self.cv_metrics: Metric = BatchMetric(
+            f"Cross Val RMSE, Model: {self.model.algorithm_name}"
+        )
+        self.training_metrics: Metric = SequentialMetric(
+            f"Train RMSE, Model: {self.model.algorithm_name}"
+        )
+        self.test_metrics: Metric = SequentialMetric(
+            f"Test RMSE, Model: {self.model.algorithm_name}"
+        )
+        self.permutation_metrics: Metric = BatchMetric(
+            f"Permutation RMSE, Model: {self.model.algorithm_name}"
+        )
 
         self.stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
 
     def cross_validation(self, K=10) -> None:
-        metrics = self.model.crossval_hparams(
-            self.loader.X_train,
-            self.loader.y_train,
-            self.stage is Stage.VAL,
-            K,
-        )
-        self.cv_metrics.batch_update(metrics)
+        X, y = self.loader.load_training_data()
+        metrics = self.model.crossval_hparams(X, y, self.stage is Stage.VAL, K)
+        self.cv_metrics.batchupdate(metrics)
 
     def train(self) -> None:
-        metrics = self.model.fit_model(
-            self.loader.X_train, self.loader.y_train, self.stage is Stage.TRAIN
-        )
-        self.training_metrics.update(metrics, len(self.X_train.index))
+        X, y = self.loader.load_training_data()
+        metrics = self.model.fit_model(X, y, self.stage is Stage.TRAIN)
+        self.training_metrics.update(metrics, len(X.index))
 
     def test(self) -> None:
-        metrics = self.model.performance(
-            self.loader.X_test, self.loader.y_test, self.stage is Stage.TEST
-        )
-        self.test_metrics.update(metrics, len(self.X_train.index))
+        X, y = self.loader.load_testing_data()
+        metrics = self.model.performance(X, y, self.stage is Stage.TEST)
+        self.test_metrics.update(metrics, len(X.index))
 
     def permutation_testing(self) -> None:
-        metrics = self.model.permutation(
-            self.loader.X, self.loader.y, self.stage is Stage.PERM
-        )
+        X, y = self.loader.load_all_working_data()
+        metrics = self.model.permutation(X, y, self.stage is Stage.PERM)
         self.permutation_metrics.update(metrics)
