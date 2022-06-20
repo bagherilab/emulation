@@ -15,15 +15,21 @@ class Model(Protocol):
     hparams: Hyperparams
 
     def crossval_hparams(
-        self, x: Any, y: Any, hparams: Hyperparams, stage_check: bool
+        self, X: Any, y: Any, hparams: Hyperparams, stage_check: bool
     ) -> list[float]:
         ...
 
-    def fit_model(self, x: Any, y: Any, stage_check: bool) -> float:
+    def fit_model(self, X: Any, y: Any, stage_check: bool) -> float:
         ...
 
-    def performance(self, x: Any, y: Any, stage_check: bool) -> float:
+    def performance(self, X: Any, y: Any, stage_check: bool) -> float:
         ...
 
-    def permutation(self, x: Any, y: Any, stage_check: bool) -> list[float]:
+    def permutation(self, X: Any, y: Any, stage_check: bool) -> list[float]:
         ...
+
+
+class IncorrectStageException(Exception):
+    def __init__(self, stage):
+        self.message = f"Incorrect stage for {correct_stage.name} method."
+        super().__init__(self.message)
