@@ -25,14 +25,18 @@ class MLR(AbstractSKLearnModel):
     ):
         cls.__init__(hparams=hparams)
         if hparams:
-            cls._model = model_dependency(**self.hparams)
+            cls._model = model_dependency(**self.hparams.as_dict())
         else:
             cls._model = model_dependency()
 
-        cls._standardization = preprocessing_dependency()
+        if preprocessing_dependency:
+            cls._standardization = preprocessing_dependency()
 
-        cls._pipeline = Pipeline(
-            [("scaler", self._standardization), ("mlr", self._model)]
-        )
+            cls._pipeline = Pipeline(
+                [("scaler", self._standardization), ("mlr", self._model)]
+            )
 
+            return cls
+
+        cls._pipeline = Pipeline([("mlr", self._model)])
         return cls
