@@ -49,3 +49,6 @@ class Hparams:
 
         self.cross_validation_performance.batchupdate(values)
         self.performance_average = self.cross_validation_performance.average
+
+    def __str__(self):
+        return str(self.as_dict())

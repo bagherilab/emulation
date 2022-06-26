@@ -3,9 +3,9 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
 
-
-from modelprotocol import Hparams
-from sklearnmodel import AbstractSKLearnModel
+from permutation.models.modelprotocol import Model
+from permutation.models.hyperparameters import Hparams
+from permutation.models.sklearnmodel import AbstractSKLearnModel
 
 
 class MLR(AbstractSKLearnModel):
@@ -22,21 +22,23 @@ class MLR(AbstractSKLearnModel):
         hparams=None,
         preprocessing_dependency=StandardScaler,
         model_dependency=ElasticNet,
-    ):
-        cls.__init__(hparams=hparams)
+    ) -> Model:
+        model = cls()
+        model.hparams = hparams
+
         if hparams:
-            cls._model = model_dependency(**self.hparams.as_dict())
+            model.algorithm_name += f", hparams: {hparams}"
+            model._model = model_dependency(**hparams.as_dict())
         else:
-            cls._model = model_dependency()
+            model._model = model_dependency()
 
         if preprocessing_dependency:
-            cls._standardization = preprocessing_dependency()
+            model._standardization = preprocessing_dependency()
 
-            cls._pipeline = Pipeline(
-                [("scaler", self._standardization), ("mlr", self._model)]
+            model._pipeline = Pipeline(
+                [("scaler", model._standardization), ("mlr", model._model)]
             )
+            return model
 
-            return cls
-
-        cls._pipeline = Pipeline([("mlr", self._model)])
-        return cls
+        model._pipeline = Pipeline([("mlr", model._model)])
+        return model

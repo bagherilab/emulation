@@ -11,12 +11,14 @@ class Loader(ABC):
     path: str | Path
     features: list[str]
     response: str
-    _X: pd.DataFrame
-    _y: pd.Series
-    _X_train: pd.DataFrame
-    _X_test: pd.DataFrame
-    _y_train: pd.Series
-    _y_test: pd.Series
+    _X: Optional[pd.DataFrame]
+    _y: Optional[pd.Series]
+    _X_working: Optional[pd.DataFrame]
+    _y_working: Optional[pd.Series]
+    _X_train: Optional[pd.DataFrame]
+    _y_train: Optional[pd.Series]
+    _X_test: Optional[pd.DataFrame]
+    _y_test: Optional[pd.Series]
 
     @abstractmethod
     def _load_data(self, subsample_n=None) -> None:
@@ -54,8 +56,8 @@ class Loader(ABC):
         self._X_working = None
         self._y_working = None
         self._X_train = None
-        self._X_test = None
         self._y_train = None
+        self._X_test = None
         self._y_test = None
 
 
@@ -69,22 +71,18 @@ class CSVLoader(Loader):
         seed: Optional[int] = 100,
     ):
         self.path: str = path
-
         self.features = features
         self.response = response
         self.test_size = test_size
         self.seed = seed
-
-        self._X: pd.DataFrame = None
-        self._y: pd.Series = None
-
-        self._X_working: pd.DataFrame = None
-        self._y_working: pd.Series = None
-
-        self._X_train: pd.DataFrame = None
-        self._X_test: pd.DataFrame = None
-        self._y_train: pd.Series = None
-        self._y_test: pd.Series = None
+        self._X = None
+        self._y = None
+        self._X_working = None
+        self._y_working = None
+        self._X_train = None
+        self._y_train = None
+        self._X_test = None
+        self._y_test = None
 
         self._load_data()
         self._split_data()

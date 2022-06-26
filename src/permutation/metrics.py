@@ -1,16 +1,17 @@
 from collections.abc import Iterator
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from typing import Any
 
 
 @dataclass
 class Metric(ABC):
     @abstractmethod
-    def update(arg):
+    def update(self, arg: Any) -> None:
         ...
 
     @abstractmethod
-    def batchupdate(arg):
+    def batchupdate(self, arg: Any) -> None:
         ...
 
 
