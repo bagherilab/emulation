@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, Callable
+from typing import Optional, Callable, List, Tuple
 
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error
@@ -17,17 +17,49 @@ from permutation.models.hyperparameters import Hyperparams
 class AbstractSKLearnModel(ABC):
     algorithm_name: str
     algorithm_type: str
-    hparams: Hyperparams
-    _pipeline: Pipeline
+    hparams: Optional[Hyperparams] = None
+    _model: BaseEstimator = None
+    _standardization: Optional[List[Tuple[str, TransformerMixin]]] = None
+    _pipeline: Pipeline = None
 
     @classmethod
     @abstractmethod
     def set_model(
         cls: Model,
         model_dependency: BaseEstimator,
-        preprocessing_dependency: Optional[TransformerMixin],
+        hparams: Optional[Hyperparams],
+        preprocessing_dependency: Optional[List[Tuple[str, TransformerMixin]]],
     ) -> Model:
         ...
+
+    @classmethod
+    def _set_model(
+        cls,
+        model_dependency: BaseEstimator,
+        hparams: Optional[Hyperparams],
+        preprocessing_dependencies: Optional[List[Tuple[str, TransformerMixin]]],
+    ) -> Model:
+        model = cls()
+        model.hparams = hparams
+
+        pipeline_list = []
+
+        if preprocessing_dependencies:
+            model._standardization = [
+                (name, package()) for name, package in preprocessing_dependencies
+            ]
+            pipeline_list.extend(model._standardization)
+
+        if hparams:
+            model.algorithm_name += f", hparams: {hparams}"
+            model._model = model_dependency(**hparams.as_dict())
+        else:
+            model._model = model_dependency()
+
+        pipeline_list.append(("mlr", model._model))
+
+        model._pipeline = Pipeline(pipeline_list)
+        return model
 
     def crossval_hparams(
         self, X: pd.DataFrame, y: pd.Series, K: int = 10

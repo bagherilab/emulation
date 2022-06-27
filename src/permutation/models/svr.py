@@ -1,17 +1,22 @@
-import sklearn
+from sklearn.svm import SVR
+from sklearn.preprocessing import StandardScaler
+
+from permutation.models.sklearnmodel import AbstractSKLearnModel
 
 
-class SVR:
+class SVR(AbstractSKLearnModel):
     algorithm_name: str = "Support Vector Regression"
     algorithm_type: str = "SVR"
-    hparams: hparams = None
 
-    def fit_model(self) -> None:
-        ...
-
-    def evaluate_performance(self, x: Any) -> Metric:
-        ...
-
-
-class SVR_hparams:
-    pass
+    @classmethod
+    def set_model(
+        cls,
+        hparams=None,
+        preprocessing_dependencies=[("scaler", StandardScaler)],
+        model_dependency=SVR,
+    ) -> Model:
+        return super()._set_model(
+            hparams=hparams,
+            preprocessing_dependencies=preprocessing_dependencies,
+            model_dependency=model_dependency,
+        )
