@@ -39,7 +39,7 @@ class MLRTest(unittest.TestCase):
         self.assertIs(testMLR.hparams, None)
         self.sklearn_EN_mock.assert_called_once_with()
         self.sklearn_scalar_mock.assert_called_once()
-        self.assertEqual(len(testMLR._pipeline), 2)
+        self.assertEqual(len(testMLR.pipeline), 2)
 
     def test_mlr_initialization_with_hparams(self) -> None:
         testMLR = MLR.set_model(
@@ -56,7 +56,7 @@ class MLRTest(unittest.TestCase):
         self.assertIsNot(testMLR.hparams, None)
         self.sklearn_EN_mock.assert_called_once_with(alpha=1, l1_ratio=0.5)
         self.sklearn_scalar_mock.assert_called_once()
-        self.assertEqual(len(testMLR._pipeline), 2)
+        self.assertEqual(len(testMLR.pipeline), 2)
 
     def test_mlr_initialization_with_preprocessing(self) -> None:
         testMLR = MLR.set_model(
@@ -75,7 +75,7 @@ class MLRTest(unittest.TestCase):
         )
 
         self.sklearn_EN_mock.assert_called_once_with(alpha=1, l1_ratio=0.5)
-        self.assertEqual(len(testMLR._pipeline), 1)
+        self.assertEqual(len(testMLR.pipeline), 1)
 
     def test_fit_model_calls_fit_and_returns_fit_performance(self) -> None:
         testMLR = MLR.set_model(
@@ -83,14 +83,14 @@ class MLRTest(unittest.TestCase):
             preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
-        testMLR._pipeline.fit = Mock()
+        testMLR.pipeline.fit = Mock()
         predicted_df = self.y + 2  # force RMSE to be 2
-        testMLR._pipeline.predict = Mock(return_value=predicted_df)
+        testMLR.pipeline.predict = Mock(return_value=predicted_df)
 
         returned_value = testMLR.fit_model(self.X, self.y)
 
-        testMLR._pipeline.fit.assert_called_once_with(self.X, self.y)
-        testMLR._pipeline.predict.assert_called_once_with(self.X)
+        testMLR.pipeline.fit.assert_called_once_with(self.X, self.y)
+        testMLR.pipeline.predict.assert_called_once_with(self.X)
         self.assertEqual(returned_value, 2.0)
 
     def test_fit_model_calls_fit_and_returns_fit_performance(self) -> None:
@@ -99,14 +99,14 @@ class MLRTest(unittest.TestCase):
             preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
-        testMLR._pipeline.fit = Mock()
+        testMLR.pipeline.fit = Mock()
         predicted_df = self.y + 2  # force RMSE to be 2
-        testMLR._pipeline.predict = Mock(return_value=predicted_df)
+        testMLR.pipeline.predict = Mock(return_value=predicted_df)
 
         returned_value = testMLR.fit_model(self.X, self.y)
 
-        testMLR._pipeline.fit.assert_called_once_with(self.X, self.y)
-        testMLR._pipeline.predict.assert_called_once_with(self.X)
+        testMLR.pipeline.fit.assert_called_once_with(self.X, self.y)
+        testMLR.pipeline.predict.assert_called_once_with(self.X)
         self.assertEqual(returned_value, 2.0)
 
     @patch("permutation.models.sklearnmodel.cross_val_score")
@@ -124,7 +124,7 @@ class MLRTest(unittest.TestCase):
         returned_value = testMLR.crossval_hparams(self.X, self.y, 10).values
 
         cross_val_score_mock.assert_called_once_with(
-            testMLR._pipeline, self.X, self.y, cv=10
+            testMLR.pipeline, self.X, self.y, cv=10
         )
         self.assertEqual(returned_value, return_list)
 

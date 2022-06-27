@@ -1,10 +1,7 @@
 from typing import Protocol
-from dataclasses import dataclass, field
 
 import pandas as pd
-import numpy as np
 
-from permutation.stage import Stage
 from permutation.models.hyperparameters import Hyperparams
 
 

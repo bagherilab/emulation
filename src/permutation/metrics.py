@@ -1,57 +1,118 @@
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
-from typing import Any
+from typing import List, Tuple
 
 
 @dataclass
-class Metric(ABC):
-    @abstractmethod
-    def update(self, arg: Any) -> None:
-        ...
+class BatchMetric:
+    """
+    Class for holding aggregated results from model performance evaluation
 
-    @abstractmethod
-    def batchupdate(self, arg: Any) -> None:
-        ...
+    Attributes
+    ----------
+    name :
+        name of collection of stored data
+    values :
+        list of values/data
+    total :
+        sum of values
+    average :
+        average of values
+    length :
+        number of values contained
 
+    Methods
+    -------
+    update(new_value):
+        adds a value to the list
 
-@dataclass
-class BatchMetric(Metric):
+    batchupdate(new_values):
+        adds iterable of values to list
+    """
+
     name: str
-    values: list[float] = field(default_factory=list)
+    values: List[float] = field(default_factory=list)
     total: float = 0.0
     average: float = 0.0
     length: int = 0
 
-    def update(self, value: float) -> None:
-        self.values.append(value)
-        self.total += value
+    def update(self, new_value: float) -> None:
+        """
+        method to update `values` attribute with `new_value`
+
+        Parameters
+        ----------
+        new_value: value to add to data container
+
+        """
+        self.values.append(new_value)
+        self.total += new_value
         self.length += 1
         self.average = self.total / self.length
 
-    def batchupdate(self, new_values: list[float]):
+    def batchupdate(self, new_values: List[float]) -> None:
+        """
+        method to update `values` attribute with list of values, `new_values`
+
+        Parameters
+        ----------
+        new_values: list of values to add to data container
+
+        """
         for value in new_values:
             self.update(value)
 
 
 @dataclass
-class SequentialMetric(Metric):
-    name: str
-    values: list[float] = field(default_factory=list)
-    nums: list[int] = field(default_factory=list)
+class SequentialMetric:
+    """
+    Class for holding linked sequential results from model performance evaluation
+    (e.g. training metrics associated with size of training data)
 
-    def update(self, value: float, n: int) -> None:
+    Attributes
+    ----------
+    name :
+        name of collection of stored data
+    values :
+        list of values/data
+    nums :
+        ordered int values associated with each value by index
+    total :
+        sum of values
+    average :
+        average of values
+    length :
+        number of values contained
+
+    Methods
+    -------
+    update(new_value, n):
+        adds a value to the list
+
+    batchupdate(new_values, new_ns):
+        adds iterable of values to list
+    """
+
+    name: str
+    values: List[float] = field(default_factory=list)
+    nums: List[int] = field(default_factory=list)
+
+    def update(self, new_value: float, n: int) -> None:
+        """todo"""
         self._checkorder(n)
-        self.values.append(value)
+        self.values.append(new_value)
         self.nums.append(n)
 
-    def batchupdate(self, new_values: list[float], new_n: list[int]) -> None:
-        for value, num in zip(new_values, new_n):
+    def batchupdate(self, new_values: List[float], new_ns: List[int]) -> None:
+        """todo"""
+        for value, num in zip(new_values, new_ns):
             self.update(value, num)
 
-    def zipped(self) -> Iterator[tuple[float, int]]:
+    def zipped(self) -> Iterator[Tuple[float, int]]:
+        """todo"""
         return zip(self.values, self.nums)
 
     def _checkorder(self, n: int) -> None:
+        """ensure nums remains in sequential order"""
         if self.nums and n <= self.nums[-1]:
             raise ValueError("New n is smaller than largest value in sequential list.")

@@ -48,10 +48,10 @@ class CSVLoaderTests(unittest.TestCase):
         expected_X = pd.DataFrame([[1, 2], [4, 5], [7, 8]], columns=["a", "b"])
         expected_y = pd.Series([3, 6, 9], name="c")
 
-        self.assertEqual(testLoader._X_train.shape, (2, 2))
-        self.assertEqual(testLoader._y_train.shape, (2,))
-        self.assertEqual(testLoader._X_test.shape, (1, 2))
-        self.assertEqual(testLoader._y_test.shape, (1,))
+        self.assertEqual(testLoader._X_training.shape, (2, 2))
+        self.assertEqual(testLoader._y_training.shape, (2,))
+        self.assertEqual(testLoader._X_testing.shape, (1, 2))
+        self.assertEqual(testLoader._y_testing.shape, (1,))
 
     def test_original_data_integrity(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
@@ -83,10 +83,10 @@ class CSVLoaderTests(unittest.TestCase):
 
         testLoader.subsample(2)
 
-        self.assertEqual(testLoader._X_train.shape, (1, 2))
-        self.assertEqual(testLoader._y_train.shape, (1,))
-        self.assertEqual(testLoader._X_test.shape, (1, 2))
-        self.assertEqual(testLoader._y_test.shape, (1,))
+        self.assertEqual(testLoader._X_training.shape, (1, 2))
+        self.assertEqual(testLoader._y_training.shape, (1,))
+        self.assertEqual(testLoader._X_testing.shape, (1, 2))
+        self.assertEqual(testLoader._y_testing.shape, (1,))
 
     def test_unload(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
@@ -105,7 +105,7 @@ class CSVLoaderTests(unittest.TestCase):
         self.assertIsNone(testLoader._y)
         self.assertIsNone(testLoader._X_working)
         self.assertIsNone(testLoader._y_working)
-        self.assertIsNone(testLoader._X_train)
-        self.assertIsNone(testLoader._X_test)
-        self.assertIsNone(testLoader._y_train)
-        self.assertIsNone(testLoader._y_test)
+        self.assertIsNone(testLoader._X_training)
+        self.assertIsNone(testLoader._X_testing)
+        self.assertIsNone(testLoader._y_training)
+        self.assertIsNone(testLoader._y_testing)
