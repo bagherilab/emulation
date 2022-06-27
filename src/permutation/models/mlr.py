@@ -1,3 +1,5 @@
+from typing import Optional, Tuple, List
+
 from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
@@ -13,18 +15,26 @@ class MLR(AbstractSKLearnModel):
     algorithm_type: str = "Regression"
     hparams: Hparams = None
     _model: BaseEstimator = None
-    _standardization: TransformerMixin = None
+    _standardization: Optional[List[Tuple[str, TransformerMixin]]] = None
     _pipeline: Pipeline = None
 
     @classmethod
     def set_model(
         cls,
         hparams=None,
-        preprocessing_dependency=StandardScaler,
+        preprocessing_dependencies=("scaler", StandardScaler),
         model_dependency=ElasticNet,
     ) -> Model:
         model = cls()
         model.hparams = hparams
+
+        pipeline_list = []
+
+        if preprocessing_dependencies:
+            model._standardization = [
+                (name, package()) for name, package in preprocessing_dependencies
+            ]
+            pipeline_list.extend(model._standardization)
 
         if hparams:
             model.algorithm_name += f", hparams: {hparams}"
@@ -32,13 +42,7 @@ class MLR(AbstractSKLearnModel):
         else:
             model._model = model_dependency()
 
-        if preprocessing_dependency:
-            model._standardization = preprocessing_dependency()
+        pipeline_list.append(("mlr", model._model))
 
-            model._pipeline = Pipeline(
-                [("scaler", model._standardization), ("mlr", model._model)]
-            )
-            return model
-
-        model._pipeline = Pipeline([("mlr", model._model)])
+        model._pipeline = Pipeline(pipeline_list)
         return model

@@ -16,7 +16,7 @@ class MLRTest(unittest.TestCase):
         self.sklearn_EN_mock = MagicMock(spec=ElasticNet)
         self.sklearn_scalar_mock = MagicMock(spec=StandardScaler)
         self.expected_pipeline = Pipeline(
-            [("scaler", self.sklearn_scalar_mock), ("mlr", self.sklearn_EN_mock)]
+            [("scalar_mock", self.sklearn_scalar_mock), ("mlr", self.sklearn_EN_mock)]
         )
         self.X = pd.DataFrame([[1, 2], [4, 5], [7, 8]], columns=["a", "b"])
         self.y = pd.Series([3, 6, 9], name="c")
@@ -27,7 +27,7 @@ class MLRTest(unittest.TestCase):
 
     def test_mlr_initialization_without_hparams(self) -> None:
         testMLR = MLR.set_model(
-            preprocessing_dependency=self.sklearn_scalar_mock,
+            preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
 
@@ -44,7 +44,7 @@ class MLRTest(unittest.TestCase):
     def test_mlr_initialization_with_hparams(self) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
-            preprocessing_dependency=self.sklearn_scalar_mock,
+            preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
 
@@ -61,7 +61,7 @@ class MLRTest(unittest.TestCase):
     def test_mlr_initialization_with_preprocessing(self) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
-            preprocessing_dependency=self.sklearn_scalar_mock,
+            preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
 
@@ -70,7 +70,7 @@ class MLRTest(unittest.TestCase):
     def test_mlr_initialization_no_preprocessing(self) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
-            preprocessing_dependency=None,
+            preprocessing_dependencies=None,
             model_dependency=self.sklearn_EN_mock,
         )
 
@@ -80,7 +80,7 @@ class MLRTest(unittest.TestCase):
     def test_fit_model_calls_fit_and_returns_fit_performance(self) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
-            preprocessing_dependency=self.sklearn_scalar_mock,
+            preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
         testMLR._pipeline.fit = Mock()
@@ -96,7 +96,7 @@ class MLRTest(unittest.TestCase):
     def test_fit_model_calls_fit_and_returns_fit_performance(self) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
-            preprocessing_dependency=self.sklearn_scalar_mock,
+            preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
         testMLR._pipeline.fit = Mock()
@@ -115,7 +115,7 @@ class MLRTest(unittest.TestCase):
     ) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
-            preprocessing_dependency=self.sklearn_scalar_mock,
+            preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
 
@@ -134,7 +134,7 @@ class MLRTest(unittest.TestCase):
     ) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
-            preprocessing_dependency=self.sklearn_scalar_mock,
+            preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
             model_dependency=self.sklearn_EN_mock,
         )
 
