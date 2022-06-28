@@ -44,9 +44,7 @@ class RunnerTests(unittest.TestCase):
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
         testRunner.cross_validation()
 
-        self.model_mock.crossval_hparams.assert_called_once_with(
-            *self.load_data_return, 10
-        )
+        self.model_mock.crossval_hparams.assert_called_once_with(*self.load_data_return, 10)
 
     def test_cross_validation_hparams_called_at_incorrect_stage(self) -> None:
         self.model_mock.crossval_hparams = Mock(return_value=[1.0] * 10)
@@ -110,9 +108,7 @@ class RunnerTests(unittest.TestCase):
         list_of_metric_mocks = [metric_mock] * 10
         self.model_mock.permutation = Mock(return_value=list_of_metric_mocks)
         self.model_mock.hparams = Mock(spec=Hyperparams)
-        self.loader_mock.load_all_working_data = Mock(
-            return_value=self.load_data_return
-        )
+        self.loader_mock.load_all_working_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
         testRunner.stage = Stage.PERM
@@ -123,9 +119,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_permutation_called_at_incorrect_stage(self) -> None:
         self.model_mock.hparams = Mock(spec=Hyperparams)
-        self.loader_mock.load_all_working_data = Mock(
-            return_value=self.load_data_return
-        )
+        self.loader_mock.load_all_working_data = Mock(return_value=self.load_data_return)
 
         def call_perm_at_wrong_stage():
             testRunner = Runner(model=self.model_mock, loader=self.loader_mock)

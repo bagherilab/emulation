@@ -34,9 +34,7 @@ class Hparams:
     def update_params(self, arg, value) -> None:
         """todo"""
         if self.cross_validation_performance:
-            raise AttributeError(
-                "Already performed cross-validation with these parameters."
-            )
+            raise AttributeError("Already performed cross-validation with these parameters.")
         self.args.append(arg)
         self.values.append(value)
         self.number_of_parameters += 1

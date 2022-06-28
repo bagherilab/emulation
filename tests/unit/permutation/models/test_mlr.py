@@ -110,9 +110,7 @@ class MLRTest(unittest.TestCase):
         self.assertEqual(returned_value, 2.0)
 
     @patch("permutation.models.sklearnmodel.cross_val_score")
-    def test_fit_model_calls_fit_and_returns_fit_performance(
-        self, cross_val_score_mock
-    ) -> None:
+    def test_fit_model_calls_fit_and_returns_fit_performance(self, cross_val_score_mock) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
             preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],
@@ -123,15 +121,11 @@ class MLRTest(unittest.TestCase):
         cross_val_score_mock.return_value = np.array(return_list)
         returned_value = testMLR.crossval_hparams(self.X, self.y, 10).values
 
-        cross_val_score_mock.assert_called_once_with(
-            testMLR.pipeline, self.X, self.y, cv=10
-        )
+        cross_val_score_mock.assert_called_once_with(testMLR.pipeline, self.X, self.y, cv=10)
         self.assertEqual(returned_value, return_list)
 
     @patch("permutation.models.sklearnmodel.permutation_importance")
-    def test_model_calls_permutation_and_returns_permutation_scores(
-        self, permutation_mock
-    ) -> None:
+    def test_model_calls_permutation_and_returns_permutation_scores(self, permutation_mock) -> None:
         testMLR = MLR.set_model(
             hparams=self.hparams_mock,
             preprocessing_dependencies=[("scalar_mock", self.sklearn_scalar_mock)],

@@ -56,9 +56,7 @@ class Loader(ABC):
 
     def _set_working(self) -> None:
         """todo"""
-        self._X_working, self._y_working = self._X.copy(deep=True), self._y.copy(
-            deep=True
-        )
+        self._X_working, self._y_working = self._X.copy(deep=True), self._y.copy(deep=True)
 
     def unload_data(self) -> None:
         """todo"""

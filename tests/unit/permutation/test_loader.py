@@ -9,9 +9,7 @@ from permutation.loader import CSVLoader
 @patch("permutation.loader.pd.read_csv")
 class CSVLoaderTests(unittest.TestCase):
     def setUp(self):
-        self.test_df = pd.DataFrame(
-            [[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=["a", "b", "c"]
-        )
+        self.test_df = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9]], columns=["a", "b", "c"])
         self.features = ["a", "b"]
         self.response = "c"
         self.test_size = 0.3

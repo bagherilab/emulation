@@ -65,18 +65,14 @@ class AbstractSKLearnModel(ABC):
         model.pipeline = Pipeline(pipeline_list)
         return model
 
-    def crossval_hparams(
-        self, X: pd.DataFrame, y: pd.Series, K: int = 10
-    ) -> BatchMetric:
+    def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int = 10) -> BatchMetric:
         """todo"""
         metrics = BatchMetric(f"R^2 Cross Validation - K = {K}")
         cv_results = cross_val_score(self.pipeline, X, y, cv=K)
         metrics.batchupdate(cv_results.tolist())
         return metrics
 
-    def permutation(
-        self, X: pd.DataFrame, y: pd.Series, repeats=30
-    ) -> List[BatchMetric]:
+    def permutation(self, X: pd.DataFrame, y: pd.Series, repeats=30) -> List[BatchMetric]:
         """todo"""
         self.pipeline.fit(X, y)
         perm_output = permutation_importance(self.pipeline, X, y, n_repeats=repeats)
@@ -94,9 +90,7 @@ class AbstractSKLearnModel(ABC):
         return root_mean_square_error(y, y_pred)
 
 
-def parse_permutation_output(
-    output: Bunch, feature_names: List[str]
-) -> List[BatchMetric]:
+def parse_permutation_output(output: Bunch, feature_names: List[str]) -> List[BatchMetric]:
     """todo"""
     metric_list = []
     for i, feature in enumerate(feature_names):
