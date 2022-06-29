@@ -12,13 +12,13 @@ class Hyperparams(Protocol):
     number_of_parameters: int
 
     def update_params(self) -> None:
-        ...
+        """todo"""
 
     def as_dict(self) -> Dict[str, Any]:
-        ...
+        """todo"""
 
     def update_cv_metrics(self, value: float) -> None:
-        ...
+        """todo"""
 
 
 @dataclass

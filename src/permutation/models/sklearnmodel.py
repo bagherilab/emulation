@@ -33,7 +33,6 @@ class AbstractSKLearnModel(ABC):
         preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]],
     ) -> Model:
         """todo"""
-        ...
 
     @classmethod
     def _set_model(
@@ -55,12 +54,12 @@ class AbstractSKLearnModel(ABC):
             pipeline_list.extend(model.standarization)
 
         if hparams:
-            model.algorithm_name += f", hparams: {hparams}"
+            model.algorithm_name += f", hparams: {hparams}"  # pylint: disable=no-member
             model.model = model_dependency(**hparams.as_dict())
         else:
             model.model = model_dependency()
 
-        pipeline_list.append((model.algorithm_name, model.model))
+        pipeline_list.append((model.algorithm_name, model.model))  # pylint: disable=no-member
 
         model.pipeline = Pipeline(pipeline_list)
         return model
