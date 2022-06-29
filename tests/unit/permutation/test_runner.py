@@ -108,7 +108,7 @@ class RunnerTests(unittest.TestCase):
         list_of_metric_mocks = [metric_mock] * 10
         self.model_mock.permutation = Mock(return_value=list_of_metric_mocks)
         self.model_mock.hparams = Mock(spec=Hyperparams)
-        self.loader_mock.load_all_working_data = Mock(return_value=self.load_data_return)
+        self.loader_mock.load_working_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
         testRunner.stage = Stage.PERM
@@ -119,7 +119,6 @@ class RunnerTests(unittest.TestCase):
 
     def test_permutation_called_at_incorrect_stage(self) -> None:
         self.model_mock.hparams = Mock(spec=Hyperparams)
-        self.loader_mock.load_all_working_data = Mock(return_value=self.load_data_return)
 
         def call_perm_at_wrong_stage():
             testRunner = Runner(model=self.model_mock, loader=self.loader_mock)

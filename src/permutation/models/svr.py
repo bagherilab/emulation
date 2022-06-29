@@ -1,24 +1,29 @@
+from typing import Optional, Tuple, Iterable
+
 from sklearn.svm import SVR
-from sklearn.preprocessing import StandardScaler
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from permutation.models.modelprotocol import Model
 from permutation.models.sklearnmodel import AbstractSKLearnModel
+from permutation.models.hyperparameters import Hyperparams
 
 
 class SVReg(AbstractSKLearnModel):
     """todo"""
 
     algorithm_name = "Support Vector Regression"
-    algorithm_type = "SVR"
+    algorithm_type = "Regression"
 
     @classmethod
     def set_model(
         cls,
-        model_dependency=SVR,
-        hparams=None,
-        preprocessing_dependencies=[("scaler", StandardScaler)],
+        model_dependency: BaseEstimator = SVR,
+        hparams: Optional[Hyperparams] = None,
+        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """todo"""
+        if preprocessing_dependencies is None:
+            preprocessing_dependencies = []
 
         return super()._set_model(
             model_dependency=model_dependency,

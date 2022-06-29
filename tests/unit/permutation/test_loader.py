@@ -56,6 +56,8 @@ class CSVLoaderTests(unittest.TestCase):
 
     def test_subsample(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
+        expected_X = pd.DataFrame([[1, 2], [4, 5], [7, 8]], columns=["a", "b"])
+        expected_y = pd.Series([3, 6, 9], name="c")
 
         testLoader = CSVLoader(
             path="test",
@@ -64,12 +66,17 @@ class CSVLoaderTests(unittest.TestCase):
             test_size=0.5,
             seed=self.seed,
         )
-
         testLoader.subsample(2)
         X_training, y_training = testLoader.load_training_data()
         X_testing, y_testing = testLoader.load_testing_data()
+        X_working, y_working = testLoader.load_working_data()
+        X, y = testLoader.load_original_data()
 
         self.assertEqual(X_training.shape, (1, 2))
         self.assertEqual(y_training.shape, (1,))
         self.assertEqual(X_testing.shape, (1, 2))
         self.assertEqual(y_testing.shape, (1,))
+        self.assertEqual(X_working.shape, (2, 2))
+        self.assertEqual(y_working.shape, (2,))
+        self.assertTrue(X.equals(expected_X))
+        self.assertTrue(y.equals(expected_y))

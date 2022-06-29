@@ -13,11 +13,11 @@ class ExperimentTracker:
         log_dir: str,
         runner: Runner,
         hparam_set: Optional[List[Hyperparams]] = None,
-    ):
+    ) -> None:
         """todo"""
 
     @staticmethod
-    def _validate_log_dir(log_dir: str, create: bool = True):
+    def _validate_log_dir(log_dir: str, create: bool = True) -> None:
         """todo"""
         log_path = Path(log_dir).resolve()
         if log_path.exists():

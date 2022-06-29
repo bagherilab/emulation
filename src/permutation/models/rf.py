@@ -1,8 +1,11 @@
+from typing import Optional, Tuple, Iterable
+
 from sklearn.ensemble import RandomForestRegressor
-from sklearn.preprocessing import StandardScaler
+from sklearn.base import BaseEstimator, TransformerMixin
 
 from permutation.models.modelprotocol import Model
 from permutation.models.sklearnmodel import AbstractSKLearnModel
+from permutation.models.hyperparameters import Hyperparams
 
 
 class RF(AbstractSKLearnModel):
@@ -14,11 +17,13 @@ class RF(AbstractSKLearnModel):
     @classmethod
     def set_model(
         cls,
-        model_dependency=RandomForestRegressor,
-        hparams=None,
-        preprocessing_dependencies=[("scaler", StandardScaler)],
+        model_dependency: BaseEstimator = RandomForestRegressor,
+        hparams: Optional[Hyperparams] = None,
+        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """todo"""
+        if preprocessing_dependencies is None:
+            preprocessing_dependencies = []
 
         return super()._set_model(
             model_dependency=model_dependency,

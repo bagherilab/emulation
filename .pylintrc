@@ -10,6 +10,7 @@ good-names= i, X, y, n, K, _X, _X_working, _X_testing, _X_training, X_testing, X
 
 # Maximum number of arguments for function / method
 max-args=10
+max-attributes=12
 
 [SIMILARITIES]
 

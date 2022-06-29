@@ -24,7 +24,7 @@ class Loader(ABC):
         """todo"""
 
     @abstractmethod
-    def _split_data(self):
+    def _split_data(self) -> None:
         """todo"""
 
     def subsample(self, n: int) -> None:
@@ -58,9 +58,9 @@ class CSVLoader(Loader):
 
     def __init__(
         self,
-        path,
-        features,
-        response,
+        path: str | Path,
+        features: list[str],
+        response: str,
         test_size: float = 0.3,
         seed: Optional[int] = 100,
     ) -> None:

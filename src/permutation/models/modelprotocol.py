@@ -1,8 +1,9 @@
-from typing import Protocol
+from typing import Protocol, Optional, List
 
 import pandas as pd
 
 from permutation.models.hyperparameters import Hyperparams
+from permutation.metrics import BatchMetric
 
 
 class Model(Protocol):
@@ -12,37 +13,33 @@ class Model(Protocol):
 
     algorithm_name: str
     algorithm_type: str
-    hparams: Hyperparams
+    hparams: Optional[Hyperparams]
 
     def crossval_hparams(
         self,
         X: pd.DataFrame,
-        y: pd.DataFrame,
-        hparams: Hyperparams,
-        stage_check: bool,
-    ) -> list[float]:
+        y: pd.Series,
+        K: int,
+    ) -> BatchMetric:
         ...
 
     def fit_model(
         self,
         X: pd.DataFrame,
-        y: pd.DataFrame,
-        stage_check: bool,
+        y: pd.Series,
     ) -> float:
         ...
 
     def performance(
         self,
         X: pd.DataFrame,
-        y: pd.DataFrame,
-        stage_check: bool,
+        y: pd.Series,
     ) -> float:
         ...
 
     def permutation(
         self,
         X: pd.DataFrame,
-        y: pd.DataFrame,
-        stage_check: bool,
-    ) -> list[float]:
+        y: pd.Series,
+    ) -> List[BatchMetric]:
         ...

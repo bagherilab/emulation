@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Iterable
 
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error
@@ -19,10 +19,10 @@ class AbstractSKLearnModel(ABC):
 
     algorithm_name: str
     algorithm_type: str
+    pipeline: Pipeline
+    model: BaseEstimator
     hparams: Optional[Hyperparams] = None
-    model: BaseEstimator = None
-    standarization: Optional[List[Tuple[str, TransformerMixin]]] = None
-    pipeline: Pipeline = None
+    standarization: Optional[Iterable[Tuple[str, TransformerMixin]]] = None
 
     @classmethod
     @abstractmethod
@@ -30,7 +30,7 @@ class AbstractSKLearnModel(ABC):
         cls: Model,
         model_dependency: BaseEstimator,
         hparams: Optional[Hyperparams],
-        preprocessing_dependencies: Optional[List[Tuple[str, TransformerMixin]]],
+        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]],
     ) -> Model:
         """todo"""
         ...
@@ -40,7 +40,7 @@ class AbstractSKLearnModel(ABC):
         cls,
         model_dependency: BaseEstimator,
         hparams: Optional[Hyperparams] = None,
-        preprocessing_dependencies: Optional[List[Tuple[str, TransformerMixin]]] = None,
+        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """todo"""
         model = cls()
@@ -60,7 +60,7 @@ class AbstractSKLearnModel(ABC):
         else:
             model.model = model_dependency()
 
-        pipeline_list.append(("mlr", model.model))
+        pipeline_list.append((model.algorithm_name, model.model))
 
         model.pipeline = Pipeline(pipeline_list)
         return model
@@ -72,14 +72,14 @@ class AbstractSKLearnModel(ABC):
         metrics.batchupdate(cv_results.tolist())
         return metrics
 
-    def permutation(self, X: pd.DataFrame, y: pd.Series, repeats=30) -> List[BatchMetric]:
+    def permutation(self, X: pd.DataFrame, y: pd.Series, repeats: int = 30) -> List[BatchMetric]:
         """todo"""
         self.pipeline.fit(X, y)
         perm_output = permutation_importance(self.pipeline, X, y, n_repeats=repeats)
         list_of_metrics = parse_permutation_output(perm_output, X.columns.to_list())
         return list_of_metrics
 
-    def fit_model(self, X: pd.DataFrame, y: pd.DataFrame) -> float:
+    def fit_model(self, X: pd.DataFrame, y: pd.Series) -> float:
         """todo"""
         self.pipeline.fit(X, y)
         return self.performance(X, y)

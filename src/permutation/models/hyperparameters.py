@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
-from typing import Protocol, Optional, List, Any
+from typing import Protocol, Optional, List, Dict, Any
 
-from permutation.stage import Stage
 from permutation.metrics import BatchMetric
 
 
@@ -15,7 +14,7 @@ class Hyperparams(Protocol):
     def update_params(self) -> None:
         ...
 
-    def as_dict(self, stage: Stage) -> dict:
+    def as_dict(self) -> Dict[str, Any]:
         ...
 
     def update_cv_metrics(self, value: float) -> None:
@@ -32,7 +31,7 @@ class Hparams:
     cross_validation_performance: Optional[BatchMetric] = None
     performance_average: float = 0.0
 
-    def update_params(self, arg, value) -> None:
+    def update_params(self, arg: str, value: Any) -> None:
         """todo"""
         if self.cross_validation_performance:
             raise AttributeError("Already performed cross-validation with these parameters.")
@@ -40,7 +39,7 @@ class Hparams:
         self.values.append(value)
         self.number_of_parameters += 1
 
-    def as_dict(self) -> None:
+    def as_dict(self) -> Dict[str, Any]:
         """todo"""
         return dict(zip(self.args, self.values))
 
