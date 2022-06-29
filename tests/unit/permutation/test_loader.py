@@ -43,30 +43,16 @@ class CSVLoaderTests(unittest.TestCase):
             seed=self.seed,
         )
 
-        expected_X = pd.DataFrame([[1, 2], [4, 5], [7, 8]], columns=["a", "b"])
-        expected_y = pd.Series([3, 6, 9], name="c")
+        X_training, y_training = testLoader.load_training_data()
+        X_testing, y_testing = testLoader.load_testing_data()
+        X_working, y_working = testLoader.load_working_data()
 
-        self.assertEqual(testLoader._X_training.shape, (2, 2))
-        self.assertEqual(testLoader._y_training.shape, (2,))
-        self.assertEqual(testLoader._X_testing.shape, (1, 2))
-        self.assertEqual(testLoader._y_testing.shape, (1,))
-
-    def test_original_data_integrity(self, mock_read_csv):
-        mock_read_csv.return_value = self.test_df
-
-        testLoader = CSVLoader(
-            path="test",
-            features=self.features,
-            response=self.response,
-            test_size=self.test_size,
-            seed=self.seed,
-        )
-
-        testLoader._X_working.loc["a", 1] = 0
-        testLoader._y_working[0] = 2
-
-        self.assertFalse(testLoader._X.equals(testLoader._X_working))
-        self.assertFalse(testLoader._y.equals(testLoader._y_working))
+        self.assertEqual(X_training.shape, (2, 2))
+        self.assertEqual(y_training.shape, (2,))
+        self.assertEqual(X_testing.shape, (1, 2))
+        self.assertEqual(y_testing.shape, (1,))
+        self.assertEqual(X_working.shape, (3, 2))
+        self.assertEqual(y_working.shape, (3,))
 
     def test_subsample(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
@@ -80,30 +66,10 @@ class CSVLoaderTests(unittest.TestCase):
         )
 
         testLoader.subsample(2)
+        X_training, y_training = testLoader.load_training_data()
+        X_testing, y_testing = testLoader.load_testing_data()
 
-        self.assertEqual(testLoader._X_training.shape, (1, 2))
-        self.assertEqual(testLoader._y_training.shape, (1,))
-        self.assertEqual(testLoader._X_testing.shape, (1, 2))
-        self.assertEqual(testLoader._y_testing.shape, (1,))
-
-    def test_unload(self, mock_read_csv):
-        mock_read_csv.return_value = self.test_df
-
-        testLoader = CSVLoader(
-            path="test",
-            features=self.features,
-            response=self.response,
-            test_size=self.test_size,
-            seed=self.seed,
-        )
-
-        testLoader.unload_data()
-
-        self.assertIsNone(testLoader._X)
-        self.assertIsNone(testLoader._y)
-        self.assertIsNone(testLoader._X_working)
-        self.assertIsNone(testLoader._y_working)
-        self.assertIsNone(testLoader._X_training)
-        self.assertIsNone(testLoader._X_testing)
-        self.assertIsNone(testLoader._y_training)
-        self.assertIsNone(testLoader._y_testing)
+        self.assertEqual(X_training.shape, (1, 2))
+        self.assertEqual(y_training.shape, (1,))
+        self.assertEqual(X_testing.shape, (1, 2))
+        self.assertEqual(y_testing.shape, (1,))
