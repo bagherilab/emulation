@@ -1,6 +1,6 @@
 from pathlib import Path
 from abc import ABC, abstractmethod
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple
 
 import pandas as pd
 
@@ -15,9 +15,9 @@ class Loader(ABC):
     response: str
     _X: pd.DataFrame
     _y: pd.Series
-    _working_idx: List[int]
-    _training_idx: List[int]
-    _testing_idx: List[int]
+    _working_idx: list[int]
+    _training_idx: list[int]
+    _testing_idx: list[int]
 
     @abstractmethod
     def _load_data(self) -> None:

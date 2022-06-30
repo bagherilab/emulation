@@ -13,7 +13,7 @@ class Stage(Enum):
 class IncorrectStageException(Exception):
     """todo"""
 
-    def __init__(self, correct_stage: Stage):
+    def __init__(self, correct_stage: Stage) -> None:
         """todo"""
         self.message = f"Incorrect stage for {correct_stage.name} method."
         super().__init__(self.message)

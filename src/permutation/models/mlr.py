@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Iterable
+from typing import Optional, Iterable
 
 from sklearn.linear_model import ElasticNet
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -21,7 +21,7 @@ class MLR(AbstractSKLearnModel):
         cls,
         model_dependency: BaseEstimator = ElasticNet,
         hparams: Optional[Hyperparams] = None,
-        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]] = None,
+        preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """todo"""
         if preprocessing_dependencies is None:

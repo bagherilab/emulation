@@ -1,4 +1,4 @@
-from typing import Optional, Tuple, Iterable
+from typing import Optional, Iterable
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -19,7 +19,7 @@ class RF(AbstractSKLearnModel):
         cls,
         model_dependency: BaseEstimator = RandomForestRegressor,
         hparams: Optional[Hyperparams] = None,
-        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]] = None,
+        preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """todo"""
         if preprocessing_dependencies is None:

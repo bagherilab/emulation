@@ -1,4 +1,4 @@
-from typing import Optional, List
+from typing import Optional
 
 from permutation.metrics import BatchMetric, SequentialMetric
 from permutation.models.modelprotocol import Model
@@ -23,7 +23,7 @@ class Runner:
             f"Test RMSE, Model: {self.model.algorithm_name}"
         )
         self.cv_metrics: Optional[BatchMetric] = None
-        self.permutation_metrics: List[BatchMetric] = []
+        self.permutation_metrics: list[BatchMetric] = []
 
         self.stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
 

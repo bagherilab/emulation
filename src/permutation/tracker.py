@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional
 
 from permutation.runner import Runner
 from permutation.models.hyperparameters import Hyperparams
@@ -12,7 +12,7 @@ class ExperimentTracker:
         self,
         log_dir: str,
         runner: Runner,
-        hparam_set: Optional[List[Hyperparams]] = None,
+        hparam_set: Optional[list[Hyperparams]] = None,
     ) -> None:
         """todo"""
 

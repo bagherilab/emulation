@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Protocol, Optional, List, Dict, Any
+from typing import Protocol, Optional, Any
 
 from permutation.metrics import BatchMetric
 
@@ -14,7 +14,7 @@ class Hyperparams(Protocol):
     def update_params(self) -> None:
         """todo"""
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         """todo"""
 
     def update_cv_metrics(self, value: float) -> None:
@@ -25,8 +25,8 @@ class Hyperparams(Protocol):
 class Hparams:
     """Dataclass for storing hyperparameter information and associated performance metrics."""
 
-    args: List[str] = field(default_factory=list)
-    values: List[Any] = field(default_factory=list)
+    args: list[str] = field(default_factory=list)
+    values: list[Any] = field(default_factory=list)
     number_of_parameters: int = 0
     cross_validation_performance: Optional[BatchMetric] = None
     performance_average: float = 0.0
@@ -39,7 +39,7 @@ class Hparams:
         self.values.append(value)
         self.number_of_parameters += 1
 
-    def as_dict(self) -> Dict[str, Any]:
+    def as_dict(self) -> dict[str, Any]:
         """todo"""
         return dict(zip(self.args, self.values))
 

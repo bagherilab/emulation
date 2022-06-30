@@ -1,6 +1,5 @@
 from collections.abc import Iterator
 from dataclasses import dataclass, field
-from typing import List, Tuple
 
 
 @dataclass
@@ -31,7 +30,7 @@ class BatchMetric:
     """
 
     name: str
-    values: List[float] = field(default_factory=list)
+    values: list[float] = field(default_factory=list)
     total: float = 0.0
     average: float = 0.0
     length: int = 0
@@ -50,7 +49,7 @@ class BatchMetric:
         self.length += 1
         self.average = self.total / self.length
 
-    def batchupdate(self, new_values: List[float]) -> None:
+    def batchupdate(self, new_values: list[float]) -> None:
         """
         method to update `values` attribute with list of values, `new_values`
 
@@ -94,8 +93,8 @@ class SequentialMetric:
     """
 
     name: str
-    values: List[float] = field(default_factory=list)
-    nums: List[int] = field(default_factory=list)
+    values: list[float] = field(default_factory=list)
+    nums: list[int] = field(default_factory=list)
 
     def update(self, new_value: float, n: int) -> None:
         """todo"""
@@ -103,12 +102,12 @@ class SequentialMetric:
         self.values.append(new_value)
         self.nums.append(n)
 
-    def batchupdate(self, new_values: List[float], new_ns: List[int]) -> None:
+    def batchupdate(self, new_values: list[float], new_ns: list[int]) -> None:
         """todo"""
         for value, num in zip(new_values, new_ns):
             self.update(value, num)
 
-    def zipped(self) -> Iterator[Tuple[float, int]]:
+    def zipped(self) -> Iterator[tuple[float, int]]:
         """todo"""
         return zip(self.values, self.nums)
 

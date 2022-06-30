@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional, List, Tuple, Iterable
+from typing import Optional, Iterable
 
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_squared_error
@@ -22,7 +22,7 @@ class AbstractSKLearnModel(ABC):
     pipeline: Pipeline
     model: BaseEstimator
     hparams: Optional[Hyperparams] = None
-    standarization: Optional[Iterable[Tuple[str, TransformerMixin]]] = None
+    standarization: Optional[Iterable[tuple[str, TransformerMixin]]] = None
 
     @classmethod
     @abstractmethod
@@ -30,7 +30,7 @@ class AbstractSKLearnModel(ABC):
         cls: Model,
         model_dependency: BaseEstimator,
         hparams: Optional[Hyperparams],
-        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]],
+        preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]],
     ) -> Model:
         """todo"""
 
@@ -39,7 +39,7 @@ class AbstractSKLearnModel(ABC):
         cls,
         model_dependency: BaseEstimator,
         hparams: Optional[Hyperparams] = None,
-        preprocessing_dependencies: Optional[Iterable[Tuple[str, TransformerMixin]]] = None,
+        preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """todo"""
         model = cls()
@@ -71,7 +71,7 @@ class AbstractSKLearnModel(ABC):
         metrics.batchupdate(cv_results.tolist())
         return metrics
 
-    def permutation(self, X: pd.DataFrame, y: pd.Series, repeats: int = 30) -> List[BatchMetric]:
+    def permutation(self, X: pd.DataFrame, y: pd.Series, repeats: int = 30) -> list[BatchMetric]:
         """todo"""
         self.pipeline.fit(X, y)
         perm_output = permutation_importance(self.pipeline, X, y, n_repeats=repeats)
@@ -89,7 +89,7 @@ class AbstractSKLearnModel(ABC):
         return root_mean_square_error(y, y_pred)
 
 
-def parse_permutation_output(output: Bunch, feature_names: List[str]) -> List[BatchMetric]:
+def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[BatchMetric]:
     """todo"""
     metric_list = []
     for i, feature in enumerate(feature_names):

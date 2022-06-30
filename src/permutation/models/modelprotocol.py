@@ -1,4 +1,4 @@
-from typing import Protocol, Optional, List
+from typing import Protocol, Optional
 
 import pandas as pd
 
@@ -41,5 +41,5 @@ class Model(Protocol):
         self,
         X: pd.DataFrame,
         y: pd.Series,
-    ) -> List[BatchMetric]:
+    ) -> list[BatchMetric]:
         """todo"""
