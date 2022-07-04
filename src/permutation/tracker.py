@@ -2,7 +2,9 @@ from pathlib import Path
 from typing import Optional
 
 from permutation.runner import Runner
+from permutation.loader import Loader, CSVLoader
 from permutation.models.hyperparameters import Hyperparams
+from permutation.models.modelprotocol import Models
 
 
 class ExperimentTracker:
@@ -11,9 +13,26 @@ class ExperimentTracker:
     def __init__(
         self,
         log_dir: str,
-        runner: Runner,
-        hparam_set: Optional[list[Hyperparams]] = None,
+        data_path: str,
     ) -> None:
+        """todo"""
+        self.logger: Logger = Logger(log_dir)
+        self.loader: Loader = CSVLoader(data_path)
+        self._models: List[Models] = []
+
+    def add_model(self, model: Model) -> None:
+        """todo"""
+        self._models.append(model)
+
+    def hyperparameter_selection(self) -> None:
+        """todo"""
+        for model in self._models():
+            runner = Runner(model, self.loader)
+
+    def train_models(self) -> None:
+        """todo"""
+
+    def permutation_testing(self) -> None:
         """todo"""
 
     @staticmethod

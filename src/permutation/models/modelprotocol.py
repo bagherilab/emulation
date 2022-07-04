@@ -15,31 +15,14 @@ class Model(Protocol):
     algorithm_type: str
     hparams: Optional[Hyperparams]
 
-    def crossval_hparams(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-        K: int,
-    ) -> BatchMetric:
+    def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int) -> BatchMetric:
         """todo"""
 
-    def fit_model(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-    ) -> float:
+    def fit_model(self, X: pd.DataFrame, y: pd.Series) -> float:
         """todo"""
 
-    def performance(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-    ) -> float:
+    def performance(self, X: pd.DataFrame, y: pd.Series) -> float:
         """todo"""
 
-    def permutation(
-        self,
-        X: pd.DataFrame,
-        y: pd.Series,
-    ) -> list[BatchMetric]:
+    def permutation(self, X: pd.DataFrame, y: pd.Series) -> list[BatchMetric]:
         """todo"""

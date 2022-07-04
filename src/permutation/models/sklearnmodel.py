@@ -8,6 +8,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.inspection import permutation_importance
 from sklearn.utils import Bunch
 import pandas as pd
+import numpy as np
 
 from permutation.metrics import BatchMetric
 from permutation.models.modelprotocol import Model
@@ -32,7 +33,7 @@ class AbstractSKLearnModel(ABC):
         hparams: Optional[Hyperparams],
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]],
     ) -> Model:
-        """todo"""
+        """abstract method for specific models with sklearn defaults"""
 
     @classmethod
     def _set_model(
@@ -67,7 +68,10 @@ class AbstractSKLearnModel(ABC):
     def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int = 10) -> BatchMetric:
         """todo"""
         metrics = BatchMetric(f"R^2 Cross Validation - K = {K}")
+        metrics.set_stage(Stage.VAL)
+
         cv_results = cross_val_score(self.pipeline, X, y, cv=K)
+
         metrics.batchupdate(cv_results.tolist())
         return metrics
 
@@ -85,8 +89,12 @@ class AbstractSKLearnModel(ABC):
 
     def performance(self, X: pd.DataFrame, y: pd.Series) -> float:
         """todo"""
-        y_pred = self.pipeline.predict(X)
+        y_pred = self.get_predicted_values(X)
         return root_mean_square_error(y, y_pred)
+
+    def get_predicted_values(self, X: pd.DataFrame) -> np.ndarray | pd.Series:
+        """todo"""
+        return self.pipeline.predict(X)
 
 
 def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[BatchMetric]:
@@ -94,12 +102,13 @@ def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[Ba
     metric_list = []
     for i, feature in enumerate(feature_names):
         temp_metric = BatchMetric(name=f"R^2, Feature: {feature}")
+        temp_metric.set_stage(Stage.PERM)
         importance_val_list = output.importances[:, i].flatten().tolist()
         temp_metric.batchupdate(importance_val_list)
         metric_list.append(temp_metric)
     return metric_list
 
 
-def root_mean_square_error(y_true: pd.Series, y_pred: pd.Series) -> float:
+def root_mean_square_error(y_true: pd.Series, y_pred: np.ndarray | pd.Series) -> float:
     """todo"""
     return mean_squared_error(y_true, y_pred, squared=False)

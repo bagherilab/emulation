@@ -18,10 +18,10 @@ class Runner:
 
         self.training_metrics: SequentialMetric = SequentialMetric(
             f"Train RMSE, Model: {self.model.algorithm_name}"
-        )
+        ).set_stage(Stage.TRAIN)
         self.test_metrics: SequentialMetric = SequentialMetric(
             f"Test RMSE, Model: {self.model.algorithm_name}"
-        )
+        ).set_stage(Stage.TEST)
         self.cv_metrics: Optional[BatchMetric] = None
         self.permutation_metrics: list[BatchMetric] = []
 

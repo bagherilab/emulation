@@ -1,5 +1,7 @@
-from collections.abc import Iterator
+from typing import Optional, Iterator
 from dataclasses import dataclass, field
+
+from permutation.stage import Stage
 
 
 @dataclass
@@ -19,6 +21,8 @@ class BatchMetric:
         average of values
     length :
         number of values contained
+    stage:
+        stage of model training process data is associated with
 
     Methods
     -------
@@ -27,13 +31,18 @@ class BatchMetric:
 
     batchupdate(new_values):
         adds iterable of values to list
+
+    set_stage(stage):
+        updates the associated stage of the metric, e.g. Stage.VAL, Stage.PERM
     """
 
     name: str
+
     values: list[float] = field(default_factory=list)
     total: float = 0.0
     average: float = 0.0
     length: int = 0
+    stage: Optional[Stage] = None
 
     def update(self, new_value: float) -> None:
         """
@@ -61,6 +70,17 @@ class BatchMetric:
         for value in new_values:
             self.update(value)
 
+    def set_stage(self, stage: Stage) -> None:
+        """
+        method to update `stage` attribute with Stage variable, e.g. Stage.TEST
+
+        Parameters
+        ----------
+        stage: stage variable
+
+        """
+        self.stage = stage
+
 
 @dataclass
 class SequentialMetric:
@@ -76,12 +96,8 @@ class SequentialMetric:
         list of values/data
     nums :
         ordered int values associated with each value by index
-    total :
-        sum of values
-    average :
-        average of values
-    length :
-        number of values contained
+    stage:
+        stage of model training process data is associated with, e.g. Stage.TRAIN, Stage.TEST
 
     Methods
     -------
@@ -90,11 +106,14 @@ class SequentialMetric:
 
     batchupdate(new_values, new_ns):
         adds iterable of values to list
+
+
     """
 
     name: str
     values: list[float] = field(default_factory=list)
     nums: list[int] = field(default_factory=list)
+    stage: Optional[Stage] = None
 
     def update(self, new_value: float, n: int) -> None:
         """todo"""
@@ -106,6 +125,17 @@ class SequentialMetric:
         """todo"""
         for value, num in zip(new_values, new_ns):
             self.update(value, num)
+
+    def set_stage(self, stage: Stage) -> None:
+        """
+        method to update `stage` attribute with Stage variable, e.g. Stage.TEST
+
+        Parameters
+        ----------
+        stage: stage variable
+
+        """
+        self.stage = stage
 
     def zipped(self) -> Iterator[tuple[float, int]]:
         """todo"""
