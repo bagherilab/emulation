@@ -18,10 +18,13 @@ class Runner:
 
         self.training_metrics: SequentialMetric = SequentialMetric(
             f"Train RMSE, Model: {self.model.algorithm_name}"
-        ).set_stage(Stage.TRAIN)
+        )
+        self.training_metrics.set_stage(Stage.TRAIN)
         self.test_metrics: SequentialMetric = SequentialMetric(
             f"Test RMSE, Model: {self.model.algorithm_name}"
-        ).set_stage(Stage.TEST)
+        )
+        self.test_metrics.set_stage(Stage.TEST)
+
         self.cv_metrics: Optional[BatchMetric] = None
         self.permutation_metrics: list[BatchMetric] = []
 
@@ -53,6 +56,9 @@ class Runner:
         X, y = self.loader.load_working_data()
         metrics_list = self.model.permutation(X, y)
         self.permutation_metrics.extend(metrics_list)
+
+    def set_stage(self, stage: Stage):
+        self.stage = stage
 
     def stage_check(self, correct_stage: Stage) -> None:
         """todo"""

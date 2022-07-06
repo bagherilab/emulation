@@ -11,12 +11,13 @@ import pandas as pd
 import numpy as np
 
 from permutation.metrics import BatchMetric
+from permutation.stage import Stage
 from permutation.models.modelprotocol import Model
 from permutation.models.hyperparameters import Hyperparams
 
 
 class AbstractSKLearnModel(ABC):
-    """todo"""
+    """Abstract class for sklearn based models."""
 
     algorithm_name: str
     algorithm_type: str
@@ -33,7 +34,7 @@ class AbstractSKLearnModel(ABC):
         hparams: Optional[Hyperparams],
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]],
     ) -> Model:
-        """abstract method for specific models with sklearn defaults"""
+        """abstract method for to implement models with sklearn defaults"""
 
     @classmethod
     def _set_model(
