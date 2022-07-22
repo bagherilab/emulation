@@ -1,7 +1,19 @@
 from typing import Optional, Iterator
 from dataclasses import dataclass, field
+from abc import ABC, abstractmethod
+
+import pandas as pd
 
 from permutation.stage import Stage
+
+
+class Metric(ABC):
+    name: str
+    stage: Optional[Stage]
+
+    @abstractmethod
+    def to_pandas(self) -> pd.DataFrame:
+        """implement a method to export to dataframe"""
 
 
 @dataclass
@@ -81,6 +93,10 @@ class BatchMetric:
         """
         self.stage = stage
 
+    def to_pandas(self) -> pd.DataFrame:
+        """method to export to dataframe"""
+        return pd.DataFrame(self.values, columns=[self.value_type])
+
 
 @dataclass
 class SequentialMetric:
@@ -111,6 +127,7 @@ class SequentialMetric:
     """
 
     name: str
+    value_type: str
     values: list[float] = field(default_factory=list)
     nums: list[int] = field(default_factory=list)
     stage: Optional[Stage] = None
@@ -145,3 +162,7 @@ class SequentialMetric:
         """ensure nums remains in sequential order"""
         if self.nums and n <= self.nums[-1]:
             raise ValueError("New n is smaller than largest value in sequential list.")
+
+    def to_pandas(self) -> pd.DataFrame:
+        """method to export to dataframe"""
+        return pd.DataFrame(list(zip(self.nums, self.values)), columns=["nums", self.value_type])
