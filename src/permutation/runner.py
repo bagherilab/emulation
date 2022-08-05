@@ -17,7 +17,7 @@ class Runner:
         self.loader = loader
 
         self.training_metrics: SequentialMetric = SequentialMetric(
-            f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TRAIN
+            name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TRAIN
         )
         self.testing_metrics: SequentialMetric = SequentialMetric(
             name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TEST

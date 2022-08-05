@@ -7,9 +7,10 @@ import pandas as pd
 from permutation.stage import Stage
 
 
+@dataclass
 class Metric(ABC):
     name: str
-    stage: Optional[Stage]
+    stage: Stage
 
     @abstractmethod
     def to_pandas(self) -> pd.DataFrame:
@@ -49,12 +50,12 @@ class BatchMetric:
     """
 
     name: str
-
+    value_type: str
+    stage: Stage
     values: list[float] = field(default_factory=list)
     total: float = 0.0
     average: float = 0.0
     length: int = 0
-    stage: Optional[Stage] = None
 
     def update(self, new_value: float) -> None:
         """
@@ -81,17 +82,6 @@ class BatchMetric:
         """
         for value in new_values:
             self.update(value)
-
-    def set_stage(self, stage: Stage) -> None:
-        """
-        method to update `stage` attribute with Stage variable, e.g. Stage.TEST
-
-        Parameters
-        ----------
-        stage: stage variable
-
-        """
-        self.stage = stage
 
     def to_pandas(self) -> pd.DataFrame:
         """method to export to dataframe"""
@@ -128,9 +118,9 @@ class SequentialMetric:
 
     name: str
     value_type: str
+    stage: Stage
     values: list[float] = field(default_factory=list)
     nums: list[int] = field(default_factory=list)
-    stage: Optional[Stage] = None
 
     def update(self, new_value: float, n: int) -> None:
         """todo"""
@@ -142,17 +132,6 @@ class SequentialMetric:
         """todo"""
         for value, num in zip(new_values, new_ns):
             self.update(value, num)
-
-    def set_stage(self, stage: Stage) -> None:
-        """
-        method to update `stage` attribute with Stage variable, e.g. Stage.TEST
-
-        Parameters
-        ----------
-        stage: stage variable
-
-        """
-        self.stage = stage
 
     def zipped(self) -> Iterator[tuple[float, int]]:
         """todo"""
