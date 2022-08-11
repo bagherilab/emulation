@@ -12,6 +12,7 @@ class SVReg(AbstractSKLearnModel):
     """todo"""
 
     algorithm_name = "Support Vector Regression"
+    algorithm_abv = "SVR"
     algorithm_type = "Regression"
 
     @classmethod

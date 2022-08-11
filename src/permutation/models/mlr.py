@@ -14,6 +14,7 @@ class MLR(AbstractSKLearnModel):
     """
 
     algorithm_name = "Regularized Linear Regression"
+    algorithm_abv = "MLR"
     algorithm_type = "Regression"
 
     @classmethod

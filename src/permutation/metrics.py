@@ -9,6 +9,18 @@ from permutation.stage import Stage
 
 @dataclass
 class Metric(ABC):
+    """
+    abstract class for implementing different metrics,
+    specifically with methods to ensure correct csv handling by logger object
+    through pandas
+
+    Abstract Method
+    ----------
+
+    to_pandas() -> pd.DataFrame:
+        organize data in metric class into tabular format, and return a pandas Dataframe
+    """
+
     name: str
     stage: Stage
 

@@ -62,3 +62,15 @@ class Runner:
         """todo"""
         if self.stage is not correct_stage:
             raise IncorrectStageException(correct_stage)
+
+    @property
+    def name(self) -> str:
+        """
+        name attribute to use as naming convention (file names, structure) for associated model
+        """
+
+        if self.model.hparams:
+            temp_list = [f"{param}-{val}" for param, val in self.model.hparams.as_dict.items()]
+            return f"{self.model.abv}__" + "_".join(temp_list)
+        else:
+            return self.model.abv

@@ -12,6 +12,7 @@ class RF(AbstractSKLearnModel):
     """todo"""
 
     algorithm_name = "Random Forest"
+    algorithm_abv = "RF"
     algorithm_type = "Regression"
 
     @classmethod

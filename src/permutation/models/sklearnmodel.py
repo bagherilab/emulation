@@ -21,6 +21,7 @@ class AbstractSKLearnModel(ABC):
 
     algorithm_name: str
     algorithm_type: str
+    algorithm_abv: str
     pipeline: Pipeline
     model: BaseEstimator
     hparams: Optional[Hyperparams] = None
@@ -79,7 +80,7 @@ class AbstractSKLearnModel(ABC):
         """todo"""
         self.pipeline.fit(X, y)
         perm_output = permutation_importance(self.pipeline, X, y, n_repeats=repeats)
-        list_of_metrics = parse_permutation_output(perm_output, X.columns.to_list())
+        list_of_metrics = parse_permutation_output(perm_output, feature_names=X.columns.to_list())
         return list_of_metrics
 
     def fit_model(self, X: pd.DataFrame, y: pd.Series) -> float:

@@ -1,6 +1,7 @@
 from typing import Protocol, Optional
 
 import pandas as pd
+import numpy as np
 
 from permutation.models.hyperparameters import Hyperparams
 from permutation.metrics import BatchMetric
@@ -25,4 +26,7 @@ class Model(Protocol):
         """todo"""
 
     def permutation(self, X: pd.DataFrame, y: pd.Series) -> list[BatchMetric]:
+        """todo"""
+
+    def get_predicted_values(self, X: pd.DataFrame) -> np.ndarray | pd.Series:
         """todo"""

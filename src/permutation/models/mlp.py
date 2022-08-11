@@ -12,6 +12,7 @@ class MLP(AbstractSKLearnModel):
     """todo"""
 
     algorithm_name = "Multi-layer Perceptron Regressor"
+    algorithm_abv = "MLP"
     algorithm_type = "Regression"
 
     @classmethod
