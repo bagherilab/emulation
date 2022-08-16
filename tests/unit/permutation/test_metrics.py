@@ -1,18 +1,24 @@
 import unittest
+from unittest.mock import Mock, MagicMock
 
 from permutation.metrics import SequentialMetric, BatchMetric
+from permutation.stage import Stage
 
 
 class SequentialMetricTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.stage_mock = MagicMock(Stage)
+        self.stage_mock.name = Mock(return_value="TEST")
+
     def test_empty_defaults(self) -> None:
-        testSeqMetric = SequentialMetric("test")
+        testSeqMetric = SequentialMetric("test", value_type="RMSE", stage=self.stage_mock)
 
         self.assertFalse(testSeqMetric.values)
         self.assertFalse(testSeqMetric.nums)
         self.assertEqual(testSeqMetric.name, "test")
 
     def test_update(self) -> None:
-        testSeqMetric = SequentialMetric("test")
+        testSeqMetric = SequentialMetric("test", value_type="RMSE", stage=self.stage_mock)
         testSeqMetric.update(1.0, 1)
 
         expected_values = [1.0]
@@ -22,7 +28,7 @@ class SequentialMetricTests(unittest.TestCase):
         self.assertEqual(testSeqMetric.nums, expected_nums)
 
     def test_multiple_updates(self) -> None:
-        testSeqMetric = SequentialMetric("test")
+        testSeqMetric = SequentialMetric("test", value_type="RMSE", stage=self.stage_mock)
         testSeqMetric.update(1.0, 1)
         testSeqMetric.update(2.0, 2)
 
@@ -34,15 +40,15 @@ class SequentialMetricTests(unittest.TestCase):
 
     def test_mutability(self) -> None:
         """test for intializing empty lists correctly"""
-        _ = SequentialMetric("foo")
+        _ = SequentialMetric("foo", value_type="RMSE", stage=self.stage_mock)
         _.update(1.0, 1)
-        testSeqMetric = SequentialMetric("test")
+        testSeqMetric = SequentialMetric("test", value_type="RMSE", stage=self.stage_mock)
 
         self.assertFalse(testSeqMetric.values)
         self.assertFalse(testSeqMetric.nums)
 
     def test_batchupdate(self) -> None:
-        testSeqMetric = SequentialMetric("test")
+        testSeqMetric = SequentialMetric("test", value_type="RMSE", stage=self.stage_mock)
         testSeqMetric.batchupdate([1.0, 2.0, 3.0], [1, 2, 3])
 
         expected_values = [1.0, 2.0, 3.0]
@@ -55,7 +61,7 @@ class SequentialMetricTests(unittest.TestCase):
         """test for ensuring sequential n"""
 
         def add_nonsequential_args():
-            testSeqMetric = SequentialMetric("test")
+            testSeqMetric = SequentialMetric("test", value_type="RMSE", stage=self.stage_mock)
             testSeqMetric.update(2.0, 2)
             testSeqMetric.update(1.0, 1)
 
@@ -63,8 +69,12 @@ class SequentialMetricTests(unittest.TestCase):
 
 
 class BatchMetricTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.stage_mock = MagicMock(Stage)
+        self.stage_mock.name = Mock(return_value="TEST")
+
     def test_empty_defaults(self) -> None:
-        testBatchMetric = BatchMetric("test")
+        testBatchMetric = BatchMetric("test", value_type="RMSE", stage=self.stage_mock)
 
         self.assertFalse(testBatchMetric.values)
         self.assertEqual(testBatchMetric.name, "test")
@@ -73,7 +83,7 @@ class BatchMetricTests(unittest.TestCase):
         self.assertEqual(testBatchMetric.length, 0)
 
     def test_update(self) -> None:
-        testBatchMetric = BatchMetric("test")
+        testBatchMetric = BatchMetric("test", value_type="RMSE", stage=self.stage_mock)
         testBatchMetric.update(1.0)
 
         self.assertEqual(testBatchMetric.values, [1.0])
@@ -82,7 +92,7 @@ class BatchMetricTests(unittest.TestCase):
         self.assertEqual(testBatchMetric.length, 1)
 
     def test_multiple_updates(self) -> None:
-        testBatchMetric = BatchMetric("test")
+        testBatchMetric = BatchMetric("test", value_type="RMSE", stage=self.stage_mock)
         testBatchMetric.update(1.0)
         testBatchMetric.update(2.0)
 
@@ -93,14 +103,14 @@ class BatchMetricTests(unittest.TestCase):
 
     def test_mutability(self) -> None:
         """test for intializing empty lists correctly"""
-        _ = BatchMetric("foo")
+        _ = BatchMetric("foo", value_type="RMSE", stage=self.stage_mock)
         _.update(1.0)
-        testBatchMetric = BatchMetric("test")
+        testBatchMetric = BatchMetric("test", value_type="RMSE", stage=self.stage_mock)
 
         self.assertFalse(testBatchMetric.values)
 
     def test_batchupdate(self) -> None:
-        testBatchMetric = BatchMetric("test")
+        testBatchMetric = BatchMetric("test", value_type="RMSE", stage=self.stage_mock)
         testBatchMetric.batchupdate([1.0, 2.0, 3.0])
 
         self.assertEqual(testBatchMetric.values, [1.0, 2.0, 3.0])

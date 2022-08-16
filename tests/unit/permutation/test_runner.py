@@ -17,7 +17,6 @@ class RunnerTests(unittest.TestCase):
         self.model_mock.algorithm_name = Mock(return_value="test")
 
         self.loader_mock = Mock(spec=Loader)
-
         df_mock = MagicMock(spec=pd.DataFrame)
         series_mock = MagicMock(spec=pd.Series)
         self.load_data_return = (df_mock, series_mock)
@@ -27,14 +26,14 @@ class RunnerTests(unittest.TestCase):
         self.model_mock.hparams = None
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
 
-        self.assertEqual(testRunner.stage.name, "TRAIN")
+        self.assertEqual(testRunner._stage.name, "TRAIN")
 
     def test_stage_initialization_without_hparam(self) -> None:
         """Check to see if correct stage is set (TRAIN) if no hyperparameters are passed."""
         self.model_mock.hparams = Mock(spec=Hyperparams)
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
 
-        self.assertEqual(testRunner.stage.name, "VAL")
+        self.assertEqual(testRunner._stage.name, "VAL")
 
     def test_cross_validation_hparams_called(self) -> None:
         self.model_mock.crossval_hparams = Mock(return_value=[1.0] * 10)
@@ -63,7 +62,7 @@ class RunnerTests(unittest.TestCase):
         self.loader_mock.load_training_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
-        testRunner.stage = Stage.TRAIN
+        testRunner._stage = Stage.TRAIN
         testRunner.train()
 
         self.model_mock.fit_model.assert_called_once_with(*self.load_data_return)
@@ -75,7 +74,7 @@ class RunnerTests(unittest.TestCase):
 
         def call_train_at_wrong_stage():
             testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
-            testRunner.stage = Stage.TEST
+            testRunner._stage = Stage.TEST
             testRunner.train()
 
         self.assertRaises(IncorrectStageException, call_train_at_wrong_stage)
@@ -86,7 +85,7 @@ class RunnerTests(unittest.TestCase):
         self.loader_mock.load_testing_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
-        testRunner.stage = Stage.TEST
+        testRunner._stage = Stage.TEST
         testRunner.test()
 
         self.model_mock.performance.assert_called_once_with(*self.load_data_return)
@@ -98,7 +97,7 @@ class RunnerTests(unittest.TestCase):
 
         def call_test_at_wrong_stage():
             testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
-            testRunner.stage = Stage.TRAIN
+            testRunner._stage = Stage.TRAIN
             testRunner.test()
 
         self.assertRaises(IncorrectStageException, call_test_at_wrong_stage)
@@ -111,7 +110,7 @@ class RunnerTests(unittest.TestCase):
         self.loader_mock.load_working_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
-        testRunner.stage = Stage.PERM
+        testRunner._stage = Stage.PERM
         testRunner.permutation_testing()
 
         self.model_mock.permutation.assert_called_once_with(*self.load_data_return)
@@ -122,7 +121,7 @@ class RunnerTests(unittest.TestCase):
 
         def call_perm_at_wrong_stage():
             testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
-            testRunner.stage = Stage.TEST
+            testRunner._stage = Stage.TEST
             testRunner.permutation_testing()
 
         self.assertRaises(IncorrectStageException, call_perm_at_wrong_stage)

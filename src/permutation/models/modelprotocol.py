@@ -13,6 +13,7 @@ class Model(Protocol):
     """
 
     algorithm_name: str
+    algorithm_abv: str
     algorithm_type: str
     hparams: Optional[Hyperparams]
 

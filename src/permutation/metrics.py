@@ -1,4 +1,4 @@
-from typing import Optional, Iterator
+from typing import Iterator
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 
@@ -7,8 +7,7 @@ import pandas as pd
 from permutation.stage import Stage
 
 
-@dataclass
-class Metric(ABC):
+class Metric(ABC):  # pylint: disable=too-few-public-methods
     """
     abstract class for implementing different metrics,
     specifically with methods to ensure correct csv handling by logger object
@@ -30,7 +29,7 @@ class Metric(ABC):
 
 
 @dataclass
-class BatchMetric:
+class BatchMetric(Metric):
     """
     Class for holding aggregated results from model performance evaluation
 
@@ -101,7 +100,7 @@ class BatchMetric:
 
 
 @dataclass
-class SequentialMetric:
+class SequentialMetric(Metric):
     """
     Class for holding linked sequential results from model performance evaluation
     (e.g. training metrics associated with size of training data)

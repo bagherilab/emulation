@@ -146,7 +146,7 @@ class MLPTest(unittest.TestCase):
 
         inspected_names = [metric.name for metric in return_value]
         inspected_values = [metric.values for metric in return_value]
-        expected_names = ["R^2, Feature: a", "R^2, Feature: b"]
+        expected_names = ["Feature: a", "Feature: b"]
         expected_values = [[0.0] * n_repeats] * 2
 
         # two features

@@ -43,14 +43,6 @@ class Hparams:
         """todo"""
         return dict(zip(self.args, self.values))
 
-    def update_cv_metrics(self, values: list[float]) -> None:
-        """todo"""
-        if self.cross_validation_performance is None:
-            self.cross_validation_performance = BatchMetric(str(self))
-
-        self.cross_validation_performance.batchupdate(values)
-        self.performance_average = self.cross_validation_performance.average
-
     def __str__(self) -> str:
         """todo"""
         return str(self.as_dict())

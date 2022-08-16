@@ -1,6 +1,6 @@
 from typing import Optional
 
-from permutation.metrics import BatchMetric, SequentialMetric
+from permutation.metrics import BatchMetric
 from permutation.models.modelprotocol import Model
 from permutation.loader import Loader
 from permutation.stage import Stage, IncorrectStageException
@@ -55,14 +55,14 @@ class Runner:
         metrics_list = self.model.permutation(X, y)
         self.permutation_metrics.extend(metrics_list)
 
-    def set_stage(self, stage: Stage):
+    def set_stage(self, stage: Stage) -> None:
         """todo"""
         self._stage = stage
 
     def stage_check(self, correct_stage: Stage) -> None:
         """todo"""
         if self._stage is not correct_stage:
-            raise IncorrectStageException(correct_stage)
+            raise IncorrectStageException(self._stage, correct_stage)
 
     def reset(self) -> None:
         """todo"""
@@ -72,8 +72,8 @@ class Runner:
         self.testing_metrics = BatchMetric(
             name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TEST
         )
-        self.cv_metrics: Optional[BatchMetric] = None
-        self.permutation_metrics: list[BatchMetric] = []
+        self.cv_metrics = None
+        self.permutation_metrics = []
 
         self._stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
 
@@ -83,9 +83,8 @@ class Runner:
         name attribute to use as naming convention (file names, structure) for associated model
         returns string: <modelabbreviation>_n=<observations>__<hyperparameter>=<value>
         """
-        return_str = f"{self.model.abv}_n={self.loader.n_working}"
+        return_str = f"{self.model.algorithm_abv}_n={self.loader.n_working}"
         if self.model.hparams:
-            temp_list = [f"{param}-{val}" for param, val in self.model.hparams.as_dict.items()]
+            temp_list = [f"{param}-{val}" for param, val in self.model.hparams.as_dict().items()]
             return return_str + "__" + "_".join(temp_list)
-        else:
-            return self.model.abv
+        return return_str
