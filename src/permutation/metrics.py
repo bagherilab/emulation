@@ -14,7 +14,7 @@ class Metric(ABC):
     specifically with methods to ensure correct csv handling by logger object
     through pandas
 
-    Abstract Method
+    Abstract Methods
     ----------
 
     to_pandas() -> pd.DataFrame:

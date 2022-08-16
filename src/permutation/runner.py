@@ -16,17 +16,17 @@ class Runner:
         self.model = model
         self.loader = loader
 
-        self.training_metrics: SequentialMetric = SequentialMetric(
+        self.training_metrics: BatchMetric = BatchMetric(
             name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TRAIN
         )
-        self.testing_metrics: SequentialMetric = SequentialMetric(
+        self.testing_metrics: BatchMetric = BatchMetric(
             name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TEST
         )
 
         self.cv_metrics: Optional[BatchMetric] = None
         self.permutation_metrics: list[BatchMetric] = []
 
-        self.stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
+        self._stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
 
     def cross_validation(self, K: int = 10) -> None:
         """todo"""
@@ -39,14 +39,14 @@ class Runner:
         self.stage_check(Stage.TRAIN)
         X, y = self.loader.load_training_data()
         metric = self.model.fit_model(X, y)
-        self.training_metrics.update(metric, len(X.index))
+        self.training_metrics.update(metric)
 
     def test(self) -> None:
         """todo"""
         self.stage_check(Stage.TEST)
         X, y = self.loader.load_testing_data()
         metric = self.model.performance(X, y)
-        self.testing_metrics.update(metric, len(X.index))
+        self.testing_metrics.update(metric)
 
     def permutation_testing(self) -> None:
         """todo"""
@@ -56,21 +56,36 @@ class Runner:
         self.permutation_metrics.extend(metrics_list)
 
     def set_stage(self, stage: Stage):
-        self.stage = stage
+        """todo"""
+        self._stage = stage
 
     def stage_check(self, correct_stage: Stage) -> None:
         """todo"""
-        if self.stage is not correct_stage:
+        if self._stage is not correct_stage:
             raise IncorrectStageException(correct_stage)
+
+    def reset(self) -> None:
+        """todo"""
+        self.training_metrics = BatchMetric(
+            name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TRAIN
+        )
+        self.testing_metrics = BatchMetric(
+            name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TEST
+        )
+        self.cv_metrics: Optional[BatchMetric] = None
+        self.permutation_metrics: list[BatchMetric] = []
+
+        self._stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
 
     @property
     def name(self) -> str:
         """
         name attribute to use as naming convention (file names, structure) for associated model
+        returns string: <modelabbreviation>_n=<observations>_<hyperparamete>=<value>
         """
-
+        return_str = f"{self.model.abv}_n={self.loader.n_working}"
         if self.model.hparams:
             temp_list = [f"{param}-{val}" for param, val in self.model.hparams.as_dict.items()]
-            return f"{self.model.abv}__" + "_".join(temp_list)
+            return return_str + "__" + "_".join(temp_list)
         else:
             return self.model.abv

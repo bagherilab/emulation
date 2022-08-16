@@ -85,6 +85,26 @@ class CSVLoader(Loader):
             self._working_idx, test_size=self.test_size, random_state=self.seed
         )
 
+    @property
+    def n_total(self) -> int:
+        """Property that returns the number of observations in the total data set"""
+        return self._X.shape[0]
+
+    @property
+    def n_working(self) -> int:
+        """Property that returns the number of observations in the working (test+train) set"""
+        return len(self._working_idx)
+
+    @property
+    def n_train(self) -> int:
+        """Property that returns the number of observations in the train set"""
+        return len(self._training_idx)
+
+    @property
+    def n_test(self) -> int:
+        """Property that returns the number of observations in the test set"""
+        return len(self._testing_idx)
+
 
 def features_response_split(
     data: pd.DataFrame, features: list[str], response: str

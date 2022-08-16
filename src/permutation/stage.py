@@ -11,9 +11,11 @@ class Stage(Enum):
 
 
 class IncorrectStageException(Exception):
-    """todo"""
+    """Exception for stage inconsistencies between classes. Check against expected enum."""
 
-    def __init__(self, correct_stage: Stage) -> None:
-        """todo"""
-        self.message = f"Incorrect stage for {correct_stage.name} method."
+    def __init__(self, incorrect_stage: Stage, correct_stage: Stage) -> None:
+        """Raise error message with correct stage specified in declaration."""
+        self.message = (
+            f"Incorrect stage passed ({incorrect_stage.name}) for {correct_stage.name} method."
+        )
         super().__init__(self.message)
