@@ -1,4 +1,3 @@
-from typing import Iterator
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 
@@ -143,10 +142,6 @@ class SequentialMetric(Metric):
         """todo"""
         for value, num in zip(new_values, new_ns):
             self.update(value, num)
-
-    def zipped(self) -> Iterator[tuple[float, int]]:
-        """todo"""
-        return zip(self.values, self.nums)
 
     def _checkorder(self, n: int) -> None:
         """ensure nums remains in sequential order"""
