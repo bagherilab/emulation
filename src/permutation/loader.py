@@ -8,7 +8,37 @@ from sklearn.model_selection import train_test_split
 
 
 class Loader(ABC):
-    """todo"""
+    """
+    Attributes
+    ----------
+    path : path where data is stored
+
+    n_total: total observations
+
+    n_working: number of working observations
+
+    n_train: number of training observations
+
+    n_test: number of test observations
+
+    Methods
+    -------
+    subsample(n): selects n random observations to subsample,
+        impacts training, testing and working data
+        todo: add random state from hydra
+
+    load_training_data():
+        return training data as dataframe with features, series with response
+
+    load_testing_data():
+        return testing data as dataframe with features, series with response
+
+    load_working_data():
+        return training and testing data as dataframe with features, series with response
+
+    load_original_data():
+        return all data as dataframe with features, series with response
+    """
 
     path: str | Path
     features: list[str]
@@ -21,35 +51,59 @@ class Loader(ABC):
 
     @abstractmethod
     def _load_data(self) -> None:
-        """todo"""
+        """Loading function for file interaction needs to be implemented in subclasses"""
 
     @abstractmethod
     def _split_data(self) -> None:
-        """todo"""
+        """Method for test/train split needs to be implemented in subclasses"""
 
     def subsample(self, n: int) -> None:
-        """todo"""
+        """Sample n observations"""
         self._working_idx = self._X.sample(n).index.tolist()
         self._split_data()
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """todo"""
+        """Get training data
+
+        Returns
+        --------
+        X : Pandas dataframe contatining <features> variables
+        y : Pandas series containing <response> variable
+        """
         return self._X.iloc[self._training_idx], self._y.iloc[self._training_idx]
 
     def load_testing_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """todo"""
+        """Get testing data
+
+        Returns
+        --------
+        X : Pandas dataframe contatining <features> variables
+        y : Pandas series containing <response> variable
+        """
         return self._X.iloc[self._testing_idx], self._y.iloc[self._testing_idx]
 
     def load_working_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """todo"""
+        """Get testing and training data in one structure
+
+        Returns
+        --------
+        X : Pandas dataframe contatining <features> variables
+        y : Pandas series containing <response> variable
+        """
         return self._X.iloc[self._working_idx], self._y.iloc[self._working_idx]
 
     def load_original_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """todo"""
+        """Load entire dataset
+
+        Returns
+        --------
+        X : Pandas dataframe contatining <features> variables
+        y : Pandas series containing <response> variable
+        """
         return self._X, self._y
 
     def _set_working(self) -> None:
-        """todo"""
+        """update the working indices"""
         self._working_idx = self._X.index.tolist()
 
     @property
@@ -74,7 +128,37 @@ class Loader(ABC):
 
 
 class CSVLoader(Loader):
-    """todo"""
+    """
+    Attributes
+    ----------
+    path : path were data is stored
+
+    n_total: total observations
+
+    n_working: number of working observations
+
+    n_train: number of training observations
+
+    n_test: number of test observations
+
+    Methods
+    -------
+    subsample(n): selects n random observations to subsample,
+        impacts training, testing and working data
+        todo: add random state from hydra
+
+    load_training_data():
+        return training data as dataframe with features, series with response
+
+    load_testing_data():
+        return testing data as dataframe with features, series with response
+
+    load_working_data():
+        return training and testing data as dataframe with features, series with response
+
+    load_original_data():
+        return all data as dataframe with features, series with response
+    """
 
     def __init__(
         self,
@@ -84,7 +168,6 @@ class CSVLoader(Loader):
         test_size: float = 0.3,
         seed: Optional[int] = 100,
     ) -> None:
-        """todo"""
         self.path = path
         self.features = features
         self.response = response
@@ -94,13 +177,13 @@ class CSVLoader(Loader):
         self._split_data()
 
     def _load_data(self) -> None:
-        """todo"""
+        """load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path)
         self._X, self._y = features_response_split(data, self.features, self.response)
         self._set_working()
 
     def _split_data(self) -> None:
-        """todo"""
+        """Test train split implementation"""
         self._training_idx, self._testing_idx = train_test_split(
             self._working_idx, test_size=self.test_size, random_state=self.seed
         )

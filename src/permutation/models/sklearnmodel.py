@@ -44,7 +44,10 @@ class AbstractSKLearnModel(ABC):
         hparams: Optional[Hyperparams] = None,
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
-        """todo"""
+        """Helper function for subclasses:
+
+        Set up pipeline for sklearn to allow for flexibility in preprocessing steps
+        """
         model = cls()
         model.hparams = hparams
 
@@ -68,7 +71,7 @@ class AbstractSKLearnModel(ABC):
         return model
 
     def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int = 10) -> BatchMetric:
-        """todo"""
+        """perform cross validation"""
         metrics = BatchMetric(name=f"CV_K={K},", value_type="R^2", stage=Stage.VAL)
 
         cv_results = cross_val_score(self.pipeline, X, y, cv=K)
@@ -76,30 +79,30 @@ class AbstractSKLearnModel(ABC):
         metrics.batchupdate(cv_results.tolist())
         return metrics
 
+    def fit_model(self, X: pd.DataFrame, y: pd.Series) -> float:
+        """Fit the model according to sklearn functionality"""
+        self.pipeline.fit(X, y)
+        return self.performance(X, y)
+
+    def performance(self, X: pd.DataFrame, y: pd.Series) -> float:
+        """Evaluate performance of model by comparing predicted values to known"""
+        y_pred = self.get_predicted_values(X)
+        return root_mean_square_error(y, y_pred)
+
+    def get_predicted_values(self, X: pd.DataFrame) -> np.ndarray | pd.Series:
+        """Predict y from X"""
+        return self.pipeline.predict(X)
+
     def permutation(self, X: pd.DataFrame, y: pd.Series, repeats: int = 30) -> list[BatchMetric]:
-        """todo"""
+        """Perform permutation testing"""
         self.pipeline.fit(X, y)
         perm_output = permutation_importance(self.pipeline, X, y, n_repeats=repeats)
         list_of_metrics = parse_permutation_output(perm_output, feature_names=X.columns.to_list())
         return list_of_metrics
 
-    def fit_model(self, X: pd.DataFrame, y: pd.Series) -> float:
-        """todo"""
-        self.pipeline.fit(X, y)
-        return self.performance(X, y)
-
-    def performance(self, X: pd.DataFrame, y: pd.Series) -> float:
-        """todo"""
-        y_pred = self.get_predicted_values(X)
-        return root_mean_square_error(y, y_pred)
-
-    def get_predicted_values(self, X: pd.DataFrame) -> np.ndarray | pd.Series:
-        """todo"""
-        return self.pipeline.predict(X)
-
 
 def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[BatchMetric]:
-    """todo"""
+    """helper function for extracting from sklearn Bunch object for permutation testing"""
     metric_list = []
     for i, feature in enumerate(feature_names):
         temp_metric = BatchMetric(name=f"Feature: {feature}", value_type="R^2", stage=Stage.PERM)
@@ -110,5 +113,5 @@ def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[Ba
 
 
 def root_mean_square_error(y_true: pd.Series, y_pred: np.ndarray | pd.Series) -> float:
-    """todo"""
+    """Find the RMSE of linked data collections"""
     return mean_squared_error(y_true, y_pred, squared=False)

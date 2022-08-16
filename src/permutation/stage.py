@@ -2,7 +2,10 @@ from enum import Enum
 
 
 class Stage(Enum):
-    """todo"""
+    """
+    Enum class for specifying the stage of the experiment
+    is required for sequential training, testing, etc.
+    """
 
     TRAIN = "train"
     TEST = "test"

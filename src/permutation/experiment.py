@@ -10,13 +10,70 @@ from permutation.models.modelprotocol import Model
 
 
 class Experiment:
-    """todo"""
+    """
+
+    Arguments
+    ----------
+    experiment_name :
+        name of experiment for file management purposes
+    log_dir :
+        directory to save experiment results
+    data_path :
+        location of original datafile
+    features :
+        list of features in the dataset to use to train models
+    response :
+        response variable to use as the target variable for training
+
+    Attributes
+    ----------
+    name :
+        location where files will be stored
+    logger :
+        Logger object where the experiment will export results
+    loader :
+        Loader object where the experiment will export results
+    models:
+        models that have been added to the experiment
+    algorithms :
+        algorithms that have been added to the experiment
+    best_models :
+        hyperparameter models that have been identified as the best model through CV
+
+    Methods
+    -------
+    hyperparameter_selection():
+        Perform hyperparameter selection on all models for all algorithms
+        Add models to best_models
+
+    train_models():
+        Train models in best_models
+
+    test_models():
+        train_models() must be run first.
+        Get performance of models in best_models
+
+    permutation_testing():
+        train_models() must be run first.
+        Get permutation testing results of all models in _best_models
+
+    run_standard_experiment():
+        Run the member methods associated with standard ML practices.
+        1) Hyperparameter selection via cross validation.
+        2) Model training of the best models selected in (1)
+        3) Model performance testing of the best models selected in (1)
+        4) Permutation testing of the best models selected in (1)
+
+    run_training_quantity_experiment(n, repeats):
+        Run the standard experiment different amounts of training data available.
+        n: number of quantity experiments
+        repeats: replicates of the subsample (account for noise in dataset)
+
+    """
 
     def __init__(
         self, experiment_name: str, log_dir: str, data_path: str, features: list[str], response: str
     ) -> None:
-        """todo"""
-
         self.name = experiment_name
         self.logger: Logger = Logger(log_dir)
         self.loader: Loader = CSVLoader(data_path, features, response)
@@ -46,15 +103,20 @@ class Experiment:
 
     @property
     def algorithms(self) -> list[str]:
-        """todo"""
+        """returns algorithms included in the experiment"""
         return list(self._models.keys())
 
+    @property
+    def best_models(self) -> dict[str, str]:
+        """returns dictionary and name of best models"""
+        return {alg: runner.name for alg, runner in self._best_models.items()}
+
     def hyperparameter_selection(self) -> None:
-        """todo"""
+        """perform hparam selection using cv"""
         self._get_best_cv_model()
 
     def _get_best_cv_model(self) -> None:
-        """todo"""
+        """run CV for all models and identify best model"""
         for algorithm, runner_list in self._models.items():
             map(lambda r: r.cross_validation(), runner_list)
             # if None, an IncorrectStageException will be thrown before the next line runs
@@ -65,12 +127,12 @@ class Experiment:
             self._log_hyperparameter_selection(algorithm)
 
     def _update_best_model(self, algorithm: str, model_index: int) -> None:
-        """todo"""
+        """update best_model"""
         self._best_models[algorithm] = self._models[algorithm][model_index]
         self._best_models[algorithm].set_stage(Stage.TRAIN)
 
     def _log_hyperparameter_selection(self, algorithm: str) -> None:
-        """todo"""
+        """log the data from cv"""
         for runner in self._models[algorithm]:
             # if None, an IncorrectStageException will be thrown before the next line runs
             self.logger.metric_to_csv(
@@ -78,37 +140,37 @@ class Experiment:
             )
 
     def train_models(self) -> None:
-        """todo"""
+        """train models in best_model"""
         for algorithm, runner in self._best_models.items():
             runner.train()
             runner.set_stage(Stage.TEST)
             self._log_training_performance(algorithm)
 
     def _log_training_performance(self, algorithm: str) -> None:
-        """todo"""
+        """log the training performance"""
         runner = self._best_models[algorithm]
         self.logger.metric_to_csv(self.name, algorithm, runner.name, runner.training_metrics)
 
     def test_models(self) -> None:
-        """todo"""
+        """test trained best_model performances"""
         for algorithm, runner in self._best_models.items():
             runner.test()
             runner.set_stage(Stage.PERM)
             self._log_test_performance(algorithm)
 
     def _log_test_performance(self, algorithm: str) -> None:
-        """todo"""
+        """log test performance"""
         runner = self._best_models[algorithm]
         self.logger.metric_to_csv(self.name, algorithm, runner.name, runner.testing_metrics)
 
     def permutation_testing(self) -> None:
-        """todo"""
+        """perform permutation testing"""
         for algorithm, runner in self._best_models.items():
             runner.permutation_testing()
             self._log_perm_performance(algorithm)
 
     def _log_perm_performance(self, algorithm: str) -> None:
-        """todo"""
+        """log the permutation performance"""
         runner = self._best_models[algorithm]
         for perm_metric in runner.permutation_metrics:
             self.logger.metric_to_csv(
@@ -148,7 +210,7 @@ class Experiment:
                 self._run_repeats(n=val, repeats=repeat)
 
     def _subsample_and_run(self, n: int) -> None:
-        """todo"""
+        """helper function for subsampling data and running experiment"""
         self.loader.subsample(n)
         self.run_standard_experiment()
 
@@ -165,5 +227,7 @@ class Experiment:
         self.name = original
 
     def _reset_best_models(self) -> None:
-        """todo"""
+        """reset the best models"""
         self._best_models = {}
+
+    # todo: add logic for models where hparams are not specified, i.e. no cv needed

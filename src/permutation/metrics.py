@@ -9,7 +9,7 @@ from permutation.stage import Stage
 class Metric(ABC):  # pylint: disable=too-few-public-methods
     """
     abstract class for implementing different metrics,
-    specifically with methods to ensure correct csv handling by logger object
+    specifically with methods to ensure correct csv handling by Logger object
     through pandas
 
     Abstract Methods
@@ -123,7 +123,6 @@ class SequentialMetric(Metric):
     batchupdate(new_values, new_ns):
         adds iterable of values to list
 
-
     """
 
     name: str
@@ -133,13 +132,13 @@ class SequentialMetric(Metric):
     nums: list[int] = field(default_factory=list)
 
     def update(self, new_value: float, n: int) -> None:
-        """todo"""
+        """method to update `values` and `nums` attribute with `new_value` and `n`"""
         self._checkorder(n)
         self.values.append(new_value)
         self.nums.append(n)
 
     def batchupdate(self, new_values: list[float], new_ns: list[int]) -> None:
-        """todo"""
+        """add list of floats and ints to `values` and `nums`"""
         for value, num in zip(new_values, new_ns):
             self.update(value, num)
 
