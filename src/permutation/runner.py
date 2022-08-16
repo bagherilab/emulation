@@ -81,7 +81,7 @@ class Runner:
     def name(self) -> str:
         """
         name attribute to use as naming convention (file names, structure) for associated model
-        returns string: <modelabbreviation>_n=<observations>_<hyperparamete>=<value>
+        returns string: <modelabbreviation>_n=<observations>__<hyperparameter>=<value>
         """
         return_str = f"{self.model.abv}_n={self.loader.n_working}"
         if self.model.hparams:

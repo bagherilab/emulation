@@ -20,9 +20,9 @@ def arcade_case_study():
 
 
 def main():
-    finley_case_study()
+    # finley_case_study()
     tumorcode_case_study()
-    arcade_case_study()
+    # arcade_case_study()
 
 
 if __name__ == "__main__":
