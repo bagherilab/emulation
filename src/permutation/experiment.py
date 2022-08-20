@@ -5,7 +5,7 @@ import numpy as np
 from permutation.runner import Runner
 from permutation.stage import Stage, IncorrectStageException
 from permutation.loader import Loader, CSVLoader
-from permutation.logger import Logger
+from permutation.exporter import Exporter
 from permutation.models.modelprotocol import Model
 
 
@@ -29,10 +29,12 @@ class Experiment:
     ----------
     name :
         location where files will be stored
+    exporter :
+        Exporter object where the experiment will export results
     logger :
-        Logger object where the experiment will export results
+        Logger object where the experiment will log status
     loader :
-        Loader object where the experiment will export results
+        Loader object where the experiment will load data
     models:
         models that have been added to the experiment
     algorithms :
@@ -72,10 +74,15 @@ class Experiment:
     """
 
     def __init__(
-        self, experiment_name: str, log_dir: str, data_path: str, features: list[str], response: str
+        self,
+        experiment_name: str,
+        export_dir: str,
+        data_path: str,
+        features: list[str],
+        response: str,
     ) -> None:
         self.name = experiment_name
-        self.logger: Logger = Logger(log_dir)
+        self.exporter: Exporter = Exporter(export_dir)
         self.loader: Loader = CSVLoader(data_path, features, response)
         self._features = features
         self._response = response
@@ -135,7 +142,7 @@ class Experiment:
         """log the data from cv"""
         for runner in self._models[algorithm]:
             # if None, an IncorrectStageException will be thrown before the next line runs
-            self.logger.metric_to_csv(
+            self.exporter.metric_to_csv(
                 self.name, algorithm, runner.name, runner.cv_metrics  # type: ignore
             )
 
@@ -149,7 +156,7 @@ class Experiment:
     def _log_training_performance(self, algorithm: str) -> None:
         """log the training performance"""
         runner = self._best_models[algorithm]
-        self.logger.metric_to_csv(self.name, algorithm, runner.name, runner.training_metrics)
+        self.exporter.metric_to_csv(self.name, algorithm, runner.name, runner.training_metrics)
 
     def test_models(self) -> None:
         """test trained best_model performances"""
@@ -161,7 +168,7 @@ class Experiment:
     def _log_test_performance(self, algorithm: str) -> None:
         """log test performance"""
         runner = self._best_models[algorithm]
-        self.logger.metric_to_csv(self.name, algorithm, runner.name, runner.testing_metrics)
+        self.exporter.metric_to_csv(self.name, algorithm, runner.name, runner.testing_metrics)
 
     def permutation_testing(self) -> None:
         """perform permutation testing"""
@@ -173,7 +180,7 @@ class Experiment:
         """log the permutation performance"""
         runner = self._best_models[algorithm]
         for perm_metric in runner.permutation_metrics:
-            self.logger.metric_to_csv(
+            self.exporter.metric_to_csv(
                 self.name, algorithm, f"{runner.name}_{perm_metric.name}", perm_metric
             )
 
@@ -195,12 +202,10 @@ class Experiment:
         self.test_models()
         self.permutation_testing()
 
-    def run_training_quantity_experiment(
-        self, num: int = 10, repeat: Optional[int] = False
-    ) -> None:
+    def run_training_quantity_experiment(self, num: int = 10, repeat: Optional[int] = None) -> None:
         """
         Run the member methods associated with the experiment.
-        Repeats standard experiment N times
+        Repeats standard experiment times
         """
         evenly_spaced_arr = np.linspace(0, self.loader.n_total, num=num, dtype=int)
         for val in evenly_spaced_arr:
