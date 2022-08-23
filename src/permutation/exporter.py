@@ -4,6 +4,7 @@ import pandas as pd
 
 from permutation.metrics import Metric
 from permutation.stage import Stage
+from permutation.file_util import validate_dir
 
 
 class Exporter:
@@ -21,13 +22,11 @@ class Exporter:
 
     pandas_to_csv(experiment, model, filename, stage, dataframe):
         writes data to csv file from pandas Dataframe using filenaming and path conventions
-
-    TODO: Add log file implementation
     """
 
     def __init__(self, export_path: str) -> None:
         self.export_path = export_path
-        self._validate_log_dir(self.export_path)
+        validate_dir(self.export_path)
 
     def metric_to_csv(self, experiment: str, model: str, filename: str, metric: Metric) -> None:
         """takes in arguments to write to csv file, using Metric methods"""
@@ -43,20 +42,6 @@ class Exporter:
     ) -> None:
         """writes data to csv file from pandas Dataframe using filenaming and path conventions"""
         dir_path = f"{self.export_path}/{experiment}/{model}/{stage}"
-        self._validate_log_dir(dir_path)
+        validate_dir(dir_path)
         file_path = f"{dir_path}/{filename}.csv"
         dataframe.to_csv(file_path)
-
-    @staticmethod
-    def _validate_dir(dir: str, create: bool = True) -> None:
-        """
-        validates the directory exists and creates if not,
-        or raises an error if create is false
-        """
-        log_path = Path(dir).resolve()
-        if log_path.exists():
-            return
-        if not log_path.exists() and create:
-            log_path.mkdir(parents=True)
-        else:
-            raise NotADirectoryError(f"dir {dir} does not exist.")
