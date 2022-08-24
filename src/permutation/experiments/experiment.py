@@ -9,7 +9,37 @@ from permutation.exporter import Exporter
 from permutation.models.modelprotocol import Model
 
 
-class Experiment:
+class Experiment(ABC):
+    name: str
+    exporter: Exporter
+    logger: Logger
+    loader: Loader
+
+    @abstractmethod
+    def add_model(self, model: Model) -> None:
+        ...
+
+    @abstractmethod
+    def run(self) -> None:
+        ...
+
+    @abstractmethod
+    @property
+    def models(self) -> list[str]:
+        ...
+
+    @abstractmethod
+    @property
+    def algorithms(self) -> list[str]:
+        ...
+
+    @abstractmethod
+    @property
+    def best_models(self) -> dict[str, str]:
+        ...
+
+
+class StandardExperiment(Experiment):
     """
 
     Arguments
