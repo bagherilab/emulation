@@ -1,0 +1,8 @@
+alpha: 1.0
+  range: [0.0, 1.0]
+  type: continuous
+  search: sobol
+l1_ratio: 0.5
+  range: [0.0, 1.0]
+  type: continuous
+  search: sobol
