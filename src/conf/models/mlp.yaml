@@ -1,0 +1,22 @@
+mlp:
+  continuous:
+    alpha:
+      type: float
+      range: [0.0001, 1]
+  discrete:
+    activation:
+      - identity
+      - logistic
+      - tanh
+      - relu
+    hidden_layer_sizes:
+      - (25,)
+      - (25,25)
+      - (50,)
+      - (50, 50)
+      - (50,25)
+      - (100,)
+      - (100,100)
+      - (100,50)
+  static:
+    solver: lbfgs

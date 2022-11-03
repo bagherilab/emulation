@@ -1,15 +1,5 @@
-name:
-  experiment:
-files:
-  data: 
-paths:
-  log: ./log
-  data: ${hydra:runtime.cwd}/../data/raw
-data:
-  features:
-  response:
-models:
-  mlr: True
-  rf: True
-  svm: True
-  mlp: True
+defaults:
+  - arcade
+  - _self_
+
+debug: true

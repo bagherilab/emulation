@@ -1,0 +1,19 @@
+rf:
+  continuous:
+    n_estimators:
+      type: int
+      range: [1, 100]
+    max_features:
+      type: float
+      range: [0.0, 1.0]
+    max_depth:
+      type: int
+      range: [1, 100]
+    min_samples_split:
+      type: float
+      range: [0.0, 1.0]
+    min_samples_leaf:
+      type: float
+      range: [0.0, 1.0]
+  discrete:
+    bootstrap: [True, False]

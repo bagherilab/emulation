@@ -1,0 +1,38 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiment:
+  name: arcade-case-study
+  debug: False
+files:
+  data: arcade_emulation.csv
+paths:
+  log: ${hydra:runtime.cwd}/logs/
+  data: ${hydra:runtime.cwd}/data/
+  results: ${hydra:runtime.cwd}/results/
+data:
+  features:
+    - seed
+    - edges
+    - nodes
+    - gradius
+    - gdiameter
+    - indegree
+    - outdegree
+    - degree
+    - eccentricity
+    - shortpath
+    - clustering
+    - closeness
+    - betweenness
+    - components
+    - context
+    - vasculature
+  response:
+    - activity
+    - growth
+    - cycles
+    - symmetry
