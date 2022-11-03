@@ -15,6 +15,14 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "antlr4-python3-runtime"
+version = "4.9.3"
+description = "ANTLR 4.9.3 runtime for Python 3.7"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "astroid"
 version = "2.11.6"
 description = "An abstract syntax tree for Python with inference support."
@@ -275,6 +283,19 @@ python-versions = ">=3.7"
 numpy = ">=1.14.5"
 
 [[package]]
+name = "hydra-core"
+version = "1.2.0"
+description = "A framework for elegantly configuring complex applications"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+antlr4-python3-runtime = ">=4.9.0,<4.10.0"
+omegaconf = ">=2.2,<3.0"
+packaging = "*"
+
+[[package]]
 name = "idna"
 version = "3.3"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -456,6 +477,18 @@ python-versions = ">=3.6"
 rsa = ["cryptography (>=3.0.0)"]
 signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
+
+[[package]]
+name = "omegaconf"
+version = "2.2.3"
+description = "A flexible configuration library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+antlr4-python3-runtime = ">=4.9.0,<4.10.0"
+PyYAML = ">=5.1.0"
 
 [[package]]
 name = "opt-einsum"
@@ -670,6 +703,14 @@ description = "World timezone definitions, modern and historical"
 category = "main"
 optional = false
 python-versions = "*"
+
+[[package]]
+name = "pyyaml"
+version = "6.0"
+description = "YAML parser and emitter for Python"
+category = "main"
+optional = false
+python-versions = ">=3.6"
 
 [[package]]
 name = "requests"
@@ -1105,7 +1146,7 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.10,<3.11"
-content-hash = "78632b3c580bda182d158d8890bed86b57e4aae9fab337a82ade50b13bc8f1a2"
+content-hash = "55520ccb1c7438af8cc48fdace3db70c55efbf6e9e4225310bc517b50559c518"
 
 [metadata.files]
 absl-py = [
@@ -1116,6 +1157,7 @@ alabaster = [
     {file = "alabaster-0.7.12-py2.py3-none-any.whl", hash = "sha256:446438bdcca0e05bd45ea2de1668c1d9b032e1a9154c2c259092d77031ddd359"},
     {file = "alabaster-0.7.12.tar.gz", hash = "sha256:a661d72d58e6ea8a57f7a86e37d86716863ee5e92788398526d58b26a4e4dc02"},
 ]
+antlr4-python3-runtime = []
 astroid = [
     {file = "astroid-2.11.6-py3-none-any.whl", hash = "sha256:ba33a82a9a9c06a5ceed98180c5aab16e29c285b828d94696bf32d6015ea82a9"},
     {file = "astroid-2.11.6.tar.gz", hash = "sha256:4f933d0bf5e408b03a6feb5d23793740c27e07340605f236496cd6ce552043d6"},
@@ -1339,6 +1381,7 @@ h5py = [
     {file = "h5py-3.7.0-cp39-cp39-win_amd64.whl", hash = "sha256:9e2ad2aa000f5b1e73b5dfe22f358ca46bf1a2b6ca394d9659874d7fc251731a"},
     {file = "h5py-3.7.0.tar.gz", hash = "sha256:3fcf37884383c5da64846ab510190720027dca0768def34dd8dcb659dbe5cbf3"},
 ]
+hydra-core = []
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
@@ -1529,6 +1572,7 @@ oauthlib = [
     {file = "oauthlib-3.2.0-py3-none-any.whl", hash = "sha256:6db33440354787f9b7f3a6dbd4febf5d0f93758354060e802f6c06cb493022fe"},
     {file = "oauthlib-3.2.0.tar.gz", hash = "sha256:23a8208d75b902797ea29fd31fa80a15ed9dc2c6c16fe73f5d346f83f6fa27a2"},
 ]
+omegaconf = []
 opt-einsum = [
     {file = "opt_einsum-3.3.0-py3-none-any.whl", hash = "sha256:2455e59e3947d3c275477df7f5205b30635e266fe6dc300e3d9f9646bfcea147"},
     {file = "opt_einsum-3.3.0.tar.gz", hash = "sha256:59f6475f77bbc37dcf7cd748519c0ec60722e91e63ca114e68821c0c54a46549"},
@@ -1666,6 +1710,7 @@ pytz = [
     {file = "pytz-2022.1-py2.py3-none-any.whl", hash = "sha256:e68985985296d9a66a881eb3193b0906246245294a881e7c8afe623866ac6a5c"},
     {file = "pytz-2022.1.tar.gz", hash = "sha256:1e760e2fe6a8163bc0b3d9a19c4f84342afa0a2affebfaa84b01b978a02ecaa7"},
 ]
+pyyaml = []
 requests = [
     {file = "requests-2.28.0-py3-none-any.whl", hash = "sha256:bc7861137fbce630f17b03d3ad02ad0bf978c844f3536d0edda6499dafce2b6f"},
     {file = "requests-2.28.0.tar.gz", hash = "sha256:d568723a7ebd25875d8d1eaf5dfa068cd2fc8194b2e483d7b1f7c81918dbec6b"},
