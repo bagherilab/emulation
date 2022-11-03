@@ -4,34 +4,25 @@ from typing import Protocol, Optional, Any
 from permutation.metrics import BatchMetric
 
 
-class Hyperparams(Protocol):
-    """Protocol for typing hyperparameter object."""
-
-    args: str
-    values: str
-    number_of_parameters: int
-
-    def update_params(self) -> None:
-        """todo"""
-
-    def as_dict(self) -> dict[str, Any]:
-        """todo"""
-
-    def update_cv_metrics(self, value: float) -> None:
-        """todo"""
-
-
-@dataclass
-class Hparams:
+class HParams:
     """Dataclass for storing hyperparameter information and associated performance metrics."""
 
-    args: list[str] = field(default_factory=list)
-    values: list[Any] = field(default_factory=list)
-    number_of_parameters: int = 0
-    cross_validation_performance: Optional[BatchMetric] = None
-    performance_average: float = 0.0
+    def __init__(self, param_dict: dict[str, Any] = None):
+        self.args: list[str] = []
+        self.values: list[Any] = []
+        self.number_of_parameters: int = 0
+        self.cross_validation_performance: Optional[BatchMetric] = None
+        self.performance_average: float = 0.0
 
-    def update_params(self, arg: str, value: Any) -> None:
+        if param_dict is not None:
+            self.update_params(param_dict)
+
+    def update_params(self, param_dict: dict[str, Any]) -> None:
+        args, values = zip(*param_dict.items())
+        for arg, value in zip(args, values):
+            self.update_param(arg, value)
+
+    def update_param(self, arg: str, value: Any) -> None:
         """todo"""
         if self.cross_validation_performance:
             raise AttributeError("Already performed cross-validation with these parameters.")

@@ -5,7 +5,7 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 from permutation.models.modelprotocol import Model
 from permutation.models.sklearnmodel import AbstractSKLearnModel
-from permutation.models.hyperparameters import Hyperparams
+from permutation.models.hyperparameters import HParams
 
 
 class MLP(AbstractSKLearnModel):
@@ -19,7 +19,7 @@ class MLP(AbstractSKLearnModel):
     def set_model(
         cls,
         model_dependency: BaseEstimator = MLPRegressor,
-        hparams: Optional[Hyperparams] = None,
+        hparams: Optional[HParams] = None,
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """todo"""

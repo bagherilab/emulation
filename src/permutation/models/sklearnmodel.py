@@ -13,7 +13,7 @@ import numpy as np
 from permutation.metrics import BatchMetric
 from permutation.stage import Stage
 from permutation.models.modelprotocol import Model
-from permutation.models.hyperparameters import Hyperparams
+from permutation.models.hyperparameters import HParams
 
 
 class AbstractSKLearnModel(ABC):
@@ -24,7 +24,7 @@ class AbstractSKLearnModel(ABC):
     algorithm_abv: str
     pipeline: Pipeline
     model: BaseEstimator
-    hparams: Optional[Hyperparams] = None
+    hparams: Optional[HParams] = None
     standarization: Optional[Iterable[tuple[str, TransformerMixin]]] = None
 
     @classmethod
@@ -32,7 +32,7 @@ class AbstractSKLearnModel(ABC):
     def set_model(
         cls: Model,
         model_dependency: BaseEstimator,
-        hparams: Optional[Hyperparams],
+        hparams: Optional[HParams],
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]],
     ) -> Model:
         """abstract method for to implement models with sklearn defaults"""
@@ -41,7 +41,7 @@ class AbstractSKLearnModel(ABC):
     def _set_model(
         cls,
         model_dependency: BaseEstimator,
-        hparams: Optional[Hyperparams] = None,
+        hparams: Optional[HParams] = None,
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """Helper function for subclasses:

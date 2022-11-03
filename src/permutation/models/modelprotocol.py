@@ -3,7 +3,7 @@ from typing import Protocol, Optional
 import pandas as pd
 import numpy as np
 
-from permutation.models.hyperparameters import Hyperparams
+from permutation.models.hyperparameters import HParams
 from permutation.metrics import BatchMetric
 
 
@@ -15,7 +15,7 @@ class Model(Protocol):
     algorithm_name: str
     algorithm_abv: str
     algorithm_type: str
-    hparams: Optional[Hyperparams]
+    hparams: Optional[HParams]
 
     def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int) -> BatchMetric:
         """todo"""
