@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 from permutation.models.mlp import MLP
-from permutation.models.hyperparameters import Hparams
+from permutation.models.hyperparameters import HParams
 
 
 class MLPTest(unittest.TestCase):
@@ -21,7 +21,7 @@ class MLPTest(unittest.TestCase):
         self.X = pd.DataFrame([[1, 2], [4, 5], [7, 8]], columns=["a", "b"])
         self.y = pd.Series([3, 6, 9], name="c")
 
-        self.hparams_mock = Mock(spec=Hparams)
+        self.hparams_mock = Mock(spec=HParams)
         self.hparams_mock.as_dict = Mock(
             return_value={"hidden_layer_sizes": (100,), "activation": "tanh"}
         )

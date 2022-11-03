@@ -1,51 +1,51 @@
 import unittest
 
-from permutation.models.hyperparameters import Hparams
+from permutation.models.hyperparameters import HParams
 
 
-class HparametersTest(unittest.TestCase):
+class HParametersTest(unittest.TestCase):
     def test_empty_defaults(self) -> None:
-        testHparams = Hparams()
+        testHParams = HParams()
 
-        self.assertFalse(testHparams.values)
-        self.assertFalse(testHparams.args)
-        self.assertEqual(testHparams.number_of_parameters, 0)
+        self.assertFalse(testHParams.values)
+        self.assertFalse(testHParams.args)
+        self.assertEqual(testHParams.number_of_parameters, 0)
 
     def test_update(self) -> None:
-        testHparams = Hparams()
+        testHParams = HParams()
 
-        testHparams.update_params("alpha", 1.0)
+        testHParams.update_param("alpha", 1.0)
 
-        self.assertEqual(testHparams.args, ["alpha"])
-        self.assertEqual(testHparams.values, [1.0])
-        self.assertEqual(testHparams.number_of_parameters, 1)
+        self.assertEqual(testHParams.args, ["alpha"])
+        self.assertEqual(testHParams.values, [1.0])
+        self.assertEqual(testHParams.number_of_parameters, 1)
 
     def test_multiple_updates(self) -> None:
-        testHparams = Hparams()
+        testHParams = HParams()
 
-        testHparams.update_params("alpha", 1.0)
-        testHparams.update_params("beta", "foo")
+        testHParams.update_param("alpha", 1.0)
+        testHParams.update_param("beta", "foo")
 
-        self.assertEqual(testHparams.args, ["alpha", "beta"])
-        self.assertEqual(testHparams.values, [1.0, "foo"])
-        self.assertEqual(testHparams.number_of_parameters, 2)
+        self.assertEqual(testHParams.args, ["alpha", "beta"])
+        self.assertEqual(testHParams.values, [1.0, "foo"])
+        self.assertEqual(testHParams.number_of_parameters, 2)
 
     def test_mutability(self) -> None:
-        _ = Hparams()
-        _.update_params("alpha", 1.0)
+        _ = HParams()
+        _.update_param("alpha", 1.0)
 
-        testHparams = Hparams()
+        testHParams = HParams()
 
-        self.assertFalse(testHparams.values)
-        self.assertFalse(testHparams.args)
-        self.assertEqual(testHparams.number_of_parameters, 0)
+        self.assertFalse(testHParams.values)
+        self.assertFalse(testHParams.args)
+        self.assertEqual(testHParams.number_of_parameters, 0)
 
     def test_as_dict(self) -> None:
-        testHparams = Hparams()
+        testHParams = HParams()
 
-        testHparams.update_params("alpha", 1.0)
-        testHparams.update_params("beta", "foo")
+        testHParams.update_param("alpha", 1.0)
+        testHParams.update_param("beta", "foo")
 
         expected = {"alpha": 1.0, "beta": "foo"}
 
-        self.assertEqual(testHparams.as_dict(), expected)
+        self.assertEqual(testHParams.as_dict(), expected)

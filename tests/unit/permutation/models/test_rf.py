@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 
 from permutation.models.rf import RF
-from permutation.models.hyperparameters import Hparams
+from permutation.models.hyperparameters import HParams
 
 
 class RFTest(unittest.TestCase):
@@ -21,7 +21,7 @@ class RFTest(unittest.TestCase):
         self.X = pd.DataFrame([[1, 2], [4, 5], [7, 8]], columns=["a", "b"])
         self.y = pd.Series([3, 6, 9], name="c")
 
-        self.hparams_mock = Mock(spec=Hparams)
+        self.hparams_mock = Mock(spec=HParams)
         self.hparams_mock.as_dict = Mock(return_value={"n_estimators": 200, "max_features": "auto"})
         self.hparams_mock.__str__ = Mock(return_value="{'n_estimators': 1, 'max_features': 'auto'}")
 

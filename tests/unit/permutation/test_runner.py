@@ -8,7 +8,7 @@ from permutation.loader import Loader
 from permutation.stage import Stage, IncorrectStageException
 from permutation.metrics import BatchMetric
 from permutation.models.modelprotocol import Model
-from permutation.models.hyperparameters import Hyperparams
+from permutation.models.hyperparameters import HParams
 
 
 class RunnerTests(unittest.TestCase):
@@ -30,14 +30,14 @@ class RunnerTests(unittest.TestCase):
 
     def test_stage_initialization_without_hparam(self) -> None:
         """Check to see if correct stage is set (TRAIN) if no hyperparameters are passed."""
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
 
         self.assertEqual(testRunner._stage.name, "VAL")
 
     def test_cross_validation_hparams_called(self) -> None:
         self.model_mock.crossval_hparams = Mock(return_value=[1.0] * 10)
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
         self.loader_mock.load_training_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
@@ -58,7 +58,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_fit_model_called(self) -> None:
         self.model_mock.fit_model = Mock(return_value=1.0)
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
         self.loader_mock.load_training_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
@@ -69,7 +69,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_fit_model_called_at_incorrect_stage(self) -> None:
         self.model_mock.fit_model = Mock(return_value=1.0)
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
         self.loader_mock.load_training_data = Mock(return_value=self.load_data_return)
 
         def call_train_at_wrong_stage():
@@ -81,7 +81,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_performance_called(self) -> None:
         self.model_mock.performance = Mock(return_value=1.0)
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
         self.loader_mock.load_testing_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
@@ -92,7 +92,7 @@ class RunnerTests(unittest.TestCase):
 
     def test_performance_called_at_incorrect_stage(self) -> None:
         self.model_mock.performance = Mock(return_value=1.0)
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
         self.loader_mock.load_testing_data = Mock(return_value=self.load_data_return)
 
         def call_test_at_wrong_stage():
@@ -106,7 +106,7 @@ class RunnerTests(unittest.TestCase):
         metric_mock = MagicMock(spec=BatchMetric)
         list_of_metric_mocks = [metric_mock] * 10
         self.model_mock.permutation = Mock(return_value=list_of_metric_mocks)
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
         self.loader_mock.load_working_data = Mock(return_value=self.load_data_return)
 
         testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
@@ -117,7 +117,7 @@ class RunnerTests(unittest.TestCase):
         self.assertEqual(testRunner.permutation_metrics, list_of_metric_mocks)
 
     def test_permutation_called_at_incorrect_stage(self) -> None:
-        self.model_mock.hparams = Mock(spec=Hyperparams)
+        self.model_mock.hparams = Mock(spec=HParams)
 
         def call_perm_at_wrong_stage():
             testRunner = Runner(model=self.model_mock, loader=self.loader_mock)
