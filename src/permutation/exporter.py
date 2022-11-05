@@ -4,7 +4,7 @@ import pandas as pd
 
 from permutation.metrics import Metric
 from permutation.stage import Stage
-from permutation.file_util import validate_dir
+from permutation.file_utils import validate_dir
 
 
 class Exporter:
@@ -24,8 +24,9 @@ class Exporter:
         writes data to csv file from pandas Dataframe using filenaming and path conventions
     """
 
-    def __init__(self, export_path: str) -> None:
+    def __init__(self, experiment: str, export_path: str = "/results/") -> None:
         self.export_path = export_path
+        self.experiment = experiment
         validate_dir(self.export_path)
 
     def metric_to_csv(self, experiment: str, model: str, filename: str, metric: Metric) -> None:
@@ -34,14 +35,20 @@ class Exporter:
 
     def pandas_to_csv(
         self,
-        experiment: str,
         model: str,
         filename: str,
         stage: Stage,
         dataframe: pd.DataFrame | pd.Series,
     ) -> None:
         """writes data to csv file from pandas Dataframe using filenaming and path conventions"""
-        dir_path = f"{self.export_path}/{experiment}/{model}/{stage}"
+        dir_path = f"{self.export_path}/{self.experiment}/{model}/{stage}"
+        self._save_df(dir_path, filename, dataframe)
+
+    def _save_df(self, dir_path, name, df: pd.DataFrame):
         validate_dir(dir_path)
-        file_path = f"{dir_path}/{filename}.csv"
-        dataframe.to_csv(file_path)
+        file_path = f"{dir_path}/{name}.csv"
+        df.to_csv(file_path)
+
+    def save_manifest_file(self, manifest: pd.DataFrame):
+        dir_path = f"{self.export_path}/{self.experiment}/"
+        self._save_df(dir_path, "manifest", manifest)

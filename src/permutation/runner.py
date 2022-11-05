@@ -1,4 +1,5 @@
 from typing import Optional
+import uuid
 
 from permutation.metrics import BatchMetric
 from permutation.models.modelprotocol import Model
@@ -70,6 +71,7 @@ class Runner:
         self.permutation_metrics: list[BatchMetric] = []
 
         self._stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
+        self._UUID = uuid.uuid4()
 
     def cross_validation(self, K: int = 10) -> None:
         """performs and stores the <K>-fold cross validation"""
@@ -124,13 +126,18 @@ class Runner:
         self._stage = Stage.TRAIN if self.model.hparams is None else Stage.VAL
 
     @property
-    def name(self) -> str:
-        """
-        name attribute to use as naming convention (file names, structure) for associated model
-        returns string: <modelabbreviation>_n=<observations>__<hyperparameter>=<value>
-        """
-        return_str = f"{self.model.algorithm_abv}_n={self.loader.n_working}"
+    def id(self) -> str:
+        """return UUID"""
+        return str(self._UUID)
+
+    def reset_id(self) -> None:
+        """todo"""
+        self._UUID = uuid.uuid4()
+
+    @property
+    def description(self) -> dict[str, str]:
+        """todo"""
+        return_dict = {"model_type": self.model.algorithm_abv, "n": str(self.loader.n_working)}
         if self.model.hparams:
-            temp_list = [f"{param}-{val}" for param, val in self.model.hparams.as_dict().items()]
-            return return_str + "__" + "_".join(temp_list)
-        return return_str
+            return_dict.update(self.model.hparams.as_dict())
+        return return_dict

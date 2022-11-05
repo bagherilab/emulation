@@ -6,13 +6,12 @@ defaults:
   - _self_
 experiment:
   name: arcade-case-study
-  debug: False
 files:
   data: arcade_emulation.csv
 paths:
-  log: ${hydra:runtime.cwd}/logs/
-  data: ${hydra:runtime.cwd}/data/
-  results: ${hydra:runtime.cwd}/results/
+  log: ${hydra:runtime.cwd}/logs/ARCADE/
+  data: ${hydra:runtime.cwd}/data/ARCADE/
+  results: ${hydra:runtime.cwd}/results/ARCADE/
 data:
   features:
     - seed

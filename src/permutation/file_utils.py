@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 def validate_dir(dir_string: str, create: bool = True) -> None:
     """
     validates the directory exists and creates if not,

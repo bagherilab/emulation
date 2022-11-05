@@ -1,5 +1,7 @@
 import logging
 import os
+from abc import ABC, abstractmethod
+from typing import Optional
 
 from permutation.file_utils import validate_dir
 
@@ -17,19 +19,21 @@ class ExperimentLogger:
     def __init__(
         self,
         experiment_name: str,
-        log_dir: Optional[str],
+        log_dir: str = "/logs/",
         format_str: str = "%(asctime)s:%(name)s:%(message)s",
         level: int = logging.INFO,
     ):
-        self.log_path = os.path.join(f"{self.log_dir}/{self.experiment_name}.log")
+        validate_dir(log_dir)
+        self.log_path = os.path.join(f"{log_dir}/{experiment_name}.log")
         self.experiment_name = experiment_name
-        self.logger = logging.getLogger(name)
+        self.logger = logging.getLogger(self.experiment_name)
+        self._set_up(format_str, level)
 
     def _set_up(self, format_str: str, level: int):
         """todo"""
         self.logger.setLevel(level)
         formatter = logging.Formatter(format_str)
-        file_handler = logging.FileHandler(self.log_path)
+        file_handler = logging.FileHandler(self.log_path, mode="w")
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)
 

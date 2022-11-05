@@ -1,10 +1,13 @@
 from typing import Optional
+from abc import ABC, abstractmethod
 
 import numpy as np
+import pandas as pd
 
 from permutation.runner import Runner
 from permutation.stage import Stage, IncorrectStageException
 from permutation.loader import Loader, CSVLoader
+from permutation.logger import Logger, ExperimentLogger
 from permutation.exporter import Exporter
 from permutation.models.modelprotocol import Model
 
@@ -20,21 +23,25 @@ class Experiment(ABC):
         ...
 
     @abstractmethod
+    def add_models(self, models: list[Model]) -> None:
+        ...
+
+    @abstractmethod
     def run(self) -> None:
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def models(self) -> list[str]:
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def algorithms(self) -> list[str]:
         ...
 
-    @abstractmethod
     @property
+    @abstractmethod
     def best_models(self) -> dict[str, str]:
         ...
 
@@ -113,18 +120,41 @@ class StandardExperiment(Experiment):
         response: str,
     ) -> None:
         self.name = experiment_name
-        self.exporter: Exporter = Exporter(export_dir)
-        self.logger: Logger = Logger(log_dir)
+        self.exporter: Exporter = Exporter(self.name, export_dir)
+        self.logger: Logger = ExperimentLogger(self.name, log_dir)
         self.loader: Loader = CSVLoader(data_path, features, response)
         self._features = features
         self._response = response
         self._models: dict[str, list[Runner]] = {}
+        self._model_ids: set = set()
+        self._n_models = 0
         self._best_models: dict[str, Runner] = {}
+        self._log_initialization()
+
+    def _log_initialization(self):
+        self.logger.log(f"{self.name} initialized.")
 
     def add_model(self, model: Model) -> None:
         """todo"""
         self._check_algorithm_in_models(model.algorithm_name)
-        self._models[model.algorithm_name].append(Runner(model, self.loader))
+        runner = Runner(model, self.loader)
+        self._models[model.algorithm_name].append(runner)
+        model_id = self._check_ids(runner)
+        self.logger.log(f"Added {model_id}.")
+        self._n_models += 1
+
+    def _check_ids(self, runner: Runner) -> str:
+        """todo"""
+        while runner.id in self._model_ids:
+            self.logger.log(f"Reset id for {runner.Description}")
+            runner.reset_id()
+
+        return runner.id
+
+    def add_models(self, models: list[Model]) -> None:
+        """todo"""
+        for model in models:
+            self.add_model(model)
 
     def _check_algorithm_in_models(self, name: str) -> None:
         """todo"""
@@ -136,7 +166,7 @@ class StandardExperiment(Experiment):
         """todo"""
         list_of_models = []
         for _, runner_list in self._models.items():
-            temp_name_list = [runner.name for runner in runner_list]
+            temp_name_list = [runner.id for runner in runner_list]
             list_of_models.extend(temp_name_list)
         return list_of_models
 
@@ -148,7 +178,7 @@ class StandardExperiment(Experiment):
     @property
     def best_models(self) -> dict[str, str]:
         """returns dictionary and name of best models"""
-        return {alg: runner.name for alg, runner in self._best_models.items()}
+        return {alg: runner.id for alg, runner in self._best_models.items()}
 
     def hyperparameter_selection(self) -> None:
         """perform hparam selection using cv"""
@@ -156,9 +186,14 @@ class StandardExperiment(Experiment):
 
     def _get_best_cv_model(self) -> None:
         """run CV for all models and identify best model"""
+        progress_counter = 0
+
         for algorithm, runner_list in self._models.items():
-            map(lambda r: r.cross_validation(), runner_list)
-            # if None, an IncorrectStageException will be thrown before the next line runs
+            for r in runner_list:
+                r.cross_validation()
+                progress_counter += 1
+                self.logger.log(f"Progress: {progress_counter} of {self._n_models}")
+
             cv_list = [runner.cv_metrics.average for runner in runner_list]  # type: ignore
             best_value = max(cv_list)
             model_index = next(i for i, val in enumerate(cv_list) if val == best_value)
@@ -175,7 +210,7 @@ class StandardExperiment(Experiment):
         for runner in self._models[algorithm]:
             # if None, an IncorrectStageException will be thrown before the next line runs
             self.exporter.metric_to_csv(
-                self.name, algorithm, runner.name, runner.cv_metrics  # type: ignore
+                self.name, algorithm, runner.id, runner.cv_metrics  # type: ignore
             )
 
     def train_models(self) -> None:
@@ -188,7 +223,7 @@ class StandardExperiment(Experiment):
     def _log_training_performance(self, algorithm: str) -> None:
         """log the training performance"""
         runner = self._best_models[algorithm]
-        self.exporter.metric_to_csv(self.name, algorithm, runner.name, runner.training_metrics)
+        self.exporter.metric_to_csv(self.name, algorithm, runner.id, runner.training_metrics)
 
     def test_models(self) -> None:
         """test trained best_model performances"""
@@ -200,7 +235,7 @@ class StandardExperiment(Experiment):
     def _log_test_performance(self, algorithm: str) -> None:
         """log test performance"""
         runner = self._best_models[algorithm]
-        self.exporter.metric_to_csv(self.name, algorithm, runner.name, runner.testing_metrics)
+        self.exporter.metric_to_csv(self.name, algorithm, runner.id, runner.testing_metrics)
 
     def permutation_testing(self) -> None:
         """perform permutation testing"""
@@ -213,10 +248,13 @@ class StandardExperiment(Experiment):
         runner = self._best_models[algorithm]
         for perm_metric in runner.permutation_metrics:
             self.exporter.metric_to_csv(
-                self.name, algorithm, f"{runner.name}_{perm_metric.name}", perm_metric
+                self.name, algorithm, f"{runner.id}_{perm_metric.name}", perm_metric
             )
 
-    def run_standard_experiment(self) -> None:
+    def run(self):
+        self._run_standard_experiment()
+
+    def _run_standard_experiment(self) -> None:
         """
         Run the member methods associated with the experiment.
         1) Hyperparameter selection via cross validation.
@@ -266,5 +304,15 @@ class StandardExperiment(Experiment):
     def _reset_best_models(self) -> None:
         """reset the best models"""
         self._best_models = {}
+
+    def save_manifest(self) -> None:
+        self.logger.log(f"Saving manifest for {self.name}")
+        temp_d = {
+            runner.id: runner.description
+            for runner_list in self._models.values()
+            for runner in runner_list
+        }
+        manifest_df = pd.DataFrame.from_dict(temp_d, orient="index")
+        self.exporter.save_manifest_file(manifest_df)
 
     # todo: add logic for models where hparams are not specified, i.e. no cv needed

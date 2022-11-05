@@ -1,14 +1,30 @@
+import os
+
 import hydra
 
 from config_utils import assign_models, assign_hyperparameters
+from permutation.experiments.experiment import StandardExperiment
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(cfg):
-    for model, hparam_cfg in cfg.models.items():
 
+    experiment = StandardExperiment(
+        experiment_name=cfg.experiment.name,
+        export_dir=cfg.paths.results,
+        log_dir=cfg.paths.log,
+        data_path=os.path.join(cfg.paths.data, cfg.files.data),
+        features=cfg.data.features,
+        response=cfg.data.response[0],  # rewrite to accept lists
+    )
+
+    for model, hparam_cfg in cfg.models.items():
         temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg)
-        assign_models.assign_models_from_list(temp_list, model)
+        model_list = assign_models.assign_models_from_list(temp_list, model)
+        experiment.add_models(model_list)
+
+    experiment.save_manifest()
+    experiment.run()
 
 
 if __name__ == "__main__":
