@@ -1,3 +1,5 @@
+from sklearn.preprocessing import StandardScaler
+
 from permutation.models.mlr import MLR
 from permutation.models.rf import RF
 from permutation.models.svr import SVReg
@@ -11,7 +13,9 @@ MODEL_DEPENDENCIES = {"mlr": MLR, "rf": RF, "svr": SVReg, "mlp": MLP}
 def _get_correct_model(model_type: str, hparams: HParams) -> Model:
     """Choose the correct model dependency from model string"""
     try:
-        return MODEL_DEPENDENCIES[model_type].set_model(hparams=hparams)
+        return MODEL_DEPENDENCIES[model_type].set_model(
+            hparams=hparams, preprocessing_dependencies=[("standardscaler", StandardScaler)]
+        )
     except KeyError:
         raise ValueError(f"Model type {model_type} is not implemented.")
 

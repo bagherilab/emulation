@@ -1,4 +1,5 @@
 from pathlib import Path
+import glob
 
 
 def validate_dir(dir_string: str, create: bool = True) -> None:
@@ -13,3 +14,14 @@ def validate_dir(dir_string: str, create: bool = True) -> None:
         log_path.mkdir(parents=True)
     else:
         raise NotADirectoryError(f"dir {dir_string} does not exist.")
+
+
+def clean_dir(dir_string: str) -> None:
+    """todo"""
+    files = glob.glob("dir_string/**/*.csv", recursive=True)
+
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))

@@ -26,8 +26,21 @@ class MLP(AbstractSKLearnModel):
         if preprocessing_dependencies is None:
             preprocessing_dependencies = []
 
+        if hparams is not None:
+            _fix_tuple_type(hparams)
+
         return super()._set_model(
             model_dependency=model_dependency,
             hparams=hparams,
             preprocessing_dependencies=preprocessing_dependencies,
         )
+
+
+def _fix_tuple_type(
+    hparams: HParams,
+    change_arg: str = "hidden_layer_sizes",
+):
+    for i, arg_tuple in enumerate(zip(hparams.args, hparams.values)):
+        arg, val = arg_tuple
+        if arg == "hidden_layer_sizes":
+            hparams.values[i] = eval(val)

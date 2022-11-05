@@ -27,9 +27,9 @@ data:
     - clustering
     - closeness
     - betweenness
-    - components
-    - context
-    - vasculature
+    # - components
+    # - context
+    # - vasculature
   response:
     - activity
     - growth

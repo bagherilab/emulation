@@ -136,9 +136,9 @@ class StandardExperiment(Experiment):
 
     def add_model(self, model: Model) -> None:
         """todo"""
-        self._check_algorithm_in_models(model.algorithm_name)
+        self._check_algorithm_in_models(model.algorithm_abv)
         runner = Runner(model, self.loader)
-        self._models[model.algorithm_name].append(runner)
+        self._models[model.algorithm_abv].append(runner)
         model_id = self._check_ids(runner)
         self.logger.log(f"Added {model_id}.")
         self._n_models += 1
@@ -192,7 +192,7 @@ class StandardExperiment(Experiment):
             for r in runner_list:
                 r.cross_validation()
                 progress_counter += 1
-                self.logger.log(f"Progress: {progress_counter} of {self._n_models}")
+                self.logger.log(f"Progress: {progress_counter} of {self._n_models} - {r.id}")
 
             cv_list = [runner.cv_metrics.average for runner in runner_list]  # type: ignore
             best_value = max(cv_list)
@@ -207,11 +207,13 @@ class StandardExperiment(Experiment):
 
     def _log_hyperparameter_selection(self, algorithm: str) -> None:
         """log the data from cv"""
+        self.logger.log(f"Trying to log CV for {algorithm}")
         for runner in self._models[algorithm]:
             # if None, an IncorrectStageException will be thrown before the next line runs
             self.exporter.metric_to_csv(
                 self.name, algorithm, runner.id, runner.cv_metrics  # type: ignore
             )
+            self.logger.log(f"Logging CV for {runner.id}")
 
     def train_models(self) -> None:
         """train models in best_model"""
@@ -252,6 +254,7 @@ class StandardExperiment(Experiment):
             )
 
     def run(self):
+        self.logger.log(f"running {self._models}")
         self._run_standard_experiment()
 
     def _run_standard_experiment(self) -> None:

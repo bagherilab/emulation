@@ -73,9 +73,10 @@ class AbstractSKLearnModel(ABC):
     def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int = 10) -> BatchMetric:
         """perform cross validation"""
         metrics = BatchMetric(name=f"CV_K={K},", value_type="R^2", stage=Stage.VAL)
-
-        cv_results = cross_val_score(self.pipeline, X, y, cv=K)
-
+        try:
+            cv_results = cross_val_score(self.pipeline, X, y, cv=K)
+        except ValueError:
+            raise ValueError(f"Hparams are {self.hparams}")
         metrics.batchupdate(cv_results.tolist())
         return metrics
 
@@ -106,7 +107,7 @@ def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[Ba
     metric_list = []
     for i, feature in enumerate(feature_names):
         temp_metric = BatchMetric(name=f"Feature: {feature}", value_type="R^2", stage=Stage.PERM)
-        importance_val_list = output.importances[:, i].flatten().tolist()
+        importance_val_list = output.importances[i, :].flatten().tolist()
         temp_metric.batchupdate(importance_val_list)
         metric_list.append(temp_metric)
     return metric_list

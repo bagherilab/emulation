@@ -1,8 +1,10 @@
 from pathlib import Path
+import json
 
 import pandas as pd
 
 from permutation.metrics import Metric
+from permutation.runner import Runner
 from permutation.stage import Stage
 from permutation.file_utils import validate_dir
 
@@ -31,7 +33,7 @@ class Exporter:
 
     def metric_to_csv(self, experiment: str, model: str, filename: str, metric: Metric) -> None:
         """takes in arguments to write to csv file, using Metric methods"""
-        self.pandas_to_csv(experiment, model, filename, metric.stage, metric.to_pandas())
+        self.pandas_to_csv(model, filename, metric.stage, metric.to_pandas())
 
     def pandas_to_csv(
         self,
@@ -52,3 +54,8 @@ class Exporter:
     def save_manifest_file(self, manifest: pd.DataFrame):
         dir_path = f"{self.export_path}/{self.experiment}/"
         self._save_df(dir_path, "manifest", manifest)
+
+    def save_model_json(self, dir_path: str, runner: Runner):
+        dir_path = f"{self.export_path}/{self.experiment}/{model.algorithm_abv}/{runner.id}.json"
+        with open(dir_path) as outfile:
+            json.dump(runner.model.hparams.to_dict(), outfile)

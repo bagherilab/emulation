@@ -3,11 +3,14 @@ import os
 import hydra
 
 from config_utils import assign_models, assign_hyperparameters
+from permutation.file_utils import clean_dir
 from permutation.experiments.experiment import StandardExperiment
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(cfg):
+
+    clean_dir(cfg.paths.results)
 
     experiment = StandardExperiment(
         experiment_name=cfg.experiment.name,
