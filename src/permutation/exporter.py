@@ -26,7 +26,7 @@ class Exporter:
         writes data to csv file from pandas Dataframe using filenaming and path conventions
     """
 
-    def __init__(self, experiment: str, export_path: str = "/results/") -> None:
+    def __init__(self, experiment: str, export_path: str = "/results") -> None:
         self.export_path = export_path
         self.experiment = experiment
         validate_dir(self.export_path)
@@ -52,10 +52,12 @@ class Exporter:
         df.to_csv(file_path)
 
     def save_manifest_file(self, manifest: pd.DataFrame):
-        dir_path = f"{self.export_path}/{self.experiment}/"
+        dir_path = f"{self.export_path}{self.experiment}/"
         self._save_df(dir_path, "manifest", manifest)
 
-    def save_model_json(self, dir_path: str, runner: Runner):
-        dir_path = f"{self.export_path}/{self.experiment}/{model.algorithm_abv}/{runner.id}.json"
-        with open(dir_path) as outfile:
-            json.dump(runner.model.hparams.to_dict(), outfile)
+    def save_model_json(self, runner: Runner):
+        dir_path = (
+            f"{self.export_path}{self.experiment}/{runner.model.algorithm_abv}/{runner.id}.json"
+        )
+        with open(dir_path, "w") as outfile:
+            json.dump(runner.model.hparams.as_dict(), outfile)

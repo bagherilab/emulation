@@ -197,13 +197,14 @@ class StandardExperiment(Experiment):
             cv_list = [runner.cv_metrics.average for runner in runner_list]  # type: ignore
             best_value = max(cv_list)
             model_index = next(i for i, val in enumerate(cv_list) if val == best_value)
-            self._update_best_model(algorithm, model_index)
             self._log_hyperparameter_selection(algorithm)
+            self._update_best_model(algorithm, model_index)
 
     def _update_best_model(self, algorithm: str, model_index: int) -> None:
         """update best_model"""
         self._best_models[algorithm] = self._models[algorithm][model_index]
         self._best_models[algorithm].set_stage(Stage.TRAIN)
+        self.exporter.save_model_json(self._best_models[algorithm])
 
     def _log_hyperparameter_selection(self, algorithm: str) -> None:
         """log the data from cv"""

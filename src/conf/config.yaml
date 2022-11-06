@@ -1,5 +1,5 @@
 defaults:
-  - arcade
+  - arcade-symmetry
   - _self_
 
 debug: true

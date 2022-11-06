@@ -5,7 +5,7 @@ defaults:
   - models/mlp
   - _self_
 experiment:
-  name: arcade-case-study
+  name: arcade-activity
 files:
   data: arcade_emulation.csv
 paths:
@@ -32,6 +32,3 @@ data:
     # - vasculature
   response:
     - activity
-    - growth
-    - cycles
-    - symmetry

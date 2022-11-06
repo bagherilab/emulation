@@ -1,0 +1,34 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiment:
+  name: arcade-growth
+files:
+  data: arcade_emulation.csv
+paths:
+  log: ${hydra:runtime.cwd}/logs/ARCADE/
+  data: ${hydra:runtime.cwd}/data/ARCADE/
+  results: ${hydra:runtime.cwd}/results/ARCADE/
+data:
+  features:
+    - seed
+    - edges
+    - nodes
+    - gradius
+    - gdiameter
+    - indegree
+    - outdegree
+    - degree
+    - eccentricity
+    - shortpath
+    - clustering
+    - closeness
+    - betweenness
+    # - components
+    # - context
+    # - vasculature
+  response:
+    - growth
