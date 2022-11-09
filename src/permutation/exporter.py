@@ -31,9 +31,9 @@ class Exporter:
         self.experiment = experiment
         validate_dir(self.export_path)
 
-    def metric_to_csv(self, experiment: str, model: str, filename: str, metric: Metric) -> None:
+    def metric_to_csv(self, model: str, filename: str, metric: Metric) -> None:
         """takes in arguments to write to csv file, using Metric methods"""
-        self.pandas_to_csv(model, filename, metric.stage, metric.to_pandas())
+        self.pandas_to_csv(model, filename, metric.stage.name, metric.to_pandas())
 
     def pandas_to_csv(
         self,
@@ -61,3 +61,8 @@ class Exporter:
         )
         with open(dir_path, "w") as outfile:
             json.dump(runner.model.hparams.as_dict(), outfile)
+
+    def save_predictions(self, model: str, runner: Runner):
+        dir_path = f"{self.export_path}{self.experiment}/{model}/"
+        predictions = runner.get_predictions()
+        self._save_df(dir_path, f"{runner.id}.PREDICTIONS", predictions)

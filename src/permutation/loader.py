@@ -176,9 +176,9 @@ class CSVLoader(Loader):
         self._load_data()
         self._split_data()
 
-    def _load_data(self) -> None:
+    def _load_data(self, index_col=0) -> None:
         """load data from csv to _X and _y attributes"""
-        data = pd.read_csv(self.path)
+        data = pd.read_csv(self.path, index_col=index_col)
         self._X, self._y = features_response_split(data, self.features, self.response)
         self._set_working()
 

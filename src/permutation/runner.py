@@ -1,6 +1,8 @@
 from typing import Optional
 import uuid
 
+import pandas as pd
+
 from permutation.metrics import BatchMetric
 from permutation.models.modelprotocol import Model
 from permutation.loader import Loader
@@ -61,10 +63,10 @@ class Runner:
         self.loader = loader
 
         self.training_metrics: BatchMetric = BatchMetric(
-            name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TRAIN
+            name=f"Model: {self.model.algorithm_name}", value_type="R^2", stage=Stage.TRAIN
         )
         self.testing_metrics: BatchMetric = BatchMetric(
-            name=f"Model: {self.model.algorithm_name}", value_type="RMSE", stage=Stage.TEST
+            name=f"Model: {self.model.algorithm_name}", value_type="R^2", stage=Stage.TEST
         )
 
         self.cv_metrics: Optional[BatchMetric] = None
@@ -100,6 +102,14 @@ class Runner:
         metrics_list = self.model.permutation(X, y)
         self.permutation_metrics.extend(metrics_list)
 
+    def get_predictions(self) -> pd.DataFrame:
+        X, y = self.loader.load_working_data()
+        df = pd.DataFrame(self.model.get_predicted_values(X), columns=["y_pred"])
+        df["set"] = ""
+        df.loc[self.loader._training_idx, "set"] = "train"
+        df.loc[self.loader._testing_idx, "set"] = "test"
+        return df
+
     def set_stage(self, stage: Stage) -> None:
         """allows other objects to update stage"""
         self._stage = stage
@@ -129,6 +139,10 @@ class Runner:
     def id(self) -> str:
         """return UUID"""
         return str(self._UUID)
+
+    @property
+    def stage(self) -> Stage:
+        return self._stage
 
     def reset_id(self) -> None:
         """todo"""

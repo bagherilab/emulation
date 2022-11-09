@@ -211,9 +211,7 @@ class StandardExperiment(Experiment):
         self.logger.log(f"Trying to log CV for {algorithm}")
         for runner in self._models[algorithm]:
             # if None, an IncorrectStageException will be thrown before the next line runs
-            self.exporter.metric_to_csv(
-                self.name, algorithm, runner.id, runner.cv_metrics  # type: ignore
-            )
+            self.exporter.metric_to_csv(algorithm, runner.id, runner.cv_metrics)  # type: ignore
             self.logger.log(f"Logging CV for {runner.id}")
 
     def train_models(self) -> None:
@@ -226,7 +224,8 @@ class StandardExperiment(Experiment):
     def _log_training_performance(self, algorithm: str) -> None:
         """log the training performance"""
         runner = self._best_models[algorithm]
-        self.exporter.metric_to_csv(self.name, algorithm, runner.id, runner.training_metrics)
+        self.exporter.metric_to_csv(algorithm, runner.id, runner.training_metrics)
+        self.exporter.save_predictions(algorithm, runner)
 
     def test_models(self) -> None:
         """test trained best_model performances"""
@@ -238,7 +237,8 @@ class StandardExperiment(Experiment):
     def _log_test_performance(self, algorithm: str) -> None:
         """log test performance"""
         runner = self._best_models[algorithm]
-        self.exporter.metric_to_csv(self.name, algorithm, runner.id, runner.testing_metrics)
+        self.exporter.metric_to_csv(algorithm, runner.id, runner.testing_metrics)
+        self.exporter.save_predictions(algorithm, runner)
 
     def permutation_testing(self) -> None:
         """perform permutation testing"""
@@ -250,12 +250,9 @@ class StandardExperiment(Experiment):
         """log the permutation performance"""
         runner = self._best_models[algorithm]
         for perm_metric in runner.permutation_metrics:
-            self.exporter.metric_to_csv(
-                self.name, algorithm, f"{runner.id}_{perm_metric.name}", perm_metric
-            )
+            self.exporter.metric_to_csv(algorithm, f"{runner.id}_{perm_metric.name}", perm_metric)
 
     def run(self):
-        self.logger.log(f"running {self._models}")
         self._run_standard_experiment()
 
     def _run_standard_experiment(self) -> None:

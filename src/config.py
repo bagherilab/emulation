@@ -8,26 +8,26 @@ from permutation.experiments.experiment import StandardExperiment
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
-def main(cfg):
+def main(config):
+    cfg = config["cs"]
 
-    clean_dir(cfg.paths.results)
+    for response in cfg.data.response:
+        experiment = StandardExperiment(
+            experiment_name=f"{cfg.experiment.name}-{response}",
+            export_dir=cfg.paths.results,
+            log_dir=cfg.paths.log,
+            data_path=os.path.join(cfg.paths.data, cfg.files.data),
+            features=cfg.data.features,
+            response=response,  # rewrite to accept lists
+        )
 
-    experiment = StandardExperiment(
-        experiment_name=cfg.experiment.name,
-        export_dir=cfg.paths.results,
-        log_dir=cfg.paths.log,
-        data_path=os.path.join(cfg.paths.data, cfg.files.data),
-        features=cfg.data.features,
-        response=cfg.data.response[0],  # rewrite to accept lists
-    )
+        for model, hparam_cfg in cfg.models.items():
+            temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg)
+            model_list = assign_models.assign_models_from_list(temp_list, model)
+            experiment.add_models(model_list)
 
-    for model, hparam_cfg in cfg.models.items():
-        temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg)
-        model_list = assign_models.assign_models_from_list(temp_list, model)
-        experiment.add_models(model_list)
-
-    experiment.save_manifest()
-    experiment.run()
+        experiment.save_manifest()
+        experiment.run()
 
 
 if __name__ == "__main__":

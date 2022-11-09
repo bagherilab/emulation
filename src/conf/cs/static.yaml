@@ -1,0 +1,43 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiment:
+  name: STATIC
+files:
+  data: SITE_ARCHITECTURE_METRICS.csv
+paths:
+  log: ${hydra:runtime.cwd}/logs/ARCADE/
+  data: ${hydra:runtime.cwd}/data/ARCADE/
+  results: ${hydra:runtime.cwd}/results/ARCADE/
+data:
+  features:
+    - PRESSURE
+    - RADIUS
+    - WALL
+    - SHEAR
+    - CIRCUM
+    - FLOW
+    - SHORTPATH
+    - GDIAMETER
+    - GRADIUS
+    - ECCENTRICITY
+    - CLOSENESS
+    - BETWEENNESS
+    - EDGES
+    - NODES
+    - CLUSTERING
+    - INDEGREE
+    - OUTDEGREE
+    - DEGREE
+    - COMPONENTS
+    # - CONTEXT
+  response:
+    - ACTIVITY
+    - GROWTH
+    - CYCLES
+    - SYMMETRY
+    - GLUCOSE
+    - OXYGEN

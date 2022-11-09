@@ -87,8 +87,7 @@ class AbstractSKLearnModel(ABC):
 
     def performance(self, X: pd.DataFrame, y: pd.Series) -> float:
         """Evaluate performance of model by comparing predicted values to known"""
-        y_pred = self.get_predicted_values(X)
-        return root_mean_square_error(y, y_pred)
+        return self.pipeline.score(X, y)
 
     def get_predicted_values(self, X: pd.DataFrame) -> np.ndarray | pd.Series:
         """Predict y from X"""
@@ -97,7 +96,7 @@ class AbstractSKLearnModel(ABC):
     def permutation(self, X: pd.DataFrame, y: pd.Series, repeats: int = 30) -> list[BatchMetric]:
         """Perform permutation testing"""
         self.pipeline.fit(X, y)
-        perm_output = permutation_importance(self.pipeline, X, y, n_repeats=repeats)
+        perm_output = permutation_importance(self.pipeline, X, y, scoring="r2", n_repeats=repeats)
         list_of_metrics = parse_permutation_output(perm_output, feature_names=X.columns.to_list())
         return list_of_metrics
 
@@ -106,7 +105,7 @@ def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[Ba
     """helper function for extracting from sklearn Bunch object for permutation testing"""
     metric_list = []
     for i, feature in enumerate(feature_names):
-        temp_metric = BatchMetric(name=f"Feature: {feature}", value_type="R^2", stage=Stage.PERM)
+        temp_metric = BatchMetric(name=f"Feature:{feature}", value_type="R^2", stage=Stage.PERM)
         importance_val_list = output.importances[i, :].flatten().tolist()
         temp_metric.batchupdate(importance_val_list)
         metric_list.append(temp_metric)
