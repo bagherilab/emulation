@@ -5,9 +5,9 @@ defaults:
   - models/mlp
   - _self_
 experiment:
-  name: STATIC
+  name: UNCOUPLED-CHX
 files:
-  data: SITE_ARCHITECTURE_METRICS.csv
+  data: EXACT_HEMODYNAMICS_CHX.csv
 paths:
   log: ${hydra:runtime.cwd}/logs/ARCADE/
   data: ${hydra:runtime.cwd}/data/ARCADE/
@@ -33,7 +33,6 @@ data:
     - OUTDEGREE
     - DEGREE
     - COMPONENTS
-    # - CONTEXT
   response:
     - ACTIVITY
     - GROWTH

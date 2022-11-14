@@ -3,9 +3,11 @@ svr:
     C:
       type: float
       range: [0.0001, 1.0]
+      search: log
     epsilon:
       type: float
       range: [0.0, 1.0]
+      search: linear
   discrete:
     kernel:
       - linear

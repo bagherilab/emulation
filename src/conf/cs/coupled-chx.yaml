@@ -1,0 +1,42 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiment:
+  name: COUPLED-CHX
+files:
+  data: VASCULAR_FUNCTION_CHX.csv
+paths:
+  log: ${hydra:runtime.cwd}/logs/ARCADE/
+  data: ${hydra:runtime.cwd}/data/ARCADE/
+  results: ${hydra:runtime.cwd}/results/ARCADE/
+data:
+  features:
+    - PRESSURE
+    - RADIUS
+    - WALL
+    - SHEAR
+    - CIRCUM
+    - FLOW
+    - SHORTPATH
+    - GDIAMETER
+    - GRADIUS
+    - ECCENTRICITY
+    - CLOSENESS
+    - BETWEENNESS
+    - EDGES
+    - NODES
+    - CLUSTERING
+    - INDEGREE
+    - OUTDEGREE
+    - DEGREE
+    - COMPONENTS
+  response:
+    - ACTIVITY
+    - GROWTH
+    - CYCLES
+    - SYMMETRY
+    - GLUCOSE
+    - OXYGEN

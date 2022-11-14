@@ -5,9 +5,9 @@ defaults:
   - models/mlp
   - _self_
 experiment:
-  name: COUPLED
+  name: COUPLED-C
 files:
-  data: VASCULAR_FUNCTION.csv
+  data: VASCULAR_FUNCTION_C.csv
 paths:
   log: ${hydra:runtime.cwd}/logs/ARCADE/
   data: ${hydra:runtime.cwd}/data/ARCADE/
@@ -33,7 +33,6 @@ data:
     - OUTDEGREE
     - DEGREE
     - COMPONENTS
-    # - CONTEXT
   response:
     - ACTIVITY
     - GROWTH

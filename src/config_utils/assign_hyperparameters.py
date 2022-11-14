@@ -101,16 +101,26 @@ def _handle_continuous_config(param_cfg):
     except ConfigAttributeError:
         return pd.DataFrame()
 
+    log_names = []
     lower_bounds = []
     upper_bounds = []
     names = []
     for param, param_dict in cont_params.items():
         names.append(param)
-        lower_bounds.append(param_dict["range"][0])
-        upper_bounds.append(param_dict["range"][1])
+        search = param_dict["search"]
+        if search == "linear":
+            lower, upper = param_dict["range"]
+        elif search == "log":
+            log_names.append(param)
+            lower, upper = np.log(param_dict["range"])
+        else:
+            raise ValueError(f"Search: {search} is not implemented")
+        lower_bounds.append(lower)
+        upper_bounds.append(upper)
 
     temp_df = generate_sobol_hparams_df(lower_bounds, upper_bounds, names)
 
+    temp_df[log_names] = temp_df[log_names].apply(lambda x: np.exp(x))
     type_dict = {param: param_dict["type"] for param, param_dict in cont_params.items()}
     fixed_df = fix_types(temp_df, type_dict)
     return fixed_df

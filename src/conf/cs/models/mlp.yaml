@@ -3,6 +3,7 @@ mlp:
     alpha:
       type: float
       range: [0.0001, 1]
+      search: log
   discrete:
     activation:
       - identity

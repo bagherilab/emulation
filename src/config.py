@@ -18,7 +18,7 @@ def main(config):
             log_dir=cfg.paths.log,
             data_path=os.path.join(cfg.paths.data, cfg.files.data),
             features=cfg.data.features,
-            response=response,  # rewrite to accept lists
+            response=response,
         )
 
         for model, hparam_cfg in cfg.models.items():

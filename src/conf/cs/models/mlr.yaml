@@ -2,9 +2,11 @@ mlr:
   continuous:
     alpha:
       type: float
-      range: [0.01, 1.0]
+      range: [0.001, 1.0]
+      search: log
     l1_ratio:
       type: float
       range: [0.1, 1.0]
+      search: linear
   static:
     max_iter: 10000

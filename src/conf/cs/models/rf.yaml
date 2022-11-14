@@ -3,17 +3,22 @@ rf:
     n_estimators:
       type: int
       range: [1, 100]
+      search: linear
     max_features:
       type: float
       range: [0.01, 1.0]
+      search: log
     max_depth:
       type: int
       range: [1, 100]
+      search: linear
     min_samples_split:
       type: float
       range: [0.01, 1.0]
+      search: log
     min_samples_leaf:
       type: float
       range: [0.01, 1.0]
+      search: log
   discrete:
     bootstrap: [True, False]
