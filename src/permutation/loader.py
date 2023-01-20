@@ -11,33 +11,35 @@ class Loader(ABC):
     """
     Attributes
     ----------
-    path : path where data is stored
-
-    n_total: total observations
-
-    n_working: number of working observations
-
-    n_train: number of training observations
-
-    n_test: number of test observations
+    path : 
+        Path where data is stored
+    n_total: 
+        Total observations
+    n_working: 
+        Number of working observations
+    n_train: 
+        Number of training observations
+    n_test: 
+        Number of test observations
 
     Methods
     -------
-    subsample(n): selects n random observations to subsample,
+    subsample(n): 
+        Selects n random observations to subsample,
         impacts training, testing and working data
         todo: add random state from hydra
 
     load_training_data():
-        return training data as dataframe with features, series with response
+        Return training data as dataframe with features, series with response
 
     load_testing_data():
-        return testing data as dataframe with features, series with response
+        Return testing data as dataframe with features, series with response
 
     load_working_data():
-        return training and testing data as dataframe with features, series with response
+        Return training and testing data as dataframe with features, series with response
 
     load_original_data():
-        return all data as dataframe with features, series with response
+        Return all data as dataframe with features, series with response
     """
 
     path: str | Path
@@ -63,47 +65,59 @@ class Loader(ABC):
         self._split_data()
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """Get training data
+        """
+        Get training data
 
         Returns
         --------
-        X : Pandas dataframe contatining <features> variables
-        y : Pandas series containing <response> variable
+        X  
+            Pandas dataframe contatining <features> variables
+        y 
+            Pandas series containing <response> variable
         """
         return self._X.iloc[self._training_idx], self._y.iloc[self._training_idx]
 
     def load_testing_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """Get testing data
+        """
+        Get testing data
 
         Returns
         --------
-        X : Pandas dataframe contatining <features> variables
-        y : Pandas series containing <response> variable
+        X
+            Pandas dataframe contatining <features> variables
+        y
+            Pandas series containing <response> variable
         """
         return self._X.iloc[self._testing_idx], self._y.iloc[self._testing_idx]
 
     def load_working_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """Get testing and training data in one structure
+        """
+        Get testing and training data in one structure
 
         Returns
         --------
-        X : Pandas dataframe contatining <features> variables
-        y : Pandas series containing <response> variable
+        X
+            Pandas dataframe contatining <features> variables
+        y
+            Pandas series containing <response> variable
         """
         return self._X.iloc[self._working_idx], self._y.iloc[self._working_idx]
 
     def load_original_data(self) -> Tuple[pd.DataFrame, pd.Series]:
-        """Load entire dataset
+        """
+        Load entire dataset
 
         Returns
         --------
-        X : Pandas dataframe contatining <features> variables
-        y : Pandas series containing <response> variable
+        X   
+            Pandas dataframe contatining <features> variables
+        y
+            Pandas series containing <response> variable
         """
         return self._X, self._y
 
     def _set_working(self) -> None:
-        """update the working indices"""
+        """Update the working indices"""
         self._working_idx = self._X.index.tolist()
 
     @property
@@ -131,33 +145,36 @@ class CSVLoader(Loader):
     """
     Attributes
     ----------
-    path : path were data is stored
+    path : 
+        Path were data is stored
+    n_total: 
+        Total observations
+    n_working: 
+        Number of working observations
+    n_train: 
+        Number of training observations
 
-    n_total: total observations
-
-    n_working: number of working observations
-
-    n_train: number of training observations
-
-    n_test: number of test observations
+    n_test: 
+        Number of test observations
 
     Methods
     -------
-    subsample(n): selects n random observations to subsample,
+    subsample(n): 
+        Selects n random observations to subsample,
         impacts training, testing and working data
         todo: add random state from hydra
 
     load_training_data():
-        return training data as dataframe with features, series with response
+        Return training data as dataframe with features, series with response
 
     load_testing_data():
-        return testing data as dataframe with features, series with response
+        Return testing data as dataframe with features, series with response
 
     load_working_data():
-        return training and testing data as dataframe with features, series with response
+        Return training and testing data as dataframe with features, series with response
 
     load_original_data():
-        return all data as dataframe with features, series with response
+        Return all data as dataframe with features, series with response
     """
 
     def __init__(
@@ -177,7 +194,7 @@ class CSVLoader(Loader):
         self._split_data()
 
     def _load_data(self, index_col=0) -> None:
-        """load data from csv to _X and _y attributes"""
+        """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
         self._X, self._y = features_response_split(data, self.features, self.response)
         self._set_working()
