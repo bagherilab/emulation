@@ -97,9 +97,7 @@ def include_permutations(
 
 
 def check_list_lengths(l1: list[Any], l2: list[Any]) -> None:
-    """
-    Raise a value error if l1 and l2 are not the same length
-    """
+    """Raise a value error if l1 and l2 are not the same length"""
     try:
         assert len(l1) == len(l2)
     except AssertionError:
@@ -107,18 +105,14 @@ def check_list_lengths(l1: list[Any], l2: list[Any]) -> None:
 
 
 def add_constant_params(names: list[str], values: list[Any], df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Adds any constant parameter values to the hyperparameter dataframe
-    """
+    """Adds any constant parameter values to the hyperparameter dataframe"""
     for name, value in zip(names, values):
         df[name] = value
     return df
 
 
 def build_hparams_df(hparam_cfg) -> pd.DataFrame:
-    """ 
-    Generates a dataframe of permuted hyperparameter sample values based on values in the config files
-    """
+    """ Generates a dataframe of permuted hyperparameter sample values based on values in the config files"""
     temp_df = _handle_continuous_config(hparam_cfg)
     temp_df_discrete = _handle_discrete_config(hparam_cfg, temp_df)
     hparam_df = _handle_static_config(hparam_cfg, temp_df_discrete)
@@ -200,9 +194,7 @@ def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
 
 
 def assign_hyperparameters(hparam_cfg) -> list[HParams]:
-    """
-    Creates a list of sampled hyperparmeters for a models from a set of config files
-    """
+    """Creates a list of sampled hyperparmeters for a models from a set of config files"""
     hparam_df = build_hparams_df(hparam_cfg)
     params = [*hparam_df.to_dict(orient="index").values()]
     return [HParams(hparam_dict) for hparam_dict in params]
