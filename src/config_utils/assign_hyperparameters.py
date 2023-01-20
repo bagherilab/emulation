@@ -15,12 +15,15 @@ def generate_sobol(dimensions: int, power: int) -> np.ndarray:
 
     Arguments
     --------
-    dimensions : Number of variables (e.g. features) to generate numbers for
-    power : The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
+    dimensions : 
+        Number of variables (e.g. features) to generate numbers for
+    power : 
+        The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
 
     Returns
     --------
-    sample: numpy array of sobol indeces
+    sample: 
+        numpy array of sobol indeces
     """
     generator = qmc.Sobol(d=dimensions, scramble=False)
     sample = generator.random_base2(m=power)
@@ -38,14 +41,19 @@ def generate_sobol_hparams_df(
 
     Arguments
     --------
-    lower_bounds : List of numbers that coorespond to the lower bounds of each parameter
-    upper_bounds : List of numbers that coorespond to the upperer bounds of each parameter
-    parameter_names : Names of the parameters (e.g. features) that are being sampled
-    power :  The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
+    lower_bounds : 
+        List of numbers that coorespond to the lower bounds of each parameter
+    upper_bounds : 
+        List of numbers that coorespond to the upperer bounds of each parameter
+    parameter_names : 
+        Names of the parameters (e.g. features) that are being sampled
+    power :  
+        The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
 
     Returns
     --------
-    : dataframe of sampled parameter values
+    : 
+        dataframe of sampled parameter values
     """
     check_list_lengths(lower_bounds, upper_bounds)
     sample = generate_sobol(len(lower_bounds), power)
@@ -59,12 +67,15 @@ def fix_types(df: pd.DataFrame, types: dict[str, str]) -> pd.DataFrame:
 
     Arguments
     --------
-    df : DataFrame to cast
-    types : Dictionary of "feature": "type" strings
+    df :   
+        DataFrame to cast
+    types : 
+        Dictionary of "feature": "type" strings
 
     Returns
     --------
-    rounded: Dataframe with fixed types
+    rounded: 
+        Dataframe with fixed types
     """
     round_dict = {key: 0 for key, value in types.items() if value == "int"}
     rounded = df.round(round_dict)
@@ -79,13 +90,17 @@ def include_permutations(
 
     Arguments
     --------
-    list_of_lists : List of discrete parameters and their possible values
-    param_names : Names of the parameters (e.g. features) that are in the sampled df
-    df : Dataframe of hyperparameters to append to
+    list_of_lists : 
+        List of discrete parameters and their possible values
+    param_names : 
+        Names of the parameters (e.g. features) that are in the sampled df
+    df : 
+        Dataframe of hyperparameters to append to
 
     Returns
     --------
-    : Hyperparmeter dataframe with new permuted discrete values
+    : 
+        Hyperparmeter dataframe with new permuted discrete values
     """
     permutations = list(itertools.product(*list_of_lists))
     df["temp"] = pd.Series([permutations] * len(df))
@@ -112,7 +127,7 @@ def add_constant_params(names: list[str], values: list[Any], df: pd.DataFrame) -
 
 
 def build_hparams_df(hparam_cfg) -> pd.DataFrame:
-    """ Generates a dataframe of permuted hyperparameter sample values based on values in the config files"""
+    """Generates a dataframe of permuted hyperparameter sample values based on values in the config files"""
     temp_df = _handle_continuous_config(hparam_cfg)
     temp_df_discrete = _handle_discrete_config(hparam_cfg, temp_df)
     hparam_df = _handle_static_config(hparam_cfg, temp_df_discrete)
@@ -125,7 +140,8 @@ def _handle_continuous_config(param_cfg):
 
     Returns
     --------
-    : Dataframe with sampled values for each continuous parameter
+    : 
+        Dataframe with sampled values for each continuous parameter
     """
     try:
         cont_params = param_cfg.continuous
@@ -163,7 +179,8 @@ def _handle_discrete_config(param_cfg, hparam_df) -> pd.DataFrame:
 
     Returns
     --------
-    : Dataframe with sampled values for each continuous and discrete parameter
+    : 
+        Dataframe with sampled values for each continuous and discrete parameter
     """
     try:
         discrete_params = param_cfg.discrete
@@ -181,7 +198,8 @@ def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
 
     Returns
     --------
-    : Dataframe with sampled values for each continuous and discrete parameter along with static parameter values
+    : 
+        Dataframe with sampled values for each continuous and discrete parameter along with static parameter values
     """
     try:
         static_params = param_cfg.static
