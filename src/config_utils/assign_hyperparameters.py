@@ -10,7 +10,8 @@ from permutation.models.hyperparameters import HParams
 
 
 def generate_sobol(dimensions: int, power: int) -> np.ndarray:
-    """wrapper for sobol number generator from scipy
+    """
+    Wrapper for sobol number generator from scipy
 
     Arguments
     --------
@@ -33,7 +34,18 @@ def generate_sobol_hparams_df(
     power: int = 4,
 ) -> pd.DataFrame:
     """
-    todo
+    Generates a dataframe of hyperparameters values of size len(lower_bound), 2^power
+
+    Arguments
+    --------
+    lower_bounds : List of numbers that coorespond to the lower bounds of each parameter
+    upper_bounds : List of numbers that coorespond to the upperer bounds of each parameter
+    parameter_names : Names of the parameters (e.g. features) that are being sampled
+    power :  The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
+
+    Returns
+    --------
+    : dataframe of sampled parameter values
     """
     check_list_lengths(lower_bounds, upper_bounds)
     sample = generate_sobol(len(lower_bounds), power)
@@ -52,7 +64,7 @@ def fix_types(df: pd.DataFrame, types: dict[str, str]) -> pd.DataFrame:
 
     Returns
     --------
-    roudned: Dataframe with fixed types
+    rounded: Dataframe with fixed types
     """
     round_dict = {key: 0 for key, value in types.items() if value == "int"}
     rounded = df.round(round_dict)
@@ -62,6 +74,19 @@ def fix_types(df: pd.DataFrame, types: dict[str, str]) -> pd.DataFrame:
 def include_permutations(
     list_of_lists: list[list[str]], param_names: list[str], df: pd.DataFrame
 ) -> pd.DataFrame:
+    """
+    Permutes discrete hyperparameter values before adding them to hyperparameter samples dataframe
+
+    Arguments
+    --------
+    list_of_lists : List of discrete parameters and their possible values
+    param_names : Names of the parameters (e.g. features) that are in the sampled df
+    df : Dataframe of hyperparameters to append to
+
+    Returns
+    --------
+    : Hyperparmeter dataframe with new permuted discrete values
+    """
     permutations = list(itertools.product(*list_of_lists))
     df["temp"] = pd.Series([permutations] * len(df))
     temp_df = df.explode("temp")
@@ -73,7 +98,7 @@ def include_permutations(
 
 def check_list_lengths(l1: list[Any], l2: list[Any]) -> None:
     """
-    raise a value error if l1 and l2 are not the same length
+    Raise a value error if l1 and l2 are not the same length
     """
     try:
         assert len(l1) == len(l2)
@@ -82,13 +107,18 @@ def check_list_lengths(l1: list[Any], l2: list[Any]) -> None:
 
 
 def add_constant_params(names: list[str], values: list[Any], df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Adds any constant parameter values to the hyperparameter dataframe
+    """
     for name, value in zip(names, values):
         df[name] = value
     return df
 
 
 def build_hparams_df(hparam_cfg) -> pd.DataFrame:
-    """ """
+    """ 
+    Generates a dataframe of permuted hyperparameter sample values based on values in the config files
+    """
     temp_df = _handle_continuous_config(hparam_cfg)
     temp_df_discrete = _handle_discrete_config(hparam_cfg, temp_df)
     hparam_df = _handle_static_config(hparam_cfg, temp_df_discrete)
@@ -96,6 +126,13 @@ def build_hparams_df(hparam_cfg) -> pd.DataFrame:
 
 
 def _handle_continuous_config(param_cfg):
+    """
+    Reads in continuous parameters from config file and generates a dataframe of randomly generated samples from those parameters
+
+    Returns
+    --------
+    : Dataframe with sampled values for each continuous parameter
+    """
     try:
         cont_params = param_cfg.continuous
     except ConfigAttributeError:
@@ -127,6 +164,13 @@ def _handle_continuous_config(param_cfg):
 
 
 def _handle_discrete_config(param_cfg, hparam_df) -> pd.DataFrame:
+    """
+    Reads in discrete parameters from config file and appends permutations of them to the hyperparameter dataframe
+
+    Returns
+    --------
+    : Dataframe with sampled values for each continuous and discrete parameter
+    """
     try:
         discrete_params = param_cfg.discrete
     except ConfigAttributeError:
@@ -138,6 +182,13 @@ def _handle_discrete_config(param_cfg, hparam_df) -> pd.DataFrame:
 
 
 def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
+    """
+    Reads in static parameters from config file and appends them to the hyperparameter dataframe
+
+    Returns
+    --------
+    : Dataframe with sampled values for each continuous and discrete parameter along with static parameter values
+    """
     try:
         static_params = param_cfg.static
     except ConfigAttributeError:
@@ -149,6 +200,9 @@ def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
 
 
 def assign_hyperparameters(hparam_cfg) -> list[HParams]:
+    """
+    Creates a list of sampled hyperparmeters for a models from a set of config files
+    """
     hparam_df = build_hparams_df(hparam_cfg)
     params = [*hparam_df.to_dict(orient="index").values()]
     return [HParams(hparam_dict) for hparam_dict in params]
