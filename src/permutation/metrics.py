@@ -8,15 +8,14 @@ from permutation.stage import Stage
 
 class Metric(ABC):  # pylint: disable=too-few-public-methods
     """
-    abstract class for implementing different metrics,
+    Abstract class for implementing different metrics,
     specifically with methods to ensure correct csv handling by Logger object
     through pandas
 
     Abstract Methods
-    ----------
-
+    ----------------
     to_pandas() -> pd.DataFrame:
-        organize data in metric class into tabular format, and return a pandas Dataframe
+        Organize data in metric class into tabular format, and return a pandas Dataframe
     """
 
     name: str
@@ -24,7 +23,7 @@ class Metric(ABC):  # pylint: disable=too-few-public-methods
 
     @abstractmethod
     def to_pandas(self) -> pd.DataFrame:
-        """implement a method to export to dataframe"""
+        """Implement a method to export to dataframe"""
 
 
 @dataclass
@@ -35,28 +34,28 @@ class BatchMetric(Metric):
     Attributes
     ----------
     name :
-        name of collection of stored data
+        Name of collection of stored data
     values :
-        list of values/data
+        List of values/data
     total :
-        sum of values
+        Sum of values
     average :
-        average of values
+        Average of values
     length :
-        number of values contained
+        Number of values contained
     stage:
-        stage of model training process data is associated with
+        Stage of model training process data is associated with
 
     Methods
     -------
     update(new_value):
-        adds a value to the list
+        Adds a value to the list
 
     batchupdate(new_values):
-        adds iterable of values to list
+        Adds iterable of values to list
 
     set_stage(stage):
-        updates the associated stage of the metric, e.g. Stage.VAL, Stage.PERM
+        Updates the associated stage of the metric, e.g. Stage.VAL, Stage.PERM
     """
 
     name: str
@@ -69,11 +68,12 @@ class BatchMetric(Metric):
 
     def update(self, new_value: float) -> None:
         """
-        method to update `values` attribute with `new_value`
+        Method to update `values` attribute with `new_value`
 
         Parameters
         ----------
-        new_value: value to add to data container
+        new_value : 
+            Value to add to data container
 
         """
         self.values.append(new_value)
@@ -83,18 +83,19 @@ class BatchMetric(Metric):
 
     def batchupdate(self, new_values: list[float]) -> None:
         """
-        method to update `values` attribute with list of values, `new_values`
+        Method to update `values` attribute with list of values, `new_values`
 
         Parameters
         ----------
-        new_values: list of values to add to data container
+        new_values : 
+            List of values to add to data container
 
         """
         for value in new_values:
             self.update(value)
 
     def to_pandas(self) -> pd.DataFrame:
-        """method to export to dataframe"""
+        """Method to export to dataframe"""
         return pd.DataFrame(self.values, columns=[self.value_type])
 
 
@@ -107,21 +108,21 @@ class SequentialMetric(Metric):
     Attributes
     ----------
     name :
-        name of collection of stored data
+        Name of collection of stored data
     values :
-        list of values/data
+        List of values/data
     nums :
-        ordered int values associated with each value by index
+        Ordered int values associated with each value by index
     stage:
-        stage of model training process data is associated with, e.g. Stage.TRAIN, Stage.TEST
+        Stage of model training process data is associated with, e.g. Stage.TRAIN, Stage.TEST
 
     Methods
     -------
     update(new_value, n):
-        adds a value to the list
+        Adds a value to the list
 
     batchupdate(new_values, new_ns):
-        adds iterable of values to list
+        Adds iterable of values to list
 
     """
 
@@ -132,13 +133,13 @@ class SequentialMetric(Metric):
     nums: list[int] = field(default_factory=list)
 
     def update(self, new_value: float, n: int) -> None:
-        """method to update `values` and `nums` attribute with `new_value` and `n`"""
+        """Method to update `values` and `nums` attribute with `new_value` and `n`"""
         self._checkorder(n)
         self.values.append(new_value)
         self.nums.append(n)
 
     def batchupdate(self, new_values: list[float], new_ns: list[int]) -> None:
-        """add list of floats and ints to `values` and `nums`"""
+        """Add list of floats and ints to `values` and `nums`"""
         for value, num in zip(new_values, new_ns):
             self.update(value, num)
 
@@ -148,5 +149,5 @@ class SequentialMetric(Metric):
             raise ValueError("New n is smaller than largest value in sequential list.")
 
     def to_pandas(self) -> pd.DataFrame:
-        """method to export to dataframe"""
+        """Method to export to dataframe"""
         return pd.DataFrame(list(zip(self.nums, self.values)), columns=["nums", self.value_type])
