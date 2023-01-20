@@ -11,6 +11,8 @@ from permutation.file_utils import validate_dir
 
 class Exporter:
     """
+    A class for exporting experimental results to disk
+
     Attributes
     ----------
     export_path :
