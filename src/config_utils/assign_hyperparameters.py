@@ -15,7 +15,7 @@ def generate_sobol(dimensions: int, power: int) -> np.ndarray:
     Arguments
     --------
     dimensions : Number of variables (e.g. features) to generate numbers for
-    y : Pandas series containing <response> variable
+    power : The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
 
     Returns
     --------
