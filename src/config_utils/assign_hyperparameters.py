@@ -23,7 +23,7 @@ def generate_sobol(dimensions: int, power: int) -> np.ndarray:
     Returns
     --------
     sample: 
-        numpy array of sobol indeces
+        Numpy array of sobol indeces
     """
     generator = qmc.Sobol(d=dimensions, scramble=False)
     sample = generator.random_base2(m=power)
@@ -53,7 +53,7 @@ def generate_sobol_hparams_df(
     Returns
     --------
     : 
-        dataframe of sampled parameter values
+        Dataframe of sampled parameter values
     """
     check_list_lengths(lower_bounds, upper_bounds)
     sample = generate_sobol(len(lower_bounds), power)

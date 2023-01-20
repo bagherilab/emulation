@@ -13,17 +13,19 @@ class Exporter:
     """
     Attributes
     ----------
-    log_path :
-        location where files will be stored
+    export_path :
+        Location where files will be stored
+    experiment :
+        Name of experiment
 
     Methods
     -------
     metric_to_csv(experiment, model, filename, metric):
-        takes in arguments to write to csv file using filenaming and path conventions,
+        Takes in arguments to write to csv file using filenaming and path conventions,
         using Metric methods
 
     pandas_to_csv(experiment, model, filename, stage, dataframe):
-        writes data to csv file from pandas Dataframe using filenaming and path conventions
+        Writes data to csv file from pandas Dataframe using filenaming and path conventions
     """
 
     def __init__(self, experiment: str, export_path: str = "/results") -> None:
@@ -32,7 +34,7 @@ class Exporter:
         validate_dir(self.export_path)
 
     def metric_to_csv(self, model: str, filename: str, metric: Metric) -> None:
-        """takes in arguments to write to csv file, using Metric methods"""
+        """Takes in arguments to write to csv file, using Metric methods"""
         self.pandas_to_csv(model, filename, metric.stage.name, metric.to_pandas())
 
     def pandas_to_csv(
@@ -42,20 +44,23 @@ class Exporter:
         stage: Stage,
         dataframe: pd.DataFrame | pd.Series,
     ) -> None:
-        """writes data to csv file from pandas Dataframe using filenaming and path conventions"""
+        """Writes data to csv file from pandas Dataframe using filenaming and path conventions"""
         dir_path = f"{self.export_path}/{self.experiment}/{model}/{stage}"
         self._save_df(dir_path, filename, dataframe)
 
     def _save_df(self, dir_path, name, df: pd.DataFrame):
+        """Validates save path and then saves a Dataframe as a CSV file"""
         validate_dir(dir_path)
         file_path = f"{dir_path}/{name}.csv"
         df.to_csv(file_path)
 
     def save_manifest_file(self, manifest: pd.DataFrame):
+        """Saves the manifest as a CSV under the correct experiment"""
         dir_path = f"{self.export_path}{self.experiment}/"
         self._save_df(dir_path, "manifest", manifest)
 
     def save_model_json(self, runner: Runner):
+        """Saves the model parameters as a JSON file"""
         dir_path = (
             f"{self.export_path}{self.experiment}/{runner.model.algorithm_abv}/{runner.id}.json"
         )
@@ -63,6 +68,7 @@ class Exporter:
             json.dump(runner.model.hparams.as_dict(), outfile)
 
     def save_predictions(self, model: str, runner: Runner):
+        """Saves the model predictions as a CSV file"""
         dir_path = f"{self.export_path}{self.experiment}/{model}/"
         predictions = runner.get_predictions()
         self._save_df(dir_path, f"{runner.id}.PREDICTIONS", predictions)
