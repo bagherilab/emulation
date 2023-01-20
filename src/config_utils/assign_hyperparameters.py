@@ -15,9 +15,9 @@ def generate_sobol(dimensions: int, power: int) -> np.ndarray:
 
     Arguments
     --------
-    dimensions : 
+    dimensions :
         Number of variables (e.g. features) to generate numbers for
-    power : 
+    power :
         The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
 
     Returns
@@ -41,18 +41,18 @@ def generate_sobol_hparams_df(
 
     Arguments
     --------
-    lower_bounds : 
+    lower_bounds :
         List of numbers that coorespond to the lower bounds of each parameter
-    upper_bounds : 
+    upper_bounds :
         List of numbers that coorespond to the upperer bounds of each parameter
-    parameter_names : 
+    parameter_names :
         Names of the parameters (e.g. features) that are being sampled
-    power :  
+    power :
         The number of samples to generate as a logarithm in base 2 (i.e. n=2^power)
 
     Returns
     --------
-    : 
+    :
         Dataframe of sampled parameter values
     """
     check_list_lengths(lower_bounds, upper_bounds)
@@ -67,9 +67,9 @@ def fix_types(df: pd.DataFrame, types: dict[str, str]) -> pd.DataFrame:
 
     Arguments
     --------
-    df :   
+    df :
         DataFrame to cast
-    types : 
+    types :
         Dictionary of "feature": "type" strings
 
     Returns
@@ -90,16 +90,16 @@ def include_permutations(
 
     Arguments
     --------
-    list_of_lists : 
+    list_of_lists :
         List of discrete parameters and their possible values
-    param_names : 
+    param_names :
         Names of the parameters (e.g. features) that are in the sampled df
-    df : 
+    df :
         Dataframe of hyperparameters to append to
 
     Returns
     --------
-    : 
+    :
         Hyperparmeter dataframe with new permuted discrete values
     """
     permutations = list(itertools.product(*list_of_lists))
@@ -140,7 +140,7 @@ def _handle_continuous_config(param_cfg):
 
     Returns
     --------
-    : 
+    :
         Dataframe with sampled values for each continuous parameter
     """
     try:
@@ -179,7 +179,7 @@ def _handle_discrete_config(param_cfg, hparam_df) -> pd.DataFrame:
 
     Returns
     --------
-    : 
+    :
         Dataframe with sampled values for each continuous and discrete parameter
     """
     try:
@@ -198,7 +198,7 @@ def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
 
     Returns
     --------
-    : 
+    :
         Dataframe with sampled values for each continuous and discrete parameter along with static parameter values
     """
     try:

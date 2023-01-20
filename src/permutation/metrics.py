@@ -72,7 +72,7 @@ class BatchMetric(Metric):
 
         Parameters
         ----------
-        new_value : 
+        new_value :
             Value to add to data container
 
         """
@@ -87,7 +87,7 @@ class BatchMetric(Metric):
 
         Parameters
         ----------
-        new_values : 
+        new_values :
             List of values to add to data container
 
         """

@@ -26,7 +26,7 @@ def clean_dir(dir_string: str) -> None:
 
     Parameters
     ----------
-    dir_string : 
+    dir_string :
         String representing the directory to clean
     """
     files = glob.glob("dir_string/**/*.csv", recursive=True)

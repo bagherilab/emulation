@@ -11,7 +11,7 @@ from permutation.models.hyperparameters import HParams
 class MLP(AbstractSKLearnModel):
     """
     Multi-Layer Perceptron model
-        
+
     Methods
     -------
     set_model(cls, model_dependency, hparams, preprocessing_dependencies):

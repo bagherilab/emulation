@@ -11,20 +11,20 @@ class Loader(ABC):
     """
     Attributes
     ----------
-    path : 
+    path :
         Path where data is stored
-    n_total: 
+    n_total:
         Total observations
-    n_working: 
+    n_working:
         Number of working observations
-    n_train: 
+    n_train:
         Number of training observations
-    n_test: 
+    n_test:
         Number of test observations
 
     Methods
     -------
-    subsample(n): 
+    subsample(n):
         Selects n random observations to subsample,
         impacts training, testing and working data
         todo: add random state from hydra
@@ -70,9 +70,9 @@ class Loader(ABC):
 
         Returns
         --------
-        X  
+        X
             Pandas dataframe contatining <features> variables
-        y 
+        y
             Pandas series containing <response> variable
         """
         return self._X.iloc[self._training_idx], self._y.iloc[self._training_idx]
@@ -109,7 +109,7 @@ class Loader(ABC):
 
         Returns
         --------
-        X   
+        X
             Pandas dataframe contatining <features> variables
         y
             Pandas series containing <response> variable
@@ -145,21 +145,21 @@ class CSVLoader(Loader):
     """
     Attributes
     ----------
-    path : 
+    path :
         Path were data is stored
-    n_total: 
+    n_total:
         Total observations
-    n_working: 
+    n_working:
         Number of working observations
-    n_train: 
+    n_train:
         Number of training observations
 
-    n_test: 
+    n_test:
         Number of test observations
 
     Methods
     -------
-    subsample(n): 
+    subsample(n):
         Selects n random observations to subsample,
         impacts training, testing and working data
         todo: add random state from hydra
