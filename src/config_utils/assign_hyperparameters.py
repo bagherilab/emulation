@@ -22,7 +22,7 @@ def generate_sobol(dimensions: int, power: int) -> np.ndarray:
 
     Returns
     --------
-    sample: 
+    sample
         Numpy array of sobol indeces
     """
     generator = qmc.Sobol(d=dimensions, scramble=False)
@@ -74,7 +74,7 @@ def fix_types(df: pd.DataFrame, types: dict[str, str]) -> pd.DataFrame:
 
     Returns
     --------
-    rounded: 
+    rounded
         Dataframe with fixed types
     """
     round_dict = {key: 0 for key, value in types.items() if value == "int"}
