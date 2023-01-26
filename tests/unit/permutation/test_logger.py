@@ -1,5 +1,4 @@
 import unittest
-from unittest.mock import patch
 
 import logging
 import os
@@ -30,7 +29,6 @@ class TestExperimentLogger(unittest.TestCase):
         with open(self.log_path, "r") as f:
             log_content = f.read()
             self.assertIn(message, log_content)
-
 
     def test_set_up(self):
         format_str = "%(asctime)s:%(name)s:%(message)s"
