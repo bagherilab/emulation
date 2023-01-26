@@ -22,6 +22,8 @@ class MLPTest(unittest.TestCase):
         self.y = pd.Series([3, 6, 9], name="c")
 
         self.hparams_mock = Mock(spec=HParams)
+        self.hparams_mock.args = ["hidden_layer_sizes", "activation"]
+        self.hparams_mock.values = ["(100,)", "tanh"]
         self.hparams_mock.as_dict = Mock(
             return_value={"hidden_layer_sizes": (100,), "activation": "tanh"}
         )
@@ -146,7 +148,7 @@ class MLPTest(unittest.TestCase):
 
         inspected_names = [metric.name for metric in return_value]
         inspected_values = [metric.values for metric in return_value]
-        expected_names = ["Feature: a", "Feature: b"]
+        expected_names = ["Feature:a", "Feature:b"]
         expected_values = [[0.0] * n_repeats] * 2
 
         # two features
