@@ -16,8 +16,8 @@ class SequentialMetricTests(unittest.TestCase):
         self.config.hparams = Mock()
 
         continuous_params = {
-            "alpha": {"type": "int", "range": [1, 10]},
-            "beta": {"type": "float", "range": [0.0, 1.0]},
+            "alpha": {"type": "int", "range": [1, 10], "search": "log"},
+            "beta": {"type": "float", "range": [0.0, 1.0], "search": "linear"},
         }
         discrete_params = {"foo": ["a", "b", "c"], "bar": ["x", "y", "z"], "bool": [True, False]}
         static_params = {"static": "test"}
