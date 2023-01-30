@@ -7,7 +7,6 @@ authors = ["jcain <jcain@uw.edu>"]
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
 scikit-learn = "^1.1"
-tensorflow = "^2.9"
 pandas = "^1.4.2"
 numpy = "^1.22.4"
 pandas-stubs = "^1.2.0"
