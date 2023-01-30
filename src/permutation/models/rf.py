@@ -9,7 +9,14 @@ from permutation.models.hyperparameters import HParams
 
 
 class RF(AbstractSKLearnModel):
-    """todo"""
+    """
+    Random Forest model
+
+    Methods
+    -------
+    set_model(cls, model_dependency, hparams, preprocessing_dependencies):
+        Set up the model, preprocessing pipeline and read in hyperparameters
+    """
 
     algorithm_name = "Random Forest"
     algorithm_abv = "RF"
@@ -22,7 +29,7 @@ class RF(AbstractSKLearnModel):
         hparams: Optional[HParams] = None,
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
-        """todo"""
+        """Set up model from config files and super class"""
         if preprocessing_dependencies is None:
             preprocessing_dependencies = []
 

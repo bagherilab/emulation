@@ -9,7 +9,14 @@ from permutation.models.hyperparameters import HParams
 
 
 class MLP(AbstractSKLearnModel):
-    """todo"""
+    """
+    Multi-Layer Perceptron model
+
+    Methods
+    -------
+    set_model(cls, model_dependency, hparams, preprocessing_dependencies):
+        Set up the model, preprocessing pipeline and read in hyperparameters
+    """
 
     algorithm_name = "Multi-layer Perceptron Regressor"
     algorithm_abv = "MLP"
@@ -22,7 +29,7 @@ class MLP(AbstractSKLearnModel):
         hparams: Optional[HParams] = None,
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
-        """todo"""
+        """Set up model from config files and super class"""
         if preprocessing_dependencies is None:
             preprocessing_dependencies = []
 
@@ -40,7 +47,8 @@ def _fix_tuple_type(
     hparams: HParams,
     change_arg: str = "hidden_layer_sizes",
 ):
+    """Makes sure config parameter value is evaluated as correct type"""
     for i, arg_tuple in enumerate(zip(hparams.args, hparams.values)):
         arg, val = arg_tuple
-        if arg == "hidden_layer_sizes":
+        if arg == change_arg:
             hparams.values[i] = eval(val)

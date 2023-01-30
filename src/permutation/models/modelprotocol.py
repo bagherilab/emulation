@@ -8,9 +8,7 @@ from permutation.metrics import BatchMetric
 
 
 class Model(Protocol):
-    """
-    Protocol for the Model type, requiring the following attributes.
-    """
+    """Protocol for the Model type, requiring the following attributes"""
 
     algorithm_name: str
     algorithm_abv: str
@@ -18,16 +16,21 @@ class Model(Protocol):
     hparams: Optional[HParams]
 
     def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int) -> BatchMetric:
-        """todo"""
+        """Performs k-fold cross validation"""
+        ...
 
     def fit_model(self, X: pd.DataFrame, y: pd.Series) -> float:
-        """todo"""
+        """Fit the model to the training data"""
+        ...
 
     def performance(self, X: pd.DataFrame, y: pd.Series) -> float:
-        """todo"""
+        """Check the performance of the model on test data"""
+        ...
 
     def permutation(self, X: pd.DataFrame, y: pd.Series) -> list[BatchMetric]:
-        """todo"""
+        """Permute the data"""
+        ...
 
     def get_predicted_values(self, X: pd.DataFrame) -> np.ndarray | pd.Series:
-        """todo"""
+        """Return predicted values for unlabelled data"""
+        ...
