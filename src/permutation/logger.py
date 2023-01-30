@@ -12,10 +12,30 @@ class Logger(ABC):
 
     @abstractmethod
     def log(message: str) -> None:
-        """abstract method to implement for logger objects"""
+        """Abstract method to implement for logger objects"""
 
 
 class ExperimentLogger:
+    """
+    A class for logging experimental details
+
+    Attributes
+    ----------
+    experiment_name :
+        Name of the experiment
+    log_dir :
+        Directory to save log files in
+    format_str :
+        Format of log messages
+    level :
+        Level of detail for logger
+
+    Methods
+    -------
+    log(message):
+        Log a message
+    """
+
     def __init__(
         self,
         experiment_name: str,
@@ -30,7 +50,7 @@ class ExperimentLogger:
         self._set_up(format_str, level)
 
     def _set_up(self, format_str: str, level: int):
-        """todo"""
+        """Sets up logger with formatting, log path, and detail leval"""
         self.logger.setLevel(level)
         formatter = logging.Formatter(format_str)
         file_handler = logging.FileHandler(self.log_path, mode="w")
@@ -38,5 +58,5 @@ class ExperimentLogger:
         self.logger.addHandler(file_handler)
 
     def log(self, message: str) -> None:
-        """todo"""
+        """Log a passed message"""
         self.logger.info(message)

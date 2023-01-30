@@ -4,8 +4,12 @@ import glob
 
 def validate_dir(dir_string: str, create: bool = True) -> None:
     """
-    validates the directory exists and creates if not,
-    or raises an error if create is false
+    Validates the directory exists and creates if not
+
+    Raises
+    ------
+    NotADirectoryError:
+        Raises error if directory doesn't exist and create is False
     """
     log_path = Path(dir_string).resolve()
     if log_path.exists():
@@ -17,7 +21,14 @@ def validate_dir(dir_string: str, create: bool = True) -> None:
 
 
 def clean_dir(dir_string: str) -> None:
-    """todo"""
+    """
+    Removes all of the CSV files from a directory
+
+    Parameters
+    ----------
+    dir_string :
+        String representing the directory to clean
+    """
     files = glob.glob("dir_string/**/*.csv", recursive=True)
 
     for f in files:

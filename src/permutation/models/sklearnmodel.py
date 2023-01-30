@@ -35,7 +35,7 @@ class AbstractSKLearnModel(ABC):
         hparams: Optional[HParams],
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]],
     ) -> Model:
-        """abstract method for to implement models with sklearn defaults"""
+        """Abstract method for to implement models with sklearn defaults"""
 
     @classmethod
     def _set_model(
@@ -44,8 +44,8 @@ class AbstractSKLearnModel(ABC):
         hparams: Optional[HParams] = None,
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
-        """Helper function for subclasses:
-
+        """
+        Helper function for subclasses:
         Set up pipeline for sklearn to allow for flexibility in preprocessing steps
         """
         model = cls()
@@ -71,7 +71,7 @@ class AbstractSKLearnModel(ABC):
         return model
 
     def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int = 10) -> BatchMetric:
-        """perform cross validation"""
+        """Perform cross validation"""
         metrics = BatchMetric(name=f"CV_K={K},", value_type="R^2", stage=Stage.VAL)
         try:
             cv_results = cross_val_score(self.pipeline, X, y, cv=K)
@@ -102,7 +102,7 @@ class AbstractSKLearnModel(ABC):
 
 
 def parse_permutation_output(output: Bunch, feature_names: list[str]) -> list[BatchMetric]:
-    """helper function for extracting from sklearn Bunch object for permutation testing"""
+    """Helper function for extracting from sklearn Bunch object for permutation testing"""
     metric_list = []
     for i, feature in enumerate(feature_names):
         temp_metric = BatchMetric(name=f"Feature:{feature}", value_type="R^2", stage=Stage.PERM)
