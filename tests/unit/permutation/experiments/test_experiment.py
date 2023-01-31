@@ -3,11 +3,11 @@ from unittest.mock import Mock, patch
 import numpy as np
 import pandas as pd
 
-from permutation.models.mlr import MLR
-from permutation.models.rf import RF
+from permutation.models.modelprotocol import Model
 from permutation.runner import Runner
 from permutation.loader import Loader
 from permutation.experiments.experiment import StandardExperiment
+from permutation.models.hyperparameters import HParams
 
 @patch("permutation.loader.pd.read_csv")
 class TestStandardExperiment(unittest.TestCase):
@@ -20,16 +20,21 @@ class TestStandardExperiment(unittest.TestCase):
         self.features = ["x1", "x2"]
         self.response = "y"
 
-        self.linear_model = MLR()
-        self.rf_model = RF()
+        self.linear_model_mock = Mock(spec=Model)
+        self.linear_model_mock.algorithm_name = "linear_test"
+        self.linear_model_mock.algorithm_abv = "MLR"
+        self.linear_model_mock.hparams = Mock(spec=HParams)
+        self.linear_model_mock.performance = 1
 
-        self.runner_mock = Mock(spec=Runner)
-        self.loader_mock = Mock(spec=Loader)
-        self.runner_mock.model = self.linear_model
-        self.loader_mock.load_training_data.return_value = self.test_df[["x1", "x2"]], self.test_df["y"]
+        self.rf_model_mock = Mock(spec=Model)
+        self.rf_model_mock.algorithm_name = "rf_test"
+        self.rf_model_mock.algorithm_abv = "RF"
+        self.rf_model_mock.hparams = Mock(spec=HParams)
+        self.rf_model_mock.performance = 0.5
 
     def test_add_model(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
+        
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -39,16 +44,17 @@ class TestStandardExperiment(unittest.TestCase):
             self.response,
         )
 
-        experiment.add_model(self.linear_model)
+        experiment.add_model(self.linear_model_mock)
         
         self.assertEqual(experiment._n_models, 1)
         self.assertEqual(len(experiment.models), 1)
 
         self.assertEqual(len(experiment.algorithms), 1)
-        self.assertEqual(experiment.algorithms[0], self.linear_model.algorithm_abv)
+        self.assertEqual(experiment.algorithms[0], self.linear_model_mock.algorithm_abv)
 
     def test_add_models(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
+        
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -58,14 +64,17 @@ class TestStandardExperiment(unittest.TestCase):
             self.response,
         )
 
-        models = [self.linear_model, self.rf_model]
+        models = [self.linear_model_mock, self.rf_model_mock]
         experiment.add_models(models)
         
         self.assertEqual(len(experiment.models), 2)
         self.assertEqual(len(experiment.algorithms), 2)
 
-    def test_train_models(self, mock_read_csv):
+    @patch("permutation.exporter.Exporter.save_model_json")
+    def test_train_models(self, mock_save_model, mock_read_csv):
         mock_read_csv.return_value = self.test_df
+        # mock_train.return_value = None
+
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -75,8 +84,12 @@ class TestStandardExperiment(unittest.TestCase):
             self.response,
         )
 
-        experiment.add_model(self.linear_model)
+        experiment.add_model(self.linear_model_mock)
         experiment.train_models()
-        print(self.runner_mock.testing_metrics)
-        # experiment.test_models()
+        experiment.test_models()
+        experiment.hyperparameter_selection()
+
+        expected_model = list(experiment._models.keys())[0]
+        expected_runner = str(experiment._models[expected_model][0]._UUID)
+        self.assertEqual(experiment.best_models, {expected_model: expected_runner})
 
