@@ -5,11 +5,10 @@ import pandas as pd
 
 from permutation.models.modelprotocol import Model
 from permutation.runner import Runner
-from permutation.loader import Loader
 from permutation.experiments.experiment import StandardExperiment
 from permutation.models.hyperparameters import HParams
 from permutation.metrics import BatchMetric
-from permutation.stage import Stage
+from permutation.stage import Stage, IncorrectStageException
 
 @patch("permutation.loader.pd.read_csv")
 class TestStandardExperiment(unittest.TestCase):
@@ -191,3 +190,24 @@ class TestStandardExperiment(unittest.TestCase):
         experiment.hyperparameter_selection()
         experiment.test_models()
         mock_runner_test.assert_called_once()
+
+    @patch("permutation.exporter.Exporter.save_model_json")
+    @patch("permutation.exporter.Exporter.save_predictions")
+    @patch("permutation.runner.Runner.permutation_testing")
+    def test_permutation_testing_calls_runner_permutation_testing(self, mock_runner_permutation_testing, mock_save_prediction, mock_save_model, mock_read_csv):
+        mock_read_csv.return_value = self.test_df
+        
+        experiment = StandardExperiment(
+            self.experiment_name,
+            self.export_dir,
+            self.log_dir,
+            self.data_path,
+            self.features,
+            self.response,
+        )
+        
+        experiment.add_model(self.mock_linear_model)
+        experiment.hyperparameter_selection()
+        experiment.permutation_testing()
+        mock_runner_permutation_testing.assert_called_once()
+        
