@@ -126,7 +126,7 @@ def add_constant_params(names: list[str], values: list[Any], df: pd.DataFrame) -
     return df
 
 
-def build_hparams_df(hparam_cfg, sobol_power) -> pd.DataFrame:
+def build_hparams_df(hparam_cfg, sobol_power: int) -> pd.DataFrame:
     """Generates a dataframe of permuted hyperparameter sample values based on values in the config files"""
     temp_df = _handle_continuous_config(hparam_cfg, sobol_power)
     temp_df_discrete = _handle_discrete_config(hparam_cfg, temp_df)
@@ -134,7 +134,7 @@ def build_hparams_df(hparam_cfg, sobol_power) -> pd.DataFrame:
     return hparam_df
 
 
-def _handle_continuous_config(param_cfg, sobol_power):
+def _handle_continuous_config(param_cfg, sobol_power: int):
     """
     Reads in continuous parameters from config file and generates a dataframe of randomly generated samples from those parameters
 
