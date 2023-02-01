@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import Mock, patch
+import os
 import numpy as np
 import pandas as pd
 
@@ -13,9 +14,10 @@ from permutation.stage import Stage, IncorrectStageException
 @patch("permutation.loader.pd.read_csv")
 class TestStandardExperiment(unittest.TestCase):
     def setUp(self):
-        self.experiment_name = "TestExperiment"
+        self.experiment_name = "testExperiment"
         self.export_dir = "results/test"
         self.log_dir = "logs/test"
+        self.log_path = f"{self.log_dir}/{self.experiment_name}.log"
         self.data_path = "data/sample_data.csv"
         self.test_df = pd.DataFrame([[0, 0, 0], [1, 0, 1], [1, 0, 1], [1, 1, 0]], columns=["x1", "x2", "y"])
         self.features = ["x1", "x2"]
@@ -43,7 +45,9 @@ class TestStandardExperiment(unittest.TestCase):
         self.mock_best_linear_model_metrics.average = 0.9
         self.mock_best_linear_model.crossval_hparams = Mock(return_value = self.mock_best_linear_model_metrics)
 
-
+    def tearDown(self) -> None:
+        os.remove(self.log_path)
+        os.rmdir(self.log_dir)
 
     def test_add_model_adds_model(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
