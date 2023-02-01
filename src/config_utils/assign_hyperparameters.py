@@ -126,15 +126,15 @@ def add_constant_params(names: list[str], values: list[Any], df: pd.DataFrame) -
     return df
 
 
-def build_hparams_df(hparam_cfg) -> pd.DataFrame:
+def build_hparams_df(hparam_cfg, sobol_power) -> pd.DataFrame:
     """Generates a dataframe of permuted hyperparameter sample values based on values in the config files"""
-    temp_df = _handle_continuous_config(hparam_cfg)
+    temp_df = _handle_continuous_config(hparam_cfg, sobol_power)
     temp_df_discrete = _handle_discrete_config(hparam_cfg, temp_df)
     hparam_df = _handle_static_config(hparam_cfg, temp_df_discrete)
     return hparam_df
 
 
-def _handle_continuous_config(param_cfg):
+def _handle_continuous_config(param_cfg, sobol_power):
     """
     Reads in continuous parameters from config file and generates a dataframe of randomly generated samples from those parameters
 
@@ -165,7 +165,7 @@ def _handle_continuous_config(param_cfg):
         lower_bounds.append(lower)
         upper_bounds.append(upper)
 
-    temp_df = generate_sobol_hparams_df(lower_bounds, upper_bounds, names)
+    temp_df = generate_sobol_hparams_df(lower_bounds, upper_bounds, names, sobol_power)
 
     temp_df[log_names] = temp_df[log_names].apply(lambda x: np.exp(x))
     type_dict = {param: param_dict["type"] for param, param_dict in cont_params.items()}
@@ -211,8 +211,8 @@ def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
     return withstatic_hparam_df
 
 
-def assign_hyperparameters(hparam_cfg) -> list[HParams]:
+def assign_hyperparameters(hparam_cfg, sobol_power) -> list[HParams]:
     """Creates a list of sampled hyperparmeters for a models from a set of config files"""
-    hparam_df = build_hparams_df(hparam_cfg)
+    hparam_df = build_hparams_df(hparam_cfg, sobol_power)
     params = [*hparam_df.to_dict(orient="index").values()]
     return [HParams(hparam_dict) for hparam_dict in params]
