@@ -1,16 +1,21 @@
 import os
-
 import hydra
 
+
 from config_utils import assign_models, assign_hyperparameters
-from permutation.file_utils import clean_dir
+from config_utils.dataclasses import CaseStudyConfig
+# from permutation.file_utils import clean_dir
 from permutation.experiments.experiment import StandardExperiment
 
 
+from hydra.core.config_store import ConfigStore
+cs = ConfigStore.instance()
+cs.store(name="config", node=CaseStudyConfig)
+
 @hydra.main(version_base=None, config_path="conf", config_name="config")
-def main(config):
-    cfg = config["cs"]
-    sobol_power = config["sobol_power"]
+def main(config: CaseStudyConfig):
+    cfg = config.cs
+    sobol_power = config.sobol_power
 
     for response in cfg.data.response:
         experiment = StandardExperiment(

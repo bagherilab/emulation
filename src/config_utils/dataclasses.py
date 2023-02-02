@@ -1,17 +1,23 @@
+from dataclasses import dataclass
+from typing import Optional
+
+""" Experiment config """
+@dataclass
+class Experiment:
+    name: str
+
+@dataclass
+class Files:
+    data: str
+
 @dataclass
 class Paths:
     log: str
     data: str
     results: str
 
-
 @dataclass
-class Files:
-    data: str
-
-
-@dataclass
-class DataLabels:
+class Data:
     features: list[str]
     response: list[str]
 
@@ -20,58 +26,51 @@ class DataLabels:
 class Params:
     pass
 
-
+""" Model config """
 @dataclass
 class ContinuousParams(Params):
-    search: str
     type: str
     range: list[int | float]
-
+    search: str
+    
 
 @dataclass
 class DiscreteParams(Params):
-    ...
+    activation: Optional[list[str]]
+    hidden_layer_size: Optional[list[str]]
+    bootstrap: Optional[list[bool]]
+    kernel: Optional[list[str]]
 
 
 @dataclass
 class StaticParams(Params):
-    ...
+    solver: Optional[str]
+    max_iter: Optional[int]
 
 
 @dataclass
-class BoolParams(Params):
-    values: list[str]
+class HyperParams:
+    continous: Optional[ContinuousParams]
+    discrete: Optional[DiscreteParams]
+    static: Optional[StaticParams]
 
 
 @dataclass
 class ModelConfig:
-    model_type: str
-    hyperparamers: Params
-
-
-@dataclass
-class MLPConfig(ModelConfig):
-    type: str
-
+    hyperparameters: HyperParams
+    
 
 @dataclass
-class MLRConfig(ModelConfig):
-    values: list[str]
+class ExperimentConfig:
+    models: dict[str, ModelConfig]
+    experiment: Experiment
+    files: Files 
+    paths: Paths 
+    data: Data 
 
 
-@dataclass
-class RFConfig(ModelConfig):
-    type: str
-
-
-@dataclass
-class SVMConfig(ModelConfig):
-    ...
-
-
-@dataclass
+@dataclass 
 class CaseStudyConfig:
-    paths: Paths
-    files: Files
-    data_labels: DataLabels
-    model: ModelConfig
+    cs: ExperimentConfig
+    sobol_power: int 
+    debug: Optional[bool] = False
