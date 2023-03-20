@@ -2,11 +2,11 @@ svr:
   continuous:
     C:
       type: float
-      range: [0.0001, 1.0]
+      range: [0.0001, 2.0]
       search: log
     epsilon:
       type: float
-      range: [0.0, 1.0]
+      range: [0.0, 10]
       search: linear
   discrete:
     kernel:

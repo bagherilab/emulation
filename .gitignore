@@ -1,8 +1,8 @@
 # Project specific
-
 logs/
 outputs/
 results/
+emulation_cleaning/
 
 # Editors
 .vscode/
