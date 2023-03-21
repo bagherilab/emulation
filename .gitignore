@@ -3,6 +3,8 @@ logs/
 outputs/
 results/
 emulation_cleaning/
+data/test/
+test.yaml
 
 # Editors
 .vscode/
