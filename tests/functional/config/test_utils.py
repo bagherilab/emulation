@@ -26,8 +26,10 @@ class SequentialMetricTests(unittest.TestCase):
             continuous=continuous_params, discrete=discrete_params, static=static_params
         )
 
+        self.sobol_power = 4
+
         # User uses the config object to make a Dataframe of values
-        resolved_df = MOD.build_hparams_df(self.config.hparams)
+        resolved_df = MOD.build_hparams_df(self.config.hparams, self.sobol_power)
         print(resolved_df)
         # Returned df should have attributes of original config YAML with pseudo-random numbers
         self.assertEqual(resolved_df.shape, (288, 6))

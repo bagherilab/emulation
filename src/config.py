@@ -10,6 +10,7 @@ from permutation.experiments.experiment import StandardExperiment
 @hydra.main(version_base=None, config_path="conf", config_name="config")
 def main(config):
     cfg = config["cs"]
+    sobol_power = config["sobol_power"]
 
     for response in cfg.data.response:
         experiment = StandardExperiment(
@@ -20,9 +21,9 @@ def main(config):
             features=cfg.data.features,
             response=response,
         )
-
+        
         for model, hparam_cfg in cfg.models.items():
-            temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg)
+            temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg, sobol_power)
             model_list = assign_models.assign_models_from_list(temp_list, model)
             experiment.add_models(model_list)
 
