@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Optional, Tuple
 
 import pandas as pd
+import numpy as np
 
 from sklearn.model_selection import train_test_split
 
@@ -191,26 +192,23 @@ class CSVLoader(Loader):
         self.test_size = test_size
         self.seed = seed
         self._load_data()
-        self._clean_data()
         self._split_data()
 
-    def _clean_data(self) -> None:
+    def clean_data(self) -> None:
         """Handle missing or non-numeric data"""
-        _X_copy = self._X.copy()
-        _y_copy = self._y.copy()
-        self._X = _X_copy.dropna()
-        self._y = _y_copy.dropna()
+        full_data = pd.concat([self._X, self._y], axis=1)
+        full_data_copy = full_data.copy()
 
-        self._X.reset_index(drop=True, inplace=True)
-        self._y.reset_index(drop=True, inplace=True)
-
-        _X_removed = _X_copy[~_X_copy.index.isin(self._X.index)]
-        _y_removed = _y_copy[~_y_copy.index.isin(self._y.index)]
-
-        print(f"Removed {_X_removed.shape[0]} rows from X")
-        print(f"Removed {_y_removed.shape[0]} rows from y")
-
+        full_data.replace([np.inf, -np.inf], np.nan, inplace=True)
+        full_data = full_data.dropna()
+        removed_features = full_data_copy[~full_data_copy.index.isin(full_data.index)]
+        full_data.reset_index(drop=True, inplace=True)
+        self._X, self._y = features_response_split(full_data, self.features, self.response)
         self._set_working()
+        self._split_data()
+
+        removed_responses = None
+        return removed_features, removed_responses
 
     def _load_data(self, index_col=0) -> None:
         """Load data from csv to _X and _y attributes"""
