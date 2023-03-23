@@ -74,3 +74,10 @@ class Exporter:
         dir_path = f"{self.export_path}{self.experiment}/{model}/"
         predictions = runner.get_predictions()
         self._save_df(dir_path, f"{runner.id}.PREDICTIONS", predictions)
+
+    def save_train_test(self, train: pd.DataFrame, test: pd.DataFrame):
+        """Saves the model predictions as a CSV file"""
+        train_dir_path = f"{self.export_path}{self.experiment}"
+        test_dir_path = f"{self.export_path}{self.experiment}"
+        self._save_df(train_dir_path, "train", train)
+        self._save_df(test_dir_path, "test", test)
