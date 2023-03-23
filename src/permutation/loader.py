@@ -191,7 +191,26 @@ class CSVLoader(Loader):
         self.test_size = test_size
         self.seed = seed
         self._load_data()
+        self._clean_data()
         self._split_data()
+
+    def _clean_data(self) -> None:
+        """Handle missing or non-numeric data"""
+        _X_copy = self._X.copy()
+        _y_copy = self._y.copy()
+        self._X = _X_copy.dropna()
+        self._y = _y_copy.dropna()
+
+        self._X.reset_index(drop=True, inplace=True)
+        self._y.reset_index(drop=True, inplace=True)
+
+        _X_removed = _X_copy[~_X_copy.index.isin(self._X.index)]
+        _y_removed = _y_copy[~_y_copy.index.isin(self._y.index)]
+
+        print(f"Removed {_X_removed.shape[0]} rows from X")
+        print(f"Removed {_y_removed.shape[0]} rows from y")
+
+        self._set_working()
 
     def _load_data(self, index_col=0) -> None:
         """Load data from csv to _X and _y attributes"""
