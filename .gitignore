@@ -2,8 +2,12 @@
 logs/
 outputs/
 results/
-emulation_cleaning/
+utils/
+
+# Tests
 data/test/
+logs/test/
+results/test/
 test.yaml
 
 # Editors
