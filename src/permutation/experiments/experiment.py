@@ -285,6 +285,12 @@ class StandardExperiment(Experiment):
         }
         manifest_df = pd.DataFrame.from_dict(temp_d, orient="index")
         self.exporter.save_manifest_file(manifest_df)
+        
+    def save_train_test(self) -> None:
+        """Save the training and testing data"""
+        self.logger.log(f"Saving train/test data for {self.name}")
+        train_df, test_df = self.loader.load_working_data()
+        self.exporter.save_train_test(train_df, test_df)
 
     # todo: add logic for models where hparams are not specified, i.e. no cv needed
 
@@ -404,3 +410,4 @@ class TrainingQuantityExperiment(StandardExperiment):
             self.name = temp_name
             self._subsample_and_run(n=n)
         self.name = original
+
