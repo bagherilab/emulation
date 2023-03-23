@@ -271,12 +271,117 @@ class StandardExperiment(Experiment):
         self.test_models()
         self.permutation_testing()
 
-    def run_training_quantity_experiment(self, num: int = 10, repeat: Optional[int] = None) -> None:
+    def _reset_best_models(self) -> None:
+        """Reset the best models"""
+        self._best_models = {}
+
+    def save_manifest(self) -> None:
+        """Save manifest as a CSV"""
+        self.logger.log(f"Saving manifest for {self.name}")
+        temp_d = {
+            runner.id: runner.description
+            for runner_list in self._models.values()
+            for runner in runner_list
+        }
+        manifest_df = pd.DataFrame.from_dict(temp_d, orient="index")
+        self.exporter.save_manifest_file(manifest_df)
+
+    # todo: add logic for models where hparams are not specified, i.e. no cv needed
+
+
+class TrainingQuantityExperiment(StandardExperiment):
+    """
+    A class to set up and initialize an experiment to test how much training data is required
+
+    Arguments
+    ----------
+    experiment_name :
+        Name of experiment for file management purposes
+    log_dir :
+        Directory to save experiment results
+    data_path :
+        Location of original datafile
+    features :
+        List of features in the dataset to use to train models
+    response :
+        Response variable to use as the target variable for training
+
+    Attributes
+    ----------
+    name :
+        Location where files will be stored
+    exporter :
+        Exporter object where the experiment will export results
+    logger :
+        Logger object where the experiment will log status
+    loader :
+        Loader object where the experiment will load data
+    models:
+        Models that have been added to the experiment
+    algorithms :
+        Algorithms that have been added to the experiment
+    best_models :
+        Hyperparameter models that have been identified as the best model through CV
+
+    Methods
+    -------
+    hyperparameter_selection():
+        Perform hyperparameter selection on all models for all algorithms
+        Add models to best_models
+
+    train_models():
+        Train models in best_models
+
+    test_models():
+        Train_models() must be run first.
+        Get performance of models in best_models
+
+    permutation_testing():
+        Train_models() must be run first.
+        Get permutation testing results of all models in _best_models
+
+    run_standard_experiment():
+        Run the member methods associated with standard ML practices.
+        1) Hyperparameter selection via cross validation.
+        2) Model training of the best models selected in (1)
+        3) Model performance testing of the best models selected in (1)
+        4) Permutation testing of the best models selected in (1)
+
+    run_training_quantity_experiment(n, repeats):
+        Run the standard experiment different amounts of training data available.
+    """
+
+    def __init__(
+        self,
+        experiment_name: str,
+        export_dir: str,
+        log_dir: str,
+        data_path: str,
+        features: list[str],
+        response: str,
+        num: int = 10,
+        repeat: Optional[int] = None,
+    ) -> None:
+        super().__init__(
+            experiment_name,
+            export_dir,
+            log_dir,
+            data_path,
+            features,
+            response,
+        )
+        self._num = num
+        self._repeat = repeat
+
+    def run(self):
+        self._run_training_quantity_experiment(self._num, self._repeat)
+
+    def _run_training_quantity_experiment(self, num: int, repeat: Optional[int]) -> None:
         """
         Run the member methods associated with the experiment.
         Repeats standard experiment times
         """
-        evenly_spaced_arr = np.linspace(0, self.loader.n_total, num=num, dtype=int)
+        evenly_spaced_arr = np.linspace(30, self.loader.n_total, num=num, dtype=int)
         for val in evenly_spaced_arr:
             if not repeat:
                 self._subsample_and_run(n=val)
@@ -299,20 +404,3 @@ class StandardExperiment(Experiment):
             self.name = temp_name
             self._subsample_and_run(n=n)
         self.name = original
-
-    def _reset_best_models(self) -> None:
-        """Reset the best models"""
-        self._best_models = {}
-
-    def save_manifest(self) -> None:
-        """Save manifest as a CSV"""
-        self.logger.log(f"Saving manifest for {self.name}")
-        temp_d = {
-            runner.id: runner.description
-            for runner_list in self._models.values()
-            for runner in runner_list
-        }
-        manifest_df = pd.DataFrame.from_dict(temp_d, orient="index")
-        self.exporter.save_manifest_file(manifest_df)
-
-    # todo: add logic for models where hparams are not specified, i.e. no cv needed

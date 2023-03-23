@@ -102,7 +102,7 @@ class Runner:
     def get_predictions(self) -> pd.DataFrame:
         """Get predictions from the triaed model"""
         X, y = self.loader.load_working_data()
-        df = pd.DataFrame(self.model.get_predicted_values(X), columns=["y_pred"])
+        df = pd.DataFrame(self.model.get_predicted_values(X), columns=["y_pred"], index=y.index)
         df["set"] = ""
         df.loc[self.loader._training_idx, "set"] = "train"
         df.loc[self.loader._testing_idx, "set"] = "test"

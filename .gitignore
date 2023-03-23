@@ -2,9 +2,7 @@
 logs/
 outputs/
 results/
-emulation_cleaning/
-data/test/
-test.yaml
+utils/
 
 # Editors
 .vscode/
