@@ -4,14 +4,21 @@ defaults:
   - models/svr
   - models/mlp
   - _self_
-experiment:
-  name: COUPLED-C
-files:
-  data: VASCULAR_FUNCTION_C.csv
-paths:
-  log: ${hydra:runtime.cwd}/logs/ARCADE/
-  data: ${hydra:runtime.cwd}/data/ARCADE/
-  results: ${hydra:runtime.cwd}/results/ARCADE/
+experiments:
+  COUPLED-C:
+    files:
+      data: VASCULAR_FUNCTION_C.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/
+  COUPLED-CHX:
+    files:
+      data: VASCULAR_FUNCTION_CHX.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/
 data:
   features:
     - PRESSURE

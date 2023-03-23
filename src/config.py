@@ -11,16 +11,17 @@ from permutation.experiments.experiment import StandardExperiment
 def main(config):
     cfg = config["cs"]
     sobol_power = config["sobol_power"]
-
-    for response in cfg.data.response:
-        experiment = StandardExperiment(
-            experiment_name=f"{cfg.experiment.name}-{response}",
-            export_dir=cfg.paths.results,
-            log_dir=cfg.paths.log,
-            data_path=os.path.join(cfg.paths.data, cfg.files.data),
-            features=cfg.data.features,
-            response=response,
-        )
+    for experiment_name in cfg.experiments:
+        experiment_cfg = cfg["experiments"][experiment_name]
+        for response in cfg.data.response:
+            experiment = StandardExperiment(
+                experiment_name=f"{experiment_name}-{response}",
+                export_dir=experiment_cfg.paths.results,
+                log_dir=experiment_cfg.paths.log,
+                data_path=os.path.join(experiment_cfg.paths.data, experiment_cfg.files.data),
+                features=cfg.data.features,
+                response=response,
+            )
 
         for model, hparam_cfg in cfg.models.items():
             temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg, sobol_power)

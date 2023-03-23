@@ -1,4 +1,3 @@
 rm -rf results/ARCADE/*
-python src/config.py cs=coupled-c
-python src/config.py cs=coupled-chx
+python src/config.py cs=naive-features
 

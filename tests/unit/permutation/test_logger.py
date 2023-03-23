@@ -8,7 +8,7 @@ class TestExperimentLogger(unittest.TestCase):
     def setUp(self):
         self.reset_logging()
         self.experiment_name = "test_experiment"
-        self.log_dir = "test_logs"
+        self.log_dir = "logs/test"
         self.log_path = f"{self.log_dir}/{self.experiment_name}.log"
 
         self.logger = ExperimentLogger(
@@ -40,7 +40,7 @@ class TestExperimentLogger(unittest.TestCase):
         handler = self.logger.logger.handlers[0]
         self.assertIsInstance(handler, logging.FileHandler)
         baseFilename_chunks = handler.baseFilename.split("/")
-        self.assertEqual("/".join(baseFilename_chunks[-2:]), self.logger.log_path)
+        self.assertEqual("/".join(baseFilename_chunks[-3:]), self.logger.log_path)
         self.assertEqual(handler.mode, "w")
 
         formatter = handler.formatter

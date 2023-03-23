@@ -286,7 +286,7 @@ class StandardExperiment(Experiment):
     def _subsample_and_run(self, n: int) -> None:
         """Helper function for subsampling data and running experiment"""
         self.loader.subsample(n)
-        self.run_standard_experiment()
+        self._run_standard_experiment()
 
     def _run_repeats(self, n: int, repeats: int) -> None:
         """
