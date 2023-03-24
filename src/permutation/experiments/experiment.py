@@ -13,6 +13,8 @@ from permutation.models.modelprotocol import Model
 
 
 class Experiment(ABC):
+    """Abstract class for experiments"""
+
     name: str
     exporter: Exporter
     logger: Logger
@@ -129,7 +131,7 @@ class StandardExperiment(Experiment):
         self._best_models: dict[str, Runner] = {}
         self._log_initialization()
 
-    def _log_initialization(self):
+    def _log_initialization(self) -> None:
         self.logger.log(f"{self.name} initialized.")
 
     def add_model(self, model: Model) -> None:
@@ -144,7 +146,7 @@ class StandardExperiment(Experiment):
     def _check_ids(self, runner: Runner) -> str:
         """Reset the runner's ID if it exists in already"""
         while runner.id in self._model_ids:
-            self.logger.log(f"Reset id for {runner.Description}")
+            self.logger.log(f"Reset id for {runner.description}")
             runner.reset_id()
 
         return runner.id
@@ -187,10 +189,10 @@ class StandardExperiment(Experiment):
         progress_counter = 0
 
         for algorithm, runner_list in self._models.items():
-            for r in runner_list:
-                r.cross_validation()
+            for runner in runner_list:
+                runner.cross_validation()
                 progress_counter += 1
-                self.logger.log(f"Progress: {progress_counter} of {self._n_models} - {r.id}")
+                self.logger.log(f"Progress: {progress_counter} of {self._n_models} - {runner.id}")
 
             cv_list = [runner.cv_metrics.average for runner in runner_list]  # type: ignore
             best_value = max(cv_list)
@@ -250,7 +252,7 @@ class StandardExperiment(Experiment):
         for perm_metric in runner.permutation_metrics:
             self.exporter.metric_to_csv(algorithm, f"{runner.id}_{perm_metric.name}", perm_metric)
 
-    def run(self):
+    def run(self) -> None:
         self._run_standard_experiment()
 
     def _run_standard_experiment(self) -> None:

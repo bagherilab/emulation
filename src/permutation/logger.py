@@ -1,21 +1,22 @@
 import logging
 import os
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from permutation.file_utils import validate_dir
 
 
 class Logger(ABC):
+    """Abstract class for logger objects"""
+
     experiment_name: str
     log_dir: str
 
     @abstractmethod
-    def log(message: str) -> None:
+    def log(self, message: str) -> None:
         """Abstract method to implement for logger objects"""
 
 
-class ExperimentLogger:
+class ExperimentLogger(Logger):
     """
     A class for logging experimental details
 
@@ -49,7 +50,7 @@ class ExperimentLogger:
         self.logger = logging.getLogger(self.experiment_name)
         self._set_up(format_str, level)
 
-    def _set_up(self, format_str: str, level: int):
+    def _set_up(self, format_str: str, level: int) -> None:
         """Sets up logger with formatting, log path, and detail leval"""
         self.logger.setLevel(level)
         formatter = logging.Formatter(format_str)

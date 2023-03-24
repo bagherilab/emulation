@@ -1,29 +1,30 @@
 import hydra
 from hydra.core.config_store import ConfigStore
 
-from config import CaseStudyConfig
+from config_utils.dataclasses import CaseStudyConfig
 
 cs = ConfigStore.instance()
 cs.store(name="case_study", node=CaseStudyConfig)  # loads according to type hinting in config.py
 # Case Study 1
-def finley_case_study():
+def finley_case_study() -> None:
+    """Finley Case Study"""
     raise NotImplementedError()
 
 
 # Case Study 2
-def tumorcode_case_study():
+def tumorcode_case_study() -> None:
+    """Tumorcode Case Study"""
     raise NotImplementedError()
 
 
 # Case Study 3
-
-
-def arcade_case_study():
+def arcade_case_study() -> None:
+    """Arcade Case Study"""
     raise NotImplementedError()
 
 
-@hydra.main(config_path="conf", config_name="config")
-def main():
+@hydra.main(config_path="conf", config_name="config")  # type: ignore
+def main() -> None:
     # finley_case_study()
     tumorcode_case_study()
     # arcade_case_study()

@@ -75,7 +75,7 @@ class Loader(ABC):
         y
             Pandas series containing <response> variable
         """
-        return self._X.iloc[self._training_idx], self._y.iloc[self._training_idx]
+        return self._X.iloc[self._training_idx], self._y.iloc[self._training_idx]  # type: ignore
 
     def load_testing_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -88,7 +88,7 @@ class Loader(ABC):
         y
             Pandas series containing <response> variable
         """
-        return self._X.iloc[self._testing_idx], self._y.iloc[self._testing_idx]
+        return self._X.iloc[self._testing_idx], self._y.iloc[self._testing_idx]  # type: ignore
 
     def load_working_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -101,7 +101,7 @@ class Loader(ABC):
         y
             Pandas series containing <response> variable
         """
-        return self._X.iloc[self._working_idx], self._y.iloc[self._working_idx]
+        return self._X.iloc[self._working_idx], self._y.iloc[self._working_idx]  # type: ignore
 
     def load_original_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -193,7 +193,7 @@ class CSVLoader(Loader):
         self._load_data()
         self._split_data()
 
-    def _load_data(self, index_col=0) -> None:
+    def _load_data(self, index_col: int = 0) -> None:
         """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
         self._X, self._y = features_response_split(data, self.features, self.response)
