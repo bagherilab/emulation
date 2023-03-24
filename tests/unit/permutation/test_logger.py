@@ -4,6 +4,7 @@ import logging
 import os
 from permutation.logger import ExperimentLogger
 
+
 class TestExperimentLogger(unittest.TestCase):
     def setUp(self):
         self.reset_logging()
@@ -12,10 +13,10 @@ class TestExperimentLogger(unittest.TestCase):
         self.log_path = f"{self.log_dir}/{self.experiment_name}.log"
 
         self.logger = ExperimentLogger(
-            self.experiment_name, 
+            self.experiment_name,
             self.log_dir,
         )
-    
+
     def tearDown(self) -> None:
         os.remove(self.log_path)
         os.rmdir(self.log_dir)
@@ -25,7 +26,7 @@ class TestExperimentLogger(unittest.TestCase):
         self.logger.log(message)
 
         self.assertTrue(os.path.isfile(self.log_path))
-        
+
         with open(self.log_path, "r") as f:
             log_content = f.read()
             self.assertIn(message, log_content)
