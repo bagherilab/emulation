@@ -49,4 +49,4 @@ jobs:
 
       - name: Check with mypy
         run: |
-          mypy --config-file --ignore-missing-imports mypy.ini src
+          mypy --config-file mypy.ini --ignore-missing-imports src
