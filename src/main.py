@@ -5,6 +5,8 @@ from config_utils.dataclasses import CaseStudyConfig
 
 cs = ConfigStore.instance()
 cs.store(name="case_study", node=CaseStudyConfig)  # loads according to type hinting in config.py
+
+
 # Case Study 1
 def finley_case_study() -> None:
     """Finley Case Study"""
