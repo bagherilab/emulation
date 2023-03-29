@@ -59,10 +59,8 @@ class Loader(ABC):
     def _split_data(self) -> None:
         """Method for test/train split needs to be implemented in subclasses"""
 
-    def subsample(self, n: int) -> None:
+    def subsample(self, n: int, stratify: Optional[str]) -> None:
         """Sample n observations"""
-        self._working_idx = self._X.sample(n).index.tolist()
-        self._split_data()
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -198,15 +196,26 @@ class CSVLoader(Loader):
         """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
         self._X, self._y = features_response_split(data, self.features, self.response)
-        print(self._X)
-        print(self._y)
         self._set_working()
 
     def _split_data(self, stratify: Optional[str]) -> None:
         """Test train split implementation"""
+        temp_working = pd.DataFrame(self._working_idx, columns=["working_idx"])
+        if stratify:
+            temp_working[stratify] = self._X[stratify]
         self._training_idx, self._testing_idx = train_test_split(
-            self._working_idx, test_size=self.test_size, random_state=self.seed, stratify=stratify
+            temp_working,
+            test_size=self.test_size,
+            random_state=self.seed,
+            stratify=temp_working[stratify] if stratify else None,
         )
+        self._training_idx = self._training_idx["working_idx"].tolist()
+        self._testing_idx = self._testing_idx["working_idx"].tolist()
+
+    def subsample(self, n: int, stratify: Optional[str] = None) -> None:
+        """Sample n observations"""
+        self._working_idx = self._X.sample(n).index.tolist()
+        self._split_data(stratify)
 
 
 def features_response_split(
