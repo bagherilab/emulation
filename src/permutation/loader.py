@@ -183,6 +183,7 @@ class CSVLoader(Loader):
         features: list[str],
         response: str,
         test_size: float = 0.3,
+        stratify: Optional[str] = None,
         seed: Optional[int] = 100,
     ) -> None:
         self.path = path
@@ -191,18 +192,20 @@ class CSVLoader(Loader):
         self.test_size = test_size
         self.seed = seed
         self._load_data()
-        self._split_data()
+        self._split_data(stratify)
 
     def _load_data(self, index_col=0) -> None:
         """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
         self._X, self._y = features_response_split(data, self.features, self.response)
+        print(self._X)
+        print(self._y)
         self._set_working()
 
-    def _split_data(self) -> None:
+    def _split_data(self, stratify: Optional[str]) -> None:
         """Test train split implementation"""
         self._training_idx, self._testing_idx = train_test_split(
-            self._working_idx, test_size=self.test_size, random_state=self.seed
+            self._working_idx, test_size=self.test_size, random_state=self.seed, stratify=stratify
         )
 
 

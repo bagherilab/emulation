@@ -3,4 +3,5 @@ defaults:
   - _self_
 
 sobol_power: 3
+stratify: LAYOUT
 debug: true
