@@ -57,12 +57,13 @@ class CSVLoaderTests(unittest.TestCase):
 
     def test_split_data_stratify(self, mock_read_csv):
         n_samples = 1000
+        stratify_column = "Layouts"
         classes = ["A", "B", "C", "D"]
         stratified_df = pd.DataFrame(
             {
                 "Feature 1": np.random.randn(n_samples),
                 "Feature 2": np.random.randn(n_samples),
-                "Layouts": np.random.choice(classes, size=n_samples, p=[0.5, 0.1, 0.2, 0.2]),
+                stratify_column: np.random.choice(classes, size=n_samples, p=[0.5, 0.1, 0.2, 0.2]),
             }
         )
 
@@ -70,11 +71,11 @@ class CSVLoaderTests(unittest.TestCase):
 
         testLoader = CSVLoader(
             path="test",
-            features=["Feature 1", "Layouts"],
+            features=["Feature 1", stratify_column],
             response=["Feature 2"],
             test_size=self.test_size,
             seed=self.seed,
-            stratify="Layouts",
+            stratify=stratify_column,
         )
 
         X_training, _ = testLoader.load_training_data()
@@ -82,17 +83,19 @@ class CSVLoaderTests(unittest.TestCase):
         X_working, _ = testLoader.load_working_data()
 
         # Calculate the class distribution in the original data
-        class_distribution = X_working["Layouts"].value_counts(normalize=True)
+        class_distribution = X_working[stratify_column].value_counts(normalize=True)
 
         # Calculate the class distribution in the training data
-        train_class_distribution = X_training["Layouts"].value_counts(normalize=True)
+        train_class_distribution = X_training[stratify_column].value_counts(normalize=True)
 
         # Calculate the class distribution in the test data
-        test_class_distribution = X_testing["Layouts"].value_counts(normalize=True)
+        test_class_distribution = X_testing[stratify_column].value_counts(normalize=True)
 
         # Check that the class distribution in the training data is close to the original
         for class_name in classes:
-            assert abs(train_class_distribution[class_name] - class_distribution[class_name]) < 0.05
+            assert (
+                abs(train_class_distribution[class_name] - class_distribution[class_name]) < 0.05
+            )  # tolerance of 5%
 
         # Check that the class distribution in the test data is close to the original
         for class_name in class_distribution.index:
