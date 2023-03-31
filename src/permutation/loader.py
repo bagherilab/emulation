@@ -196,19 +196,29 @@ class CSVLoader(Loader):
 
     def clean_data(self) -> None:
         """Handle missing or non-numeric data"""
+        # Removed features columns with bad values
+        _X_copy = self._X.copy()
+        self._X = self._X.loc[:, ~(np.isnan(self._X).any(axis=0) | np.isinf(self._X)).any(axis=0)]
+        removed_feature_columns = _X_copy.columns[~_X_copy.columns.isin(self._X.columns)]
+
+        # Removed response rows with bad values
         full_data = pd.concat([self._X, self._y], axis=1)
         full_data_copy = full_data.copy()
 
-        full_data.replace([np.inf, -np.inf], np.nan, inplace=True)
-        full_data = full_data.dropna()
-        removed_features = full_data_copy[~full_data_copy.index.isin(full_data.index)]
+        full_data = full_data[~full_data.isin([np.nan, np.inf, -np.inf]).any(axis=1)]
+        removed_response_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
+
         full_data.reset_index(drop=True, inplace=True)
+
+        # Remove bad features from feature list
+        self.features = [
+            feature for feature in self.features if feature not in removed_feature_columns
+        ]
         self._X, self._y = features_response_split(full_data, self.features, self.response)
         self._set_working()
         self._split_data()
 
-        removed_responses = None
-        return removed_features, removed_responses
+        return removed_feature_columns, removed_response_rows
 
     def _load_data(self, index_col=0) -> None:
         """Load data from csv to _X and _y attributes"""

@@ -136,15 +136,21 @@ class StandardExperiment(Experiment):
 
     def _clean_data(self, clean_data_flag: bool):
         if clean_data_flag:
-            removed_features, removed_responses = self.loader.clean_data()
+            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+
+            self.logger.log(f"Removed the following features from the dataset:")
+            for feature in removed_feature_columns:
+                self.logger.log(f"{feature}")
+
             self.logger.log(f"Removed the following rows from the dataset:")
-            for index, row in removed_features.iterrows():
+            for index, row in removed_response_rows.iterrows():
                 self.logger.log(
                     f"Index: {index} Nan features: {row[pd.isna(row)]} Infinity features: {row[np.isinf(row)]}"
                 )
             self.logger.log(
-                f"Removed {len(removed_features)} rows from data due to missing, infinity, or nan values"
+                f"Removed {len(removed_response_rows)} rows from data due to missing, infinity, or nan values in the response column"
             )
+
         else:
             self.logger.log(
                 "Data not cleaned. Program may crash if missing or nan values are present"

@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import patch
 
 import pandas as pd
+import numpy as np
 
 from permutation.loader import CSVLoader
 
@@ -80,3 +81,50 @@ class CSVLoaderTests(unittest.TestCase):
         self.assertEqual(y_working.shape, (2,))
         self.assertTrue(X.equals(expected_X))
         self.assertTrue(y.equals(expected_y))
+
+    def test_clean_data(self, mock_read_csv):
+        X = pd.DataFrame(
+            {
+                "col1": [1, 2, np.nan, 4],
+                "col2": [5, 6, 7, 8],
+                "col3": [9, 10, np.inf, 12],
+                "col4": [13, 14, 15, 16],
+                "y": [1, 2, np.nan, 4],
+            }
+        )
+        mock_read_csv.return_value = X
+
+        testLoader = CSVLoader(
+            path="test",
+            features=["col1", "col2", "col3", "col4"],
+            response=["y"],
+            test_size=self.test_size,
+            seed=self.seed,
+        )
+
+        expected_removed_cols = ["col1", "col3"]
+        expected_removed_rows = pd.DataFrame(
+            {
+                "col2": [7],
+                "col4": [15],
+                "y": [np.nan],
+            },
+            index=[2],
+        )
+
+        expected_cleaned = pd.DataFrame(
+            {
+                "col2": [5, 6, 8],
+                "col4": [13, 14, 16],
+                "y": [1.0, 2.0, 4.0],
+            },
+            index=[0, 1, 2],
+        )
+
+        removed_cols, removed_rows = testLoader.clean_data()
+        cleaned_X, cleaned_y = testLoader.load_working_data()
+        cleaned_data = pd.concat([cleaned_X, cleaned_y], axis=1)
+
+        self.assertListEqual(removed_cols.values.tolist(), expected_removed_cols)
+        self.assertTrue(removed_rows.equals(expected_removed_rows))
+        self.assertTrue(cleaned_data.equals(expected_cleaned))
