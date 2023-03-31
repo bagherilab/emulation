@@ -189,20 +189,25 @@ class CSVLoader(Loader):
         self.response = response
         self.test_size = test_size
         self.seed = seed
+        self.stratify = stratify
+        self.stratify_labels = None
         self._load_data()
         self._split_data(stratify)
 
     def _load_data(self, index_col=0) -> None:
         """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
+        data.reset_index(drop=False, inplace=True)
         self._X, self._y = features_response_split(data, self.features, self.response)
+        if self.stratify:
+            self.stratify_labels = data[self.stratify]
         self._set_working()
 
     def _split_data(self, stratify: Optional[str]) -> None:
         """Test train split implementation"""
         temp_working = pd.DataFrame(self._working_idx, columns=["working_idx"])
         if stratify:
-            temp_working[stratify] = self._X[stratify]
+            temp_working[stratify] = self.stratify_labels
         self._training_idx, self._testing_idx = train_test_split(
             temp_working,
             test_size=self.test_size,

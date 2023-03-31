@@ -2,6 +2,6 @@ defaults:
   - cs: MISSING
   - _self_
 
-sobol_power: 3
+sobol_power: 2
 stratify: LAYOUT
 debug: true
