@@ -138,17 +138,15 @@ class StandardExperiment(Experiment):
         if clean_data_flag:
             removed_feature_columns, removed_response_rows = self.loader.clean_data()
 
-            self.logger.log(f"Removed the following features from the dataset:")
-            for feature in removed_feature_columns:
+            self.logger.log(
+                f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
+            )
+            removed_feature_columns_list = removed_feature_columns.values.tolist()
+            for feature in removed_feature_columns_list:
                 self.logger.log(f"{feature}")
 
-            self.logger.log(f"Removed the following rows from the dataset:")
-            for index, row in removed_response_rows.iterrows():
-                self.logger.log(
-                    f"Index: {index} Nan features: {row[pd.isna(row)]} Infinity features: {row[np.isinf(row)]}"
-                )
             self.logger.log(
-                f"Removed {len(removed_response_rows)} rows from data due to missing, infinity, or nan values in the response column"
+                f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
             )
 
         else:
