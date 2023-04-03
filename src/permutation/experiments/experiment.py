@@ -116,12 +116,13 @@ class StandardExperiment(Experiment):
         data_path: str,
         features: list[str],
         response: str,
+        stratify: Optional[str] = None,
         clean_data_flag: bool = False,
     ) -> None:
         self.name = experiment_name
         self.exporter: Exporter = Exporter(self.name, export_dir)
         self.logger: Logger = ExperimentLogger(self.name, log_dir)
-        self.loader: Loader = CSVLoader(data_path, features, response)
+        self.loader: Loader = CSVLoader(data_path, features, response, stratify=stratify)
         self._features = features
         self._response = response
         self._models: dict[str, list[Runner]] = {}

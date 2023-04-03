@@ -11,6 +11,7 @@ from permutation.experiments.experiment import StandardExperiment
 def main(config):
     cfg = config["cs"]
     sobol_power = config["sobol_power"]
+    stratify = config["stratify"]
     clean_data = config["clean_data"]
 
     for experiment_name in cfg.experiments:
@@ -23,6 +24,7 @@ def main(config):
                 data_path=os.path.join(experiment_cfg.paths.data, experiment_cfg.files.data),
                 features=cfg.data.features,
                 response=response,
+                stratify=stratify,
                 clean_data_flag=clean_data,
             )
 

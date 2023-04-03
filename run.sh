@@ -1,3 +1,3 @@
 rm -rf results/ARCADE/*
-python src/config.py cs=naive-features
+python src/config.py cs=network-features
 

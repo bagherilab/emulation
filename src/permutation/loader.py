@@ -60,10 +60,8 @@ class Loader(ABC):
     def _split_data(self) -> None:
         """Method for test/train split needs to be implemented in subclasses"""
 
-    def subsample(self, n: int) -> None:
+    def subsample(self, n: int, stratify: Optional[str]) -> None:
         """Sample n observations"""
-        self._working_idx = self._X.sample(n).index.tolist()
-        self._split_data()
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -184,6 +182,7 @@ class CSVLoader(Loader):
         features: list[str],
         response: str,
         test_size: float = 0.3,
+        stratify: Optional[str] = None,
         seed: Optional[int] = 100,
     ) -> None:
         self.path = path
@@ -191,8 +190,10 @@ class CSVLoader(Loader):
         self.response = response
         self.test_size = test_size
         self.seed = seed
+        self.stratify = stratify
+        self.stratify_labels = None
         self._load_data()
-        self._split_data()
+        self._split_data(stratify)
 
     def clean_data(self) -> None:
         """Handle missing or non-numeric data"""
@@ -216,21 +217,37 @@ class CSVLoader(Loader):
         ]
         self._X, self._y = features_response_split(full_data, self.features, self.response)
         self._set_working()
-        self._split_data()
+        self._split_data(self.stratify)
 
         return removed_feature_columns, removed_response_rows
 
     def _load_data(self, index_col=0) -> None:
         """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
+        data.reset_index(drop=False, inplace=True)
         self._X, self._y = features_response_split(data, self.features, self.response)
+        if self.stratify:
+            self.stratify_labels = data[self.stratify]
         self._set_working()
 
-    def _split_data(self) -> None:
+    def _split_data(self, stratify: Optional[str]) -> None:
         """Test train split implementation"""
+        temp_working = pd.DataFrame(self._working_idx, columns=["working_idx"])
+        if stratify:
+            temp_working[stratify] = self.stratify_labels
         self._training_idx, self._testing_idx = train_test_split(
-            self._working_idx, test_size=self.test_size, random_state=self.seed
+            temp_working,
+            test_size=self.test_size,
+            random_state=self.seed,
+            stratify=temp_working[stratify] if stratify else None,
         )
+        self._training_idx = self._training_idx["working_idx"].tolist()
+        self._testing_idx = self._testing_idx["working_idx"].tolist()
+
+    def subsample(self, n: int, stratify: Optional[str] = None) -> None:
+        """Sample n observations"""
+        self._working_idx = self._X.sample(n).index.tolist()
+        self._split_data(stratify)
 
 
 def features_response_split(
