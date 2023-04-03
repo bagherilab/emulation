@@ -2,6 +2,7 @@ defaults:
   - cs: MISSING
   - _self_
 
-sobol_power: 2
+sobol_power: 4
 stratify: LAYOUT
+clean_data: true
 debug: true

@@ -12,6 +12,8 @@ def main(config):
     cfg = config["cs"]
     sobol_power = config["sobol_power"]
     stratify = config["stratify"]
+    clean_data = config["clean_data"]
+
     for experiment_name in cfg.experiments:
         experiment_cfg = cfg["experiments"][experiment_name]
         for response in cfg.data.response:
@@ -23,6 +25,7 @@ def main(config):
                 features=cfg.data.features,
                 response=response,
                 stratify=stratify,
+                clean_data_flag=clean_data,
             )
 
             for model, hparam_cfg in cfg.models.items():
