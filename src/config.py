@@ -26,13 +26,14 @@ def main(config):
                 clean_data_flag=clean_data,
             )
 
-        for model, hparam_cfg in cfg.models.items():
-            temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg, sobol_power)
-            model_list = assign_models.assign_models_from_list(temp_list, model)
-            experiment.add_models(model_list)
+            for model, hparam_cfg in cfg.models.items():
+                temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg, sobol_power)
+                model_list = assign_models.assign_models_from_list(temp_list, model)
+                experiment.add_models(model_list)
 
-        experiment.save_manifest()
-        experiment.run()
+            experiment.save_train_test()
+            experiment.save_manifest()
+            experiment.run()
 
 
 if __name__ == "__main__":
