@@ -1,6 +1,6 @@
 from pathlib import Path
 from abc import ABC, abstractmethod
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
 import pandas as pd
 import numpy as np
@@ -57,11 +57,16 @@ class Loader(ABC):
         """Loading function for file interaction needs to be implemented in subclasses"""
 
     @abstractmethod
-    def _split_data(self) -> None:
+    def _split_data(self, stratify: Optional[str]) -> None:
         """Method for test/train split needs to be implemented in subclasses"""
 
+    @abstractmethod
     def subsample(self, n: int, stratify: Optional[str]) -> None:
         """Sample n observations"""
+
+    @abstractmethod
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
+        """Handle missing or non-numeric data"""
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -191,16 +196,17 @@ class CSVLoader(Loader):
         self.test_size = test_size
         self.seed = seed
         self.stratify = stratify
-        self.stratify_labels = None
+        self.stratify_labels: Optional[pd.Series] = None
         self._load_data()
         self._split_data(stratify)
 
-    def clean_data(self) -> None:
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
         """Handle missing or non-numeric data"""
         # Removed features columns with bad values
         _X_copy = self._X.copy()
         self._X = self._X.loc[:, ~(np.isnan(self._X).any(axis=0) | np.isinf(self._X)).any(axis=0)]
         removed_feature_columns = _X_copy.columns[~_X_copy.columns.isin(self._X.columns)]
+        removed_feature_columns = removed_feature_columns.values.tolist()
 
         # Removed response rows with bad values
         full_data = pd.concat([self._X, self._y], axis=1)
@@ -241,8 +247,8 @@ class CSVLoader(Loader):
             random_state=self.seed,
             stratify=temp_working[stratify] if stratify else None,
         )
-        self._training_idx = self._training_idx["working_idx"].tolist()
-        self._testing_idx = self._testing_idx["working_idx"].tolist()
+        self._training_idx = self._training_idx["working_idx"].tolist()  # type: ignore
+        self._testing_idx = self._testing_idx["working_idx"].tolist()  # type: ignore
 
     def subsample(self, n: int, stratify: Optional[str] = None) -> None:
         """Sample n observations"""

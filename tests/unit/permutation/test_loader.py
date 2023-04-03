@@ -171,6 +171,6 @@ class CSVLoaderTests(unittest.TestCase):
         cleaned_X, cleaned_y = testLoader.load_working_data()
         cleaned_data = pd.concat([cleaned_X, cleaned_y], axis=1)
 
-        self.assertListEqual(removed_cols.values.tolist(), expected_removed_cols)
+        self.assertListEqual(removed_cols, expected_removed_cols)
         self.assertTrue(removed_rows.equals(expected_removed_rows))
         self.assertTrue(cleaned_data.equals(expected_cleaned))

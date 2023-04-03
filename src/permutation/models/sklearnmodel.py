@@ -72,7 +72,7 @@ class AbstractSKLearnModel(ABC):
         return model
 
     def crossval_hparams(
-        self, X: pd.DataFrame, y: pd.Series, K: int = 10, stratify: str = None
+        self, X: pd.DataFrame, y: pd.Series, K: int = 10, stratify: Optional[str] = None
     ) -> BatchMetric:
         """Perform cross validation"""
         metrics = BatchMetric(name=f"CV_K={K},", value_type="R^2", stage=Stage.VAL)

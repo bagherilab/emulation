@@ -131,21 +131,21 @@ class StandardExperiment(Experiment):
         self._model_ids: set = set()
         self._n_models = 0
         self._best_models: dict[str, Runner] = {}
+        self.stratify = stratify
         self._log_initialization()
         self._clean_data(clean_data_flag)
 
     def _log_initialization(self) -> None:
         self.logger.log(f"{self.name} initialized.")
 
-    def _clean_data(self, clean_data_flag: bool):
+    def _clean_data(self, clean_data_flag: bool) -> None:
         if clean_data_flag:
             removed_feature_columns, removed_response_rows = self.loader.clean_data()
 
             self.logger.log(
                 f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
             )
-            removed_feature_columns_list = removed_feature_columns.values.tolist()
-            for feature in removed_feature_columns_list:
+            for feature in removed_feature_columns:
                 self.logger.log(f"{feature}")
 
             self.logger.log(
@@ -310,7 +310,7 @@ class StandardExperiment(Experiment):
 
     def _subsample_and_run(self, n: int) -> None:
         """Helper function for subsampling data and running experiment"""
-        self.loader.subsample(n)
+        self.loader.subsample(n, self.stratify)
         self._run_standard_experiment()
 
     def _run_repeats(self, n: int, repeats: int) -> None:
