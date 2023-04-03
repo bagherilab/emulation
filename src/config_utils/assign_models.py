@@ -13,11 +13,11 @@ MODEL_DEPENDENCIES = {"mlr": MLR, "rf": RF, "svr": SVReg, "mlp": MLP}
 def _get_correct_model(model_type: str, hparams: HParams) -> Model:
     """Choose the correct model dependency from model string"""
     try:
-        return MODEL_DEPENDENCIES[model_type].set_model(
+        return MODEL_DEPENDENCIES[model_type].set_model(  # type: ignore
             hparams=hparams, preprocessing_dependencies=[("standardscaler", StandardScaler)]
         )
-    except KeyError:
-        raise ValueError(f"Model type {model_type} is not implemented.")
+    except KeyError as exc:
+        raise ValueError(f"Model type {model_type} is not implemented.") from exc
 
 
 def assign_models_from_list(hparams_list: list[HParams], model_type: str) -> list[Model]:

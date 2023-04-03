@@ -1,14 +1,14 @@
 import os
 
 import hydra
+from omegaconf.dictconfig import DictConfig
 
 from config_utils import assign_models, assign_hyperparameters
-from permutation.file_utils import clean_dir
 from permutation.experiments.experiment import StandardExperiment
 
 
 @hydra.main(version_base=None, config_path="conf", config_name="config")
-def main(config):
+def main(config: DictConfig) -> None:
     cfg = config["cs"]
     sobol_power = config["sobol_power"]
     stratify = config["stratify"]

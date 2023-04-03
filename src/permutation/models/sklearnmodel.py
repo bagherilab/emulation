@@ -84,8 +84,8 @@ class AbstractSKLearnModel(ABC):
                 cv_results = cross_val_score(self.pipeline, X, y, cv=strat_cv)
             else:
                 cv_results = cross_val_score(self.pipeline, X, y, cv=K)
-        except ValueError:
-            raise ValueError(f"Hparams are {self.hparams}")
+        except ValueError as exc:
+            raise ValueError(f"Hparams are {self.hparams}") from exc
         metrics.batchupdate(cv_results.tolist())
         return metrics
 

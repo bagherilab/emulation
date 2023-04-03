@@ -1,5 +1,4 @@
-from dataclasses import dataclass, field
-from typing import Protocol, Optional, Any
+from typing import Optional, Any
 
 from permutation.metrics import BatchMetric
 
@@ -7,7 +6,7 @@ from permutation.metrics import BatchMetric
 class HParams:
     """Dataclass for storing hyperparameter information and associated performance metrics."""
 
-    def __init__(self, param_dict: dict[str, Any] = None):
+    def __init__(self, param_dict: Optional[dict[str, Any]] = None):
         self.args: list[str] = []
         self.values: list[Any] = []
         self.number_of_parameters: int = 0

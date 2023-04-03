@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import qmc
 from omegaconf.errors import ConfigAttributeError
+from omegaconf.dictconfig import DictConfig
 
 from permutation.models.hyperparameters import HParams
 
@@ -115,8 +116,8 @@ def check_list_lengths(l1: list[Any], l2: list[Any]) -> None:
     """Raise a value error if l1 and l2 are not the same length"""
     try:
         assert len(l1) == len(l2)
-    except AssertionError:
-        raise ValueError("Lists must be the same length.")
+    except AssertionError as exc:
+        raise ValueError("Lists must be the same length.") from exc
 
 
 def add_constant_params(names: list[str], values: list[Any], df: pd.DataFrame) -> pd.DataFrame:
@@ -126,7 +127,7 @@ def add_constant_params(names: list[str], values: list[Any], df: pd.DataFrame) -
     return df
 
 
-def build_hparams_df(hparam_cfg, sobol_power: int) -> pd.DataFrame:
+def build_hparams_df(hparam_cfg: DictConfig, sobol_power: int) -> pd.DataFrame:
     """Generates a dataframe of permuted hyperparameter sample values based on values in the config files"""
     temp_df = _handle_continuous_config(hparam_cfg, sobol_power)
     temp_df_discrete = _handle_discrete_config(hparam_cfg, temp_df)
@@ -134,9 +135,10 @@ def build_hparams_df(hparam_cfg, sobol_power: int) -> pd.DataFrame:
     return hparam_df
 
 
-def _handle_continuous_config(param_cfg, sobol_power: int):
+def _handle_continuous_config(param_cfg: DictConfig, sobol_power: int) -> pd.DataFrame:
     """
-    Reads in continuous parameters from config file and generates a dataframe of randomly generated samples from those parameters
+    Reads in continuous parameters from config file and generates a
+    dataframe of randomly generated samples from those parameters
 
     Returns
     --------
@@ -173,9 +175,10 @@ def _handle_continuous_config(param_cfg, sobol_power: int):
     return fixed_df
 
 
-def _handle_discrete_config(param_cfg, hparam_df) -> pd.DataFrame:
+def _handle_discrete_config(param_cfg: DictConfig, hparam_df: pd.DataFrame) -> pd.DataFrame:
     """
-    Reads in discrete parameters from config file and appends permutations of them to the hyperparameter dataframe
+    Reads in discrete parameters from config file and appends permutations
+    of them to the hyperparameter dataframe
 
     Returns
     --------
@@ -192,14 +195,15 @@ def _handle_discrete_config(param_cfg, hparam_df) -> pd.DataFrame:
     return with_perm_df
 
 
-def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
+def _handle_static_config(param_cfg: DictConfig, hparam_df: pd.DataFrame) -> pd.DataFrame:
     """
     Reads in static parameters from config file and appends them to the hyperparameter dataframe
 
     Returns
     --------
     :
-        Dataframe with sampled values for each continuous and discrete parameter along with static parameter values
+        Dataframe with sampled values for each continuous and
+        discrete parameter along with static parameter values
     """
     try:
         static_params = param_cfg.static
@@ -211,7 +215,7 @@ def _handle_static_config(param_cfg, hparam_df) -> pd.DataFrame:
     return withstatic_hparam_df
 
 
-def assign_hyperparameters(hparam_cfg, sobol_power) -> list[HParams]:
+def assign_hyperparameters(hparam_cfg: DictConfig, sobol_power: int) -> list[HParams]:
     """Creates a list of sampled hyperparmeters for a models from a set of config files"""
     hparam_df = build_hparams_df(hparam_cfg, sobol_power)
     params = [*hparam_df.to_dict(orient="index").values()]

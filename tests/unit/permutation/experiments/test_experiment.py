@@ -11,6 +11,7 @@ from permutation.models.hyperparameters import HParams
 from permutation.metrics import BatchMetric
 from permutation.stage import Stage, IncorrectStageException
 
+
 @patch("permutation.loader.pd.read_csv")
 class TestStandardExperiment(unittest.TestCase):
     def setUp(self):
@@ -19,7 +20,9 @@ class TestStandardExperiment(unittest.TestCase):
         self.log_dir = "logs/test"
         self.log_path = f"{self.log_dir}/{self.experiment_name}.log"
         self.data_path = "data/sample_data.csv"
-        self.test_df = pd.DataFrame([[0, 0, 0], [1, 0, 1], [1, 0, 1], [1, 1, 0]], columns=["x1", "x2", "y"])
+        self.test_df = pd.DataFrame(
+            [[0, 0, 0], [1, 0, 1], [1, 0, 1], [1, 1, 0]], columns=["x1", "x2", "y"]
+        )
         self.features = ["x1", "x2"]
         self.response = "y"
 
@@ -33,7 +36,7 @@ class TestStandardExperiment(unittest.TestCase):
         self.mock_linear_model_metrics = Mock(spec=BatchMetric)
         self.mock_linear_model_metrics.stage = Stage.VAL
         self.mock_linear_model_metrics.average = 0.5
-        self.mock_linear_model.crossval_hparams = Mock(return_value = self.mock_linear_model_metrics)
+        self.mock_linear_model.crossval_hparams = Mock(return_value=self.mock_linear_model_metrics)
 
         self.mock_best_linear_model = Mock(spec=Model)
         self.mock_best_linear_model.algorithm_name = "best_linear_test"
@@ -43,7 +46,9 @@ class TestStandardExperiment(unittest.TestCase):
         self.mock_best_linear_model_metrics = Mock(spec=BatchMetric)
         self.mock_best_linear_model_metrics.stage = Stage.VAL
         self.mock_best_linear_model_metrics.average = 0.9
-        self.mock_best_linear_model.crossval_hparams = Mock(return_value = self.mock_best_linear_model_metrics)
+        self.mock_best_linear_model.crossval_hparams = Mock(
+            return_value=self.mock_best_linear_model_metrics
+        )
 
     def tearDown(self) -> None:
         os.remove(self.log_path)
@@ -51,7 +56,7 @@ class TestStandardExperiment(unittest.TestCase):
 
     def test_add_model_adds_model(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
-        
+
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -62,7 +67,7 @@ class TestStandardExperiment(unittest.TestCase):
         )
 
         experiment.add_model(self.mock_linear_model)
-        
+
         self.assertEqual(experiment._n_models, 1)
         self.assertEqual(len(experiment.models), 1)
 
@@ -71,7 +76,7 @@ class TestStandardExperiment(unittest.TestCase):
 
     def test_add_models_adds_models(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
-        
+
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -83,14 +88,14 @@ class TestStandardExperiment(unittest.TestCase):
 
         models = [self.mock_linear_model, self.mock_best_linear_model]
         experiment.add_models(models)
-        
+
         self.assertEqual(len(experiment.models), 2)
         self.assertEqual(len(experiment.algorithms), 1)
 
     @patch("permutation.exporter.Exporter.save_model_json")
     def test_hyperparameter_selection_sets_best_model(self, mock_save_model, mock_read_csv):
         mock_read_csv.return_value = self.test_df
-        
+
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -109,7 +114,9 @@ class TestStandardExperiment(unittest.TestCase):
 
     @patch("permutation.exporter.Exporter.save_model_json")
     @patch("permutation.exporter.Exporter.save_predictions")
-    def test_train_models_sets_runner_stage(self, mock_save_model, mock_save_predictions, mock_read_csv):
+    def test_train_models_sets_runner_stage(
+        self, mock_save_model, mock_save_predictions, mock_read_csv
+    ):
         mock_read_csv.return_value = self.test_df
 
         experiment = StandardExperiment(
@@ -124,7 +131,7 @@ class TestStandardExperiment(unittest.TestCase):
         experiment.add_model(self.mock_linear_model)
         experiment.hyperparameter_selection()
         experiment.train_models()
-        
+
         model_key = list(experiment._models.keys())[0]
         runner = experiment._models[model_key][0]
         expected_stage = Stage.TEST
@@ -132,7 +139,9 @@ class TestStandardExperiment(unittest.TestCase):
 
     @patch("permutation.exporter.Exporter.save_model_json")
     @patch("permutation.exporter.Exporter.save_predictions")
-    def test_test_models_sets_runner_stage(self, mock_save_model, mock_save_predictions, mock_read_csv):
+    def test_test_models_sets_runner_stage(
+        self, mock_save_model, mock_save_predictions, mock_read_csv
+    ):
         mock_read_csv.return_value = self.test_df
 
         experiment = StandardExperiment(
@@ -154,13 +163,14 @@ class TestStandardExperiment(unittest.TestCase):
         expected_stage = Stage.PERM
         self.assertEqual(expected_stage, runner._stage)
 
-    
     @patch("permutation.exporter.Exporter.save_model_json")
     @patch("permutation.exporter.Exporter.save_predictions")
     @patch("permutation.runner.Runner.train")
-    def test_train_models_calls_runner_train(self, mock_runner_train, mock_save_prediction, mock_save_model, mock_read_csv):
+    def test_train_models_calls_runner_train(
+        self, mock_runner_train, mock_save_prediction, mock_save_model, mock_read_csv
+    ):
         mock_read_csv.return_value = self.test_df
-        
+
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -169,18 +179,20 @@ class TestStandardExperiment(unittest.TestCase):
             self.features,
             self.response,
         )
-        
+
         experiment.add_model(self.mock_linear_model)
         experiment.hyperparameter_selection()
         experiment.train_models()
         mock_runner_train.assert_called_once()
-        
+
     @patch("permutation.exporter.Exporter.save_model_json")
     @patch("permutation.exporter.Exporter.save_predictions")
     @patch("permutation.runner.Runner.test")
-    def test_test_models_calls_runner_test(self, mock_runner_test, mock_save_prediction, mock_save_model, mock_read_csv):
+    def test_test_models_calls_runner_test(
+        self, mock_runner_test, mock_save_prediction, mock_save_model, mock_read_csv
+    ):
         mock_read_csv.return_value = self.test_df
-        
+
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -189,7 +201,7 @@ class TestStandardExperiment(unittest.TestCase):
             self.features,
             self.response,
         )
-        
+
         experiment.add_model(self.mock_linear_model)
         experiment.hyperparameter_selection()
         experiment.test_models()
@@ -198,9 +210,11 @@ class TestStandardExperiment(unittest.TestCase):
     @patch("permutation.exporter.Exporter.save_model_json")
     @patch("permutation.exporter.Exporter.save_predictions")
     @patch("permutation.runner.Runner.permutation_testing")
-    def test_permutation_testing_calls_runner_permutation_testing(self, mock_runner_permutation_testing, mock_save_prediction, mock_save_model, mock_read_csv):
+    def test_permutation_testing_calls_runner_permutation_testing(
+        self, mock_runner_permutation_testing, mock_save_prediction, mock_save_model, mock_read_csv
+    ):
         mock_read_csv.return_value = self.test_df
-        
+
         experiment = StandardExperiment(
             self.experiment_name,
             self.export_dir,
@@ -209,9 +223,8 @@ class TestStandardExperiment(unittest.TestCase):
             self.features,
             self.response,
         )
-        
+
         experiment.add_model(self.mock_linear_model)
         experiment.hyperparameter_selection()
         experiment.permutation_testing()
         mock_runner_permutation_testing.assert_called_once()
-        

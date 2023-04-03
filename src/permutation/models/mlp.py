@@ -1,4 +1,5 @@
 from typing import Optional, Iterable
+from ast import literal_eval
 
 from sklearn.neural_network import MLPRegressor
 from sklearn.base import BaseEstimator, TransformerMixin
@@ -46,9 +47,9 @@ class MLP(AbstractSKLearnModel):
 def _fix_tuple_type(
     hparams: HParams,
     change_arg: str = "hidden_layer_sizes",
-):
+) -> None:
     """Makes sure config parameter value is evaluated as correct type"""
     for i, arg_tuple in enumerate(zip(hparams.args, hparams.values)):
         arg, val = arg_tuple
         if arg == change_arg:
-            hparams.values[i] = eval(val)
+            hparams.values[i] = literal_eval(val)
