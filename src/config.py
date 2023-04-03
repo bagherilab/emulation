@@ -11,6 +11,8 @@ from permutation.experiments.experiment import StandardExperiment
 def main(config):
     cfg = config["cs"]
     sobol_power = config["sobol_power"]
+    clean_data = config["clean_data"]
+
     for experiment_name in cfg.experiments:
         experiment_cfg = cfg["experiments"][experiment_name]
         for response in cfg.data.response:
@@ -21,6 +23,7 @@ def main(config):
                 data_path=os.path.join(experiment_cfg.paths.data, experiment_cfg.files.data),
                 features=cfg.data.features,
                 response=response,
+                clean_data_flag=clean_data,
             )
 
             for model, hparam_cfg in cfg.models.items():

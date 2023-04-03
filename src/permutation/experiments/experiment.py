@@ -116,6 +116,7 @@ class StandardExperiment(Experiment):
         data_path: str,
         features: list[str],
         response: str,
+        clean_data_flag: bool = False,
     ) -> None:
         self.name = experiment_name
         self.exporter: Exporter = Exporter(self.name, export_dir)
@@ -128,9 +129,30 @@ class StandardExperiment(Experiment):
         self._n_models = 0
         self._best_models: dict[str, Runner] = {}
         self._log_initialization()
+        self._clean_data(clean_data_flag)
 
     def _log_initialization(self):
         self.logger.log(f"{self.name} initialized.")
+
+    def _clean_data(self, clean_data_flag: bool):
+        if clean_data_flag:
+            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+
+            self.logger.log(
+                f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
+            )
+            removed_feature_columns_list = removed_feature_columns.values.tolist()
+            for feature in removed_feature_columns_list:
+                self.logger.log(f"{feature}")
+
+            self.logger.log(
+                f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
+            )
+
+        else:
+            self.logger.log(
+                "Data not cleaned. Program may crash if missing or nan values are present"
+            )
 
     def add_model(self, model: Model) -> None:
         """Add a model to test to the experiment"""
