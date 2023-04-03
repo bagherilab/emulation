@@ -1,0 +1,65 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiments:
+  COUPLED-C:
+    files:
+      data: C-features_1.0_metric_8-04032023
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/spatial_0_metric_8_C/
+      data: ${hydra:runtime.cwd}/data/ARCADE/spatial_0_metric_8_C/
+      results: ${hydra:runtime.cwd}/results/ARCADE/spatial_0_metric_8_C/
+  COUPLED-CHX:
+    files:
+      data: CH-features_1.0_metric_8-04032023
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/spatial_0_metric_8_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/spatial_0_metric_8_CH/
+      results: ${hydra:runtime.cwd}/results/ARCADE/spatial_0_metric_8_CH/
+data:
+  features:
+    - FROMX # Aggregate hemodynamics
+    - FROMY
+    - FROMZ
+    - FROMPRESSURE
+    - FROMOXYGEN
+    - TOX
+    - TOY
+    - TOZ
+    - TOPRESSURE
+    - TOOXYGEN
+    - CODE
+    - RADIUS
+    - LENGTH
+    - WALL
+    - SHEAR
+    - CIRCUM
+    - FLOW
+    - NODES # Naive network metrics
+    - EDGES
+    - GRADIUS
+    - GDIAMETER
+    - AVG_ECCENTRICITY
+    - AVG_SHORTEST_PATH
+    - AVG_IN_DEGREES
+    - AVG_DEGREES
+    - AVG_CLUSTERING
+    - AVG_CLOSENESS
+    - AVG_BETWEENESS
+    - AVG_CORENESS
+    - AVG_ECCENTRICITY_WEIGHTED # Spatial metrics
+    - AVG_CLOSENESS_WEIGHTED
+    - AVG_CORENESS_WEIGHTED
+    - AVG_BETWEENESS_WEIGHTED
+    - AVG_OUT_DEGREES_WEIGHTED
+    - AVG_IN_DEGREES_WEIGHTED
+    - AVG_DEGREES_WEIGHTED
+
+  response:
+    - ACTIVITY
+    - GROWTH
+    - CYCLES
+    - SYMMETRY

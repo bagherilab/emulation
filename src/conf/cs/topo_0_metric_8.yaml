@@ -1,0 +1,112 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiments:
+  COUPLED-C:
+    files:
+      data: C-features_1.0_metric_8-04032023
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_0_metric_8_C/
+      data: ${hydra:runtime.cwd}/data/ARCADE/topo_0_metric_8_C/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_0_metric_8_C/
+  COUPLED-CHX:
+    files:
+      data: CH-features_1.0_metric_8-04032023
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_0_metric_8_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/topo_0_metric_8_CH/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_0_metric_8_CH/
+data:
+  features:
+    - FROMX # Aggregate hemodynamics
+    - FROMY
+    - FROMZ
+    - FROMPRESSURE
+    - FROMOXYGEN
+    - TOX
+    - TOY
+    - TOZ
+    - TOPRESSURE
+    - TOOXYGEN
+    - CODE
+    - RADIUS
+    - LENGTH
+    - WALL
+    - SHEAR
+    - CIRCUM
+    - FLOW
+    - NODES # Naive network metrics
+    - EDGES
+    - GRADIUS
+    - GDIAMETER
+    - AVG_ECCENTRICITY
+    - AVG_SHORTEST_PATH
+    - AVG_IN_DEGREES
+    - AVG_OUT_DEGREES
+    - AVG_DEGREES
+    - AVG_CLUSTERING
+    - AVG_CLOSENESS
+    - AVG_BETWEENESS
+    - AVG_CORENESS
+    - GRADIUS:INVERSE_DISTANCE # Hemodynamic edges
+    - GDIAMETER:INVERSE_DISTANCE
+    - AVG_ECCENTRICITY:INVERSE_DISTANCE
+    - AVG_SHORTEST_PATH:INVERSE_DISTANCE
+    - AVG_CLOSENESS:INVERSE_DISTANCE
+    - AVG_BETWEENESS:INVERSE_DISTANCE
+    - GRADIUS:FLOW
+    - GDIAMETER:FLOW
+    - AVG_ECCENTRICITY:FLOW
+    - AVG_SHORTEST_PATH:FLOW
+    - AVG_CLOSENESS:FLOW
+    - AVG_BETWEENESS:FLOW
+    - GRADIUS:WALL
+    - GDIAMETER:WALL
+    - AVG_ECCENTRICITY:WALL
+    - AVG_SHORTEST_PATH:WALL
+    - AVG_CLOSENESS:WALL
+    - AVG_BETWEENESS:WALL
+    - GRADIUS:SHEAR
+    - GDIAMETER:SHEAR
+    - AVG_ECCENTRICITY:SHEAR
+    - AVG_SHORTEST_PATH:SHEAR
+    - AVG_CLOSENESS:SHEAR
+    - AVG_BETWEENESS:SHEAR
+    - GRADIUS:RADIUS
+    - GDIAMETER:RADIUS
+    - AVG_ECCENTRICITY:RADIUS
+    - AVG_SHORTEST_PATH:RADIUS
+    - AVG_CLOSENESS:RADIUS
+    - AVG_BETWEENESS:RADIUS
+    - GRADIUS:PRESSURE_AVG
+    - GDIAMETER:PRESSURE_AVG
+    - AVG_ECCENTRICITY:PRESSURE_AVG
+    - AVG_SHORTEST_PATH:PRESSURE_AVG
+    - AVG_CLOSENESS:PRESSURE_AVG
+    - AVG_BETWEENESS:PRESSURE_AVG
+    - GRADIUS:PRESSURE_DELTA
+    - GDIAMETER:PRESSURE_DELTA
+    - AVG_ECCENTRICITY:PRESSURE_DELTA
+    - AVG_SHORTEST_PATH:PRESSURE_DELTA
+    - AVG_CLOSENESS:PRESSURE_DELTA
+    - AVG_BETWEENESS:PRESSURE_DELTA
+    - GRADIUS:OXYGEN_AVG
+    - GDIAMETER:OXYGEN_AVG
+    - AVG_ECCENTRICITY:OXYGEN_AVG
+    - AVG_SHORTEST_PATH:OXYGEN_AVG
+    - AVG_CLOSENESS:OXYGEN_AVG
+    - AVG_BETWEENESS:OXYGEN_AVG
+    - GRADIUS:OXYGEN_DELTA
+    - GDIAMETER:OXYGEN_DELTA
+    - AVG_ECCENTRICITY:OXYGEN_DELTA
+    - AVG_SHORTEST_PATH:OXYGEN_DELTA
+    - AVG_CLOSENESS:OXYGEN_DELTA
+    - AVG_BETWEENESS:OXYGEN_DELTA
+  response:
+    - ACTIVITY
+    - GROWTH
+    - CYCLES
+    - SYMMETRY

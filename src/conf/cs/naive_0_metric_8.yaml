@@ -1,0 +1,57 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiments:
+  COUPLED-C:
+    files:
+      data: C-features_1.0_metric_8-04032023
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_8_C/
+      data: ${hydra:runtime.cwd}/data/ARCADE/naive_0_metric_8_C/
+      results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_8_C/
+  COUPLED-CHX:
+    files:
+      data: CH-features_1.0_metric_8-04032023
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_8_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/naive_0_metric_8_CH/
+      results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_8_CH/
+data:
+  features:
+    - FROMX # Aggregate hemodynamics
+    - FROMY
+    - FROMZ
+    - FROMPRESSURE
+    - FROMOXYGEN
+    - TOX
+    - TOY
+    - TOZ
+    - TOPRESSURE
+    - TOOXYGEN
+    - CODE
+    - RADIUS
+    - LENGTH
+    - WALL
+    - SHEAR
+    - CIRCUM
+    - FLOW
+    - NODES # Naive network metrics
+    - EDGES
+    - GRADIUS
+    - GDIAMETER
+    - AVG_ECCENTRICITY
+    - AVG_SHORTEST_PATH
+    - AVG_IN_DEGREES
+    - AVG_DEGREES
+    - AVG_CLUSTERING
+    - AVG_CLOSENESS
+    - AVG_BETWEENESS
+    - AVG_CORENESS
+  response:
+    - ACTIVITY
+    - GROWTH
+    - CYCLES
+    - SYMMETRY
