@@ -3,6 +3,7 @@ logs/
 outputs/
 results/
 utils/
+legacy/
 
 # Editors
 .vscode/
