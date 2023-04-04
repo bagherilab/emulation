@@ -21,18 +21,7 @@ experiments:
       results: ${hydra:runtime.cwd}/results/ARCADE/spatial_0_metric_15_C/
 data:
   features:
-    - FROMX # Aggregate hemodynamics
-    - FROMY
-    - FROMZ
-    - FROMPRESSURE
-    - FROMOXYGEN
-    - TOX
-    - TOY
-    - TOZ
-    - TOPRESSURE
-    - TOOXYGEN
-    - CODE
-    - RADIUS
+    - RADIUS # Aggregate hemodynamics
     - LENGTH
     - WALL
     - SHEAR
