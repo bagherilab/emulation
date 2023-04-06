@@ -60,10 +60,14 @@ class Runner:
         self.loader = loader
 
         self.training_metrics: BatchMetric = BatchMetric(
-            name=f"Model: {self.model.algorithm_name}", value_type="R^2", stage=Stage.TRAIN
+            name=f"Model: {self.model.algorithm_name}",
+            value_type="R^2",
+            stage=Stage.TRAIN,
         )
         self.testing_metrics: BatchMetric = BatchMetric(
-            name=f"Model: {self.model.algorithm_name}", value_type="R^2", stage=Stage.TEST
+            name=f"Model: {self.model.algorithm_name}",
+            value_type="R^2",
+            stage=Stage.TEST,
         )
 
         self.cv_metrics: Optional[BatchMetric] = None
@@ -84,6 +88,7 @@ class Runner:
         X, y = self.loader.load_training_data()
         metric = self.model.fit_model(X, y)
         self.training_metrics.update(metric)
+        self.training_metrics.num_observations.append(len(y))
 
     def test(self) -> None:
         """Test the trained model using the withheld test data"""
@@ -91,6 +96,7 @@ class Runner:
         X, y = self.loader.load_testing_data()
         metric = self.model.performance(X, y)
         self.testing_metrics.update(metric)
+        self.testing_metrics.num_observations.append(len(y))
 
     def permutation_testing(self) -> None:
         """Perform permutation testing on trained model"""

@@ -264,10 +264,10 @@ class TestQuantityExperiment(unittest.TestCase):
 
         experiment.loader.subsample = MagicMock()
 
-        experiment._run_standard_experiment = MagicMock()
+        experiment._run_experiment = MagicMock()
         experiment._subsample_and_run(experiment._num)
         experiment.loader.subsample.assert_called_with(self.num)
-        experiment._run_standard_experiment.assert_called_once()
+        experiment._run_experiment.assert_called_once()
 
     def test_run_repeats(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
@@ -285,7 +285,7 @@ class TestQuantityExperiment(unittest.TestCase):
 
         experiment.loader.subsample = MagicMock()
 
-        experiment._run_standard_experiment = MagicMock()
+        experiment._run_experiment = MagicMock()
         experiment._run_repeats(experiment._num, experiment._repeat)
         self.assertEqual(experiment.loader.subsample.call_count, self.repeats)
         experiment.loader.subsample.assert_called_with(self.num)
