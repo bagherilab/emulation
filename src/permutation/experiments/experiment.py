@@ -112,6 +112,25 @@ class Experiment(ABC):
             runner.set_stage(Stage.PERM)
             self._log_test_performance(algorithm)
 
+    def _clean_data(self, clean_data_flag: bool) -> None:
+        if clean_data_flag:
+            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+
+            self.logger.log(
+                f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
+            )
+            for feature in removed_feature_columns:
+                self.logger.log(f"{feature}")
+
+            self.logger.log(
+                f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
+            )
+
+        else:
+            self.logger.log(
+                "Data not cleaned. Program may crash if missing or nan values are present"
+            )
+
     def add_model(self, model: Model) -> None:
         """Add a model to test to the experiment"""
         self._check_algorithm_in_models(model.algorithm_abv)
@@ -154,10 +173,10 @@ class Experiment(ABC):
         progress_counter = 0
 
         for algorithm, runner_list in self._models.items():
-            for r in runner_list:
-                r.cross_validation()
+            for runner in runner_list:
+                runner.cross_validation()
                 progress_counter += 1
-                self.logger.log(f"Progress: {progress_counter} of {self._n_models} - {r.id}")
+                self.logger.log(f"Progress: {progress_counter} of {self._n_models} - {runner.id}")
 
             cv_list = [runner.cv_metrics.average for runner in runner_list]  # type: ignore
             best_value = max(cv_list)
@@ -420,8 +439,8 @@ class TrainingQuantityExperiment(Experiment):
 
     def _subsample_and_run(self, n: int) -> None:
         """Helper function for subsampling data and running experiment"""
-        self.loader.subsample(n)
-        self._run_experiment()
+        self.loader.subsample(n, self.stratify)
+        self._run_standard_experiment()
 
     def _run_repeats(self, n: int, repeats: int) -> None:
         """

@@ -228,7 +228,6 @@ class TestStandardExperiment(unittest.TestCase):
         experiment.permutation_testing()
         mock_runner_permutation_testing.assert_called_once()
 
-
 @patch("permutation.loader.pd.read_csv")
 class TestQuantityExperiment(unittest.TestCase):
     def setUp(self):

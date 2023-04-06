@@ -1,8 +1,9 @@
 from pathlib import Path
 from abc import ABC, abstractmethod
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Any
 
 import pandas as pd
+import numpy as np
 
 from sklearn.model_selection import train_test_split
 
@@ -56,13 +57,16 @@ class Loader(ABC):
         """Loading function for file interaction needs to be implemented in subclasses"""
 
     @abstractmethod
-    def _split_data(self) -> None:
+    def _split_data(self, stratify: Optional[str]) -> None:
         """Method for test/train split needs to be implemented in subclasses"""
 
-    def subsample(self, n: int) -> None:
+    @abstractmethod
+    def subsample(self, n: int, stratify: Optional[str]) -> None:
         """Sample n observations"""
-        self._working_idx = self._X.sample(n).index.tolist()
-        self._split_data()
+
+    @abstractmethod
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
+        """Handle missing or non-numeric data"""
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -75,7 +79,7 @@ class Loader(ABC):
         y
             Pandas series containing <response> variable
         """
-        return self._X.iloc[self._training_idx], self._y.iloc[self._training_idx]
+        return self._X.iloc[self._training_idx], self._y.iloc[self._training_idx]  # type: ignore
 
     def load_testing_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -88,7 +92,7 @@ class Loader(ABC):
         y
             Pandas series containing <response> variable
         """
-        return self._X.iloc[self._testing_idx], self._y.iloc[self._testing_idx]
+        return self._X.iloc[self._testing_idx], self._y.iloc[self._testing_idx]  # type: ignore
 
     def load_working_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -101,7 +105,7 @@ class Loader(ABC):
         y
             Pandas series containing <response> variable
         """
-        return self._X.iloc[self._working_idx], self._y.iloc[self._working_idx]
+        return self._X.iloc[self._working_idx], self._y.iloc[self._working_idx]  # type: ignore
 
     def load_original_data(self) -> Tuple[pd.DataFrame, pd.Series]:
         """
@@ -183,6 +187,7 @@ class CSVLoader(Loader):
         features: list[str],
         response: str,
         test_size: float = 0.3,
+        stratify: Optional[str] = None,
         seed: Optional[int] = 100,
     ) -> None:
         self.path = path
@@ -190,20 +195,65 @@ class CSVLoader(Loader):
         self.response = response
         self.test_size = test_size
         self.seed = seed
+        self.stratify = stratify
+        self.stratify_labels: Optional[pd.Series] = None
         self._load_data()
-        self._split_data()
+        self._split_data(stratify)
 
-    def _load_data(self, index_col=0) -> None:
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
+        """Handle missing or non-numeric data"""
+        # Removed features columns with bad values
+        _X_copy = self._X.copy()
+        self._X = self._X.loc[:, ~(np.isnan(self._X).any(axis=0) | np.isinf(self._X)).any(axis=0)]
+        removed_feature_columns = _X_copy.columns[~_X_copy.columns.isin(self._X.columns)]
+        removed_feature_columns = removed_feature_columns.values.tolist()
+
+        # Removed response rows with bad values
+        full_data = pd.concat([self._X, self._y], axis=1)
+        full_data_copy = full_data.copy()
+
+        full_data = full_data[~full_data.isin([np.nan, np.inf, -np.inf]).any(axis=1)]
+        removed_response_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
+
+        full_data.reset_index(drop=True, inplace=True)
+
+        # Remove bad features from feature list
+        self.features = [
+            feature for feature in self.features if feature not in removed_feature_columns
+        ]
+        self._X, self._y = features_response_split(full_data, self.features, self.response)
+        self._set_working()
+        self._split_data(self.stratify)
+
+        return removed_feature_columns, removed_response_rows
+
+    def _load_data(self, index_col: int = 0) -> None:
         """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
+        data.reset_index(drop=False, inplace=True)
         self._X, self._y = features_response_split(data, self.features, self.response)
+        if self.stratify:
+            self.stratify_labels = data[self.stratify]
         self._set_working()
 
-    def _split_data(self) -> None:
+    def _split_data(self, stratify: Optional[str]) -> None:
         """Test train split implementation"""
+        temp_working = pd.DataFrame(self._working_idx, columns=["working_idx"])
+        if stratify:
+            temp_working[stratify] = self.stratify_labels
         self._training_idx, self._testing_idx = train_test_split(
-            self._working_idx, test_size=self.test_size, random_state=self.seed
+            temp_working,
+            test_size=self.test_size,
+            random_state=self.seed,
+            stratify=temp_working[stratify] if stratify else None,
         )
+        self._training_idx = self._training_idx["working_idx"].tolist()  # type: ignore
+        self._testing_idx = self._testing_idx["working_idx"].tolist()  # type: ignore
+
+    def subsample(self, n: int, stratify: Optional[str] = None) -> None:
+        """Sample n observations"""
+        self._working_idx = self._X.sample(n).index.tolist()
+        self._split_data(stratify)
 
 
 def features_response_split(

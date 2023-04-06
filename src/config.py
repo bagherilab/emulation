@@ -1,16 +1,21 @@
 import os
 
 import hydra
+from omegaconf.dictconfig import DictConfig
 
 from config_utils import assign_models, assign_hyperparameters
 from permutation.file_utils import clean_dir
 from permutation.experiments.experiment import StandardExperiment, TrainingQuantityExperiment
 
 
+
 @hydra.main(version_base=None, config_path="conf", config_name="config")
-def main(config):
+def main(config: DictConfig) -> None:
     cfg = config["cs"]
     sobol_power = config["sobol_power"]
+    stratify = config["stratify"]
+    clean_data = config["clean_data"]
+
     for experiment_name in cfg.experiments:
         experiment_cfg = cfg["experiments"][experiment_name]
         for response in cfg.data.response:
@@ -21,6 +26,8 @@ def main(config):
                 data_path=os.path.join(experiment_cfg.paths.data, experiment_cfg.files.data),
                 features=cfg.data.features,
                 response=response,
+                stratify=stratify,
+                clean_data_flag=clean_data,
             )
 
             for model, hparam_cfg in cfg.models.items():

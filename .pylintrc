@@ -4,7 +4,7 @@
 disable=missing-module-docstring
 
 # Set good names.
-good-names= i, X, y, n, K, _X, _X_working, _X_testing, _X_training, X_testing, X_training
+good-names= i, X, y, n, K, df, l1, l2, id, _X, _X_working, _X_testing, _X_training, X_testing, X_training, _UUID
 
 [DESIGN]
 

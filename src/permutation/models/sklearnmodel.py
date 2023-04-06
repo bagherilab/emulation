@@ -14,6 +14,7 @@ from permutation.metrics import BatchMetric
 from permutation.stage import Stage
 from permutation.models.modelprotocol import Model
 from permutation.models.hyperparameters import HParams
+from permutation.models.stratified_k_fold import StratifiedKFolder
 
 
 class AbstractSKLearnModel(ABC):
@@ -70,7 +71,9 @@ class AbstractSKLearnModel(ABC):
         model.pipeline = Pipeline(pipeline_list)
         return model
 
-    def crossval_hparams(self, X: pd.DataFrame, y: pd.Series, K: int = 10) -> BatchMetric:
+    def crossval_hparams(
+        self, X: pd.DataFrame, y: pd.Series, K: int = 10, stratify: Optional[str] = None
+    ) -> BatchMetric:
         """Perform cross validation"""
         metrics = BatchMetric(
             name=f"CV_K={K},",
@@ -78,9 +81,15 @@ class AbstractSKLearnModel(ABC):
             stage=Stage.VAL,
         )
         try:
-            cv_results = cross_val_score(self.pipeline, X, y, cv=K)
-        except ValueError:
-            raise ValueError(f"Hparams are {self.hparams}")
+            if stratify:
+                strat_cv = StratifiedKFolder(
+                    n_splits=K, shuffle=True, random_state=42, stratify=stratify
+                )
+                cv_results = cross_val_score(self.pipeline, X, y, cv=strat_cv)
+            else:
+                cv_results = cross_val_score(self.pipeline, X, y, cv=K)
+        except ValueError as exc:
+            raise ValueError(f"Hparams are {self.hparams}") from exc
         metrics.batchupdate(cv_results.tolist())
         return metrics
 

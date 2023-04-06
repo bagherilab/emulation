@@ -1,4 +1,3 @@
-from pathlib import Path
 import json
 
 import pandas as pd
@@ -37,7 +36,7 @@ class Exporter:
 
     def metric_to_csv(self, model: str, filename: str, metric: Metric) -> None:
         """Takes in arguments to write to csv file, using Metric methods"""
-        self.pandas_to_csv(model, filename, metric.stage.name, metric.to_pandas())
+        self.pandas_to_csv(model, filename, metric.stage, metric.to_pandas())
 
     def pandas_to_csv(
         self,
@@ -47,35 +46,36 @@ class Exporter:
         dataframe: pd.DataFrame | pd.Series,
     ) -> None:
         """Writes data to csv file from pandas Dataframe using filenaming and path conventions"""
-        dir_path = f"{self.export_path}/{self.experiment}/{model}/{stage}"
+        dir_path = f"{self.export_path}/{self.experiment}/{model}/{stage.name}"
         self._save_df(dir_path, filename, dataframe)
 
-    def _save_df(self, dir_path, name, df: pd.DataFrame):
+    def _save_df(self, dir_path: str, name: str, df: pd.DataFrame | pd.Series) -> None:
         """Validates save path and then saves a Dataframe as a CSV file"""
         validate_dir(dir_path)
         file_path = f"{dir_path}/{name}.csv"
         df.to_csv(file_path)
 
-    def save_manifest_file(self, manifest: pd.DataFrame):
+    def save_manifest_file(self, manifest: pd.DataFrame) -> None:
         """Saves the manifest as a CSV under the correct experiment"""
         dir_path = f"{self.export_path}{self.experiment}/"
         self._save_df(dir_path, "manifest", manifest)
 
-    def save_model_json(self, runner: Runner):
+    def save_model_json(self, runner: Runner) -> None:
         """Saves the model parameters as a JSON file"""
         dir_path = (
             f"{self.export_path}{self.experiment}/{runner.model.algorithm_abv}/{runner.id}.json"
         )
-        with open(dir_path, "w") as outfile:
-            json.dump(runner.model.hparams.as_dict(), outfile)
+        with open(dir_path, "w", encoding="UTF-8") as outfile:
+            if runner.model.hparams:
+                json.dump(runner.model.hparams.as_dict(), outfile)
 
-    def save_predictions(self, model: str, runner: Runner):
+    def save_predictions(self, model: str, runner: Runner) -> None:
         """Saves the model predictions as a CSV file"""
         dir_path = f"{self.export_path}{self.experiment}/{model}/"
         predictions = runner.get_predictions()
         self._save_df(dir_path, f"{runner.id}.PREDICTIONS", predictions)
 
-    def save_train_test(self, train: pd.DataFrame, test: pd.DataFrame):
+    def save_train_test(self, train: pd.DataFrame, test: pd.Series) -> None:
         """Saves the model predictions as a CSV file"""
         train_dir_path = f"{self.export_path}{self.experiment}"
         test_dir_path = f"{self.export_path}{self.experiment}"

@@ -32,8 +32,8 @@ def clean_dir(dir_string: str) -> None:
     """
     files = glob.glob("dir_string/**/*.csv", recursive=True)
 
-    for f in files:
+    for file in files:
         try:
-            os.remove(f)
-        except OSError as e:
-            print("Error: %s : %s" % (f, e.strerror))
+            os.remove(file)
+        except OSError as exc:
+            print("Error: %s : %s" % (file, exc.strerror))
