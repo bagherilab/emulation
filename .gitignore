@@ -3,6 +3,8 @@ logs/
 outputs/
 results/
 utils/
+stored_results/
+tests/training_vis.ipynb
 
 # Editors
 .vscode/
