@@ -4,6 +4,9 @@ outputs/
 results/
 utils/
 legacy/
+plots/
+stored_results/
+training_vis.ipynb
 
 # Editors
 .vscode/
