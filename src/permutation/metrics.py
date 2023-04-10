@@ -61,6 +61,7 @@ class BatchMetric(Metric):
     name: str
     value_type: str
     stage: Stage
+    num_observations: list[float] = field(default_factory=list)
     values: list[float] = field(default_factory=list)
     total: float = 0.0
     average: float = 0.0
@@ -96,6 +97,12 @@ class BatchMetric(Metric):
 
     def to_pandas(self) -> pd.DataFrame:
         """Method to export to dataframe"""
+        if self.num_observations:
+            data_tuple = list(zip(self.values, self.num_observations))
+            return pd.DataFrame(
+                data_tuple,
+                columns=[self.value_type, "num_observations"],
+            )
         return pd.DataFrame(self.values, columns=[self.value_type])
 
 

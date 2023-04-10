@@ -2,6 +2,7 @@ import unittest
 
 import logging
 import os
+import shutil
 from permutation.logger import ExperimentLogger
 
 
@@ -18,8 +19,7 @@ class TestExperimentLogger(unittest.TestCase):
         )
 
     def tearDown(self) -> None:
-        os.remove(self.log_path)
-        os.rmdir(self.log_dir)
+        shutil.rmtree(self.log_dir)
 
     def test_log_with_valid_directory(self):
         message = "Test message"

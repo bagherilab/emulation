@@ -1,12 +1,12 @@
 import unittest
-from unittest.mock import Mock, patch
-import os
+from unittest.mock import Mock, patch, MagicMock
+import shutil
 import numpy as np
 import pandas as pd
 
 from permutation.models.modelprotocol import Model
 from permutation.runner import Runner
-from permutation.experiments.experiment import StandardExperiment
+from permutation.experiments.experiment import StandardExperiment, TrainingQuantityExperiment
 from permutation.models.hyperparameters import HParams
 from permutation.metrics import BatchMetric
 from permutation.stage import Stage, IncorrectStageException
@@ -51,8 +51,7 @@ class TestStandardExperiment(unittest.TestCase):
         )
 
     def tearDown(self) -> None:
-        os.remove(self.log_path)
-        os.rmdir(self.log_dir)
+        shutil.rmtree(self.log_dir)
 
     def test_add_model_adds_model(self, mock_read_csv):
         mock_read_csv.return_value = self.test_df
@@ -228,3 +227,64 @@ class TestStandardExperiment(unittest.TestCase):
         experiment.hyperparameter_selection()
         experiment.permutation_testing()
         mock_runner_permutation_testing.assert_called_once()
+
+@patch("permutation.loader.pd.read_csv")
+class TestQuantityExperiment(unittest.TestCase):
+    def setUp(self):
+        self.experiment_name = "testQuantityExperiment"
+        self.export_dir = "results/test"
+        self.log_dir = "logs/test"
+        self.log_path = f"{self.log_dir}/{self.experiment_name}.log"
+        self.data_path = "data/sample_data.csv"
+        self.test_df = pd.DataFrame(
+            [[0, 0, 0], [1, 0, 1], [1, 0, 1], [1, 1, 0]], columns=["x1", "x2", "y"]
+        )
+        self.features = ["x1", "x2"]
+        self.response = "y"
+        self.num = 5
+        self.repeats = 3
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.log_dir)
+
+    def test_subsample_and_run(self, mock_read_csv):
+        mock_read_csv.return_value = self.test_df
+
+        experiment = TrainingQuantityExperiment(
+            self.experiment_name,
+            self.export_dir,
+            self.log_dir,
+            self.data_path,
+            self.features,
+            self.response,
+            self.num,
+            self.repeats,
+        )
+
+        experiment.loader.subsample = MagicMock()
+
+        experiment._run_experiment = MagicMock()
+        experiment._subsample_and_run(experiment._num)
+        experiment.loader.subsample.assert_called_with(self.num)
+        experiment._run_experiment.assert_called_once()
+
+    def test_run_repeats(self, mock_read_csv):
+        mock_read_csv.return_value = self.test_df
+
+        experiment = TrainingQuantityExperiment(
+            self.experiment_name,
+            self.export_dir,
+            self.log_dir,
+            self.data_path,
+            self.features,
+            self.response,
+            self.num,
+            self.repeats,
+        )
+
+        experiment.loader.subsample = MagicMock()
+
+        experiment._run_experiment = MagicMock()
+        experiment._run_repeats(experiment._num, experiment._repeat)
+        self.assertEqual(experiment.loader.subsample.call_count, self.repeats)
+        experiment.loader.subsample.assert_called_with(self.num)
