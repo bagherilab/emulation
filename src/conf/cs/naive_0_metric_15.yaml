@@ -7,17 +7,17 @@ defaults:
 experiments:
   COUPLED-C:
     files:
-      data: C-features_1.0_metric_15-04032023
+      data: C-features_0.0_metric_15-04032023.csv
     paths:
       log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_15_C/
-      data: ${hydra:runtime.cwd}/data/ARCADE/naive_0_metric_15_C/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_15_C/
   COUPLED-CHX:
     files:
-      data: CH-features_1.0_metric_15-04032023
+      data: CH-features_0.0_metric_15-04032023.csv
     paths:
       log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_15_CH/
-      data: ${hydra:runtime.cwd}/data/ARCADE/naive_0_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_15_CH/
 data:
   features:
@@ -34,7 +34,7 @@ data:
     - AVG_ECCENTRICITY
     - AVG_SHORTEST_PATH
     - AVG_IN_DEGREES
-    - AVG_DEGREES
+    - AVG_DEGREE
     - AVG_CLUSTERING
     - AVG_CLOSENESS
     - AVG_BETWEENESS

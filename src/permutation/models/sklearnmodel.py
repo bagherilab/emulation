@@ -14,7 +14,7 @@ from permutation.metrics import BatchMetric
 from permutation.stage import Stage
 from permutation.models.modelprotocol import Model
 from permutation.models.hyperparameters import HParams
-from permutation.models.stratified_k_fold import StratifiedKFolder
+from permutation.models.stratified_k_fold import StratifiedKFolder  # type: ignore
 
 
 class AbstractSKLearnModel(ABC):

@@ -228,6 +228,7 @@ class TestStandardExperiment(unittest.TestCase):
         experiment.permutation_testing()
         mock_runner_permutation_testing.assert_called_once()
 
+
 @patch("permutation.loader.pd.read_csv")
 class TestQuantityExperiment(unittest.TestCase):
     def setUp(self):
@@ -265,7 +266,7 @@ class TestQuantityExperiment(unittest.TestCase):
 
         experiment._run_experiment = MagicMock()
         experiment._subsample_and_run(experiment._num)
-        experiment.loader.subsample.assert_called_with(self.num)
+        experiment.loader.subsample.assert_called_with(self.num, None)
         experiment._run_experiment.assert_called_once()
 
     def test_run_repeats(self, mock_read_csv):
@@ -287,4 +288,4 @@ class TestQuantityExperiment(unittest.TestCase):
         experiment._run_experiment = MagicMock()
         experiment._run_repeats(experiment._num, experiment._repeat)
         self.assertEqual(experiment.loader.subsample.call_count, self.repeats)
-        experiment.loader.subsample.assert_called_with(self.num)
+        experiment.loader.subsample.assert_called_with(self.num, None)

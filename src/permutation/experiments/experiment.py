@@ -74,6 +74,7 @@ class Experiment(ABC):
     loader: Loader
     _models: dict[str, list[Runner]]
     _n_models: int
+    _model_ids: set = set()
 
     @abstractmethod
     def run(self) -> None:
@@ -186,7 +187,7 @@ class Experiment(ABC):
 
     def _reset_best_models(self) -> None:
         """Reset the best models"""
-        self._best_models = {}
+        self._best_models: dict = {}
 
     def _check_algorithm_in_models(self, name: str) -> None:
         """Check that an algorithm exists in a model"""
@@ -202,7 +203,7 @@ class Experiment(ABC):
     def _check_ids(self, runner: Runner) -> str:
         """Reset the runner's ID if it exists in already"""
         while runner.id in self._model_ids:
-            self.logger.log(f"Reset id for {runner.Description}")
+            self.logger.log(f"Reset id for {runner.description}")
             runner.reset_id()
 
         return runner.id
@@ -285,20 +286,24 @@ class StandardExperiment(Experiment):
         data_path: str,
         features: list[str],
         response: str,
+        stratify: Optional[str] = None,
+        clean_data_flag: bool = False,
     ) -> None:
         self.name = experiment_name
         self.exporter: Exporter = Exporter(self.name, export_dir)
         self.logger: Logger = ExperimentLogger(self.name, log_dir)
-        self.loader: Loader = CSVLoader(data_path, features, response)
+        self.loader: Loader = CSVLoader(data_path, features, response, stratify=stratify)
         self._features = features
         self._response = response
         self._models: dict[str, list[Runner]] = {}
         self._model_ids: set = set()
         self._n_models = 0
         self._best_models: dict[str, Runner] = {}
+        self.stratify = stratify
         self._log_initialization()
+        self._clean_data(clean_data_flag)
 
-    def run(self):
+    def run(self) -> None:
         self._run_experiment()
 
     def _run_experiment(self) -> None:
@@ -319,8 +324,27 @@ class StandardExperiment(Experiment):
         self.test_models()
         self.permutation_testing()
 
-    def _log_initialization(self):
+    def _log_initialization(self) -> None:
         self.logger.log(f"(Standard Experiment) {self.name} initialized.")
+
+    def _clean_data(self, clean_data_flag: bool) -> None:
+        if clean_data_flag:
+            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+
+            self.logger.log(
+                f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
+            )
+            for feature in removed_feature_columns:
+                self.logger.log(f"{feature}")
+
+            self.logger.log(
+                f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
+            )
+
+        else:
+            self.logger.log(
+                "Data not cleaned. Program may crash if missing or nan values are present"
+            )
 
     @property
     def models(self) -> list[str]:
@@ -398,11 +422,13 @@ class TrainingQuantityExperiment(Experiment):
         response: str,
         num: int = 10,
         repeat: Optional[int] = None,
+        stratify: Optional[str] = None,
+        clean_data_flag: bool = False,
     ) -> None:
         self.name = experiment_name
         self.exporter: Exporter = Exporter(self.name, export_dir)
         self.logger: Logger = ExperimentLogger(self.name, log_dir)
-        self.loader: Loader = CSVLoader(data_path, features, response)
+        self.loader: Loader = CSVLoader(data_path, features, response, stratify=stratify)
         self._features = features
         self._response = response
         self._models: dict[str, list[Runner]] = {}
@@ -411,13 +437,34 @@ class TrainingQuantityExperiment(Experiment):
         self._best_models: dict[str, Runner] = {}
         self._num = num
         self._repeat = repeat
+        self.stratify = stratify
         self._log_initialization()
+        self._clean_data(clean_data_flag)
 
-    def run(self):
+    def run(self) -> None:
         self._run_training_quantity_experiment(self._num, self._repeat)
 
-    def _log_initialization(self):
+    def _log_initialization(self) -> None:
         self.logger.log(f"(Training Quantity Experiment) {self.name} initialized.")
+
+    def _clean_data(self, clean_data_flag: bool) -> None:
+        if clean_data_flag:
+            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+
+            self.logger.log(
+                f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
+            )
+            for feature in removed_feature_columns:
+                self.logger.log(f"{feature}")
+
+            self.logger.log(
+                f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
+            )
+
+        else:
+            self.logger.log(
+                "Data not cleaned. Program may crash if missing or nan values are present"
+            )
 
     def _run_training_quantity_experiment(self, num: int, repeat: Optional[int]) -> None:
         """
@@ -440,7 +487,7 @@ class TrainingQuantityExperiment(Experiment):
     def _subsample_and_run(self, n: int) -> None:
         """Helper function for subsampling data and running experiment"""
         self.loader.subsample(n, self.stratify)
-        self._run_standard_experiment()
+        self._run_experiment()
 
     def _run_repeats(self, n: int, repeats: int) -> None:
         """
