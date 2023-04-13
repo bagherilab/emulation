@@ -7,14 +7,14 @@ defaults:
 experiments:
   COUPLED-C:
     files:
-      data: C-features_0.0_metric_8-04032023.csv
+      data: C-feature_0.0_metric_8-04032023.csv
     paths:
       log: ${hydra:runtime.cwd}/logs/ARCADE/topo_0_metric_8_C/
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_0_metric_8_C/
   COUPLED-CHX:
     files:
-      data: CH-features_0.0_metric_8-04032023.csv
+      data: CH-feature_0.0_metric_8-04032023.csv
     paths:
       log: ${hydra:runtime.cwd}/logs/ARCADE/topo_0_metric_8_CH/
       data: ${hydra:runtime.cwd}/data/ARCADE/
