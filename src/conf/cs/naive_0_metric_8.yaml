@@ -7,7 +7,11 @@ defaults:
 experiments:
   COUPLED-C:
     files:
+<<<<<<< HEAD
       data: C-feature_0.0_metric_8-04032023.csv
+=======
+      data: C-features_0.0_metric_8-04032023.csv
+>>>>>>> ac0500d (Update for experiments)
     paths:
       log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_8_C/
       data: ${hydra:runtime.cwd}/data/ARCADE/
