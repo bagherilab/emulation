@@ -4,6 +4,6 @@ defaults:
 
 sobol_power: 4
 stratify: LAYOUT
-quantity_experiment: true
+quantity_experiment: false
 clean_data: true
 debug: true
