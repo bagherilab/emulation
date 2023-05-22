@@ -7,18 +7,18 @@ defaults:
 experiments:
   COUPLED-C:
     files:
-      data: C-feature_0.0_metric_8-04032023.csv
+      data: C-feature_15.0_metric_15-04032023.csv
     paths:
-      log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_8_C/
+      log: ${hydra:runtime.cwd}/logs/ARCADE/naive_15_metric_15_C/
       data: ${hydra:runtime.cwd}/data/ARCADE/
-      results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_8_C/
+      results: ${hydra:runtime.cwd}/results/ARCADE/naive_15_metric_15_C/
   COUPLED-CHX:
     files:
-      data: CH-feature_0.0_metric_8-04032023.csv
+      data: CH-feature_15.0_metric_15-04032023.csv
     paths:
-      log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_8_CH/
+      log: ${hydra:runtime.cwd}/logs/ARCADE/naive_15_metric_15_CH/
       data: ${hydra:runtime.cwd}/data/ARCADE/
-      results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_8_CH/
+      results: ${hydra:runtime.cwd}/results/ARCADE/naive_15_metric_15_CH/
 data:
   features:
     - RADIUS # Aggregate hemodynamics
