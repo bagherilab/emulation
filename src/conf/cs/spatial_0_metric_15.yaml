@@ -7,14 +7,14 @@ defaults:
 experiments:
   COUPLED-C:
     files:
-      data: C-features_0.0_metric_15-04032023.csv
+      data: C-feature_0.0_metric_15-04032023.csv
     paths:
       log: ${hydra:runtime.cwd}/logs/ARCADE/spatial_0_metric_15_C/
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/spatial_0_metric_15_C/
   COUPLED-CHX:
     files:
-      data: CH-features_0.0_metric_15-04032023.csv
+      data: CH-feature_0.0_metric_15-04032023.csv
     paths:
       log: ${hydra:runtime.cwd}/logs/ARCADE/spatial_0_metric_15_C/
       data: ${hydra:runtime.cwd}/data/ARCADE/
@@ -40,13 +40,7 @@ data:
     - AVG_CLOSENESS
     - AVG_BETWEENNESS
     - AVG_CORENESS
-    - GRADIUS:INVERSE_DISTANCE # Hemodynamic edges
-    - GDIAMETER:INVERSE_DISTANCE
-    - AVG_ECCENTRICITY:INVERSE_DISTANCE
-    - AVG_SHORTEST_PATH:INVERSE_DISTANCE
-    - AVG_CLOSENESS:INVERSE_DISTANCE
-    - AVG_BETWEENNESS:INVERSE_DISTANCE
-    - GRADIUS:FLOW
+    - GRADIUS:FLOW # Hemodynamic edges
     - GDIAMETER:FLOW
     - AVG_ECCENTRICITY:FLOW
     - AVG_SHORTEST_PATH:FLOW
@@ -101,6 +95,12 @@ data:
     - AVG_OUT_DEGREES_WEIGHTED
     - AVG_IN_DEGREES_WEIGHTED
     - AVG_DEGREE_WEIGHTED
+    - GRADIUS:INVERSE_DISTANCE
+    - GDIAMETER:INVERSE_DISTANCE
+    - AVG_ECCENTRICITY:INVERSE_DISTANCE
+    - AVG_SHORTEST_PATH:INVERSE_DISTANCE
+    - AVG_CLOSENESS:INVERSE_DISTANCE
+    - AVG_BETWEENNESS:INVERSE_DISTANCE
 
   response:
     - ACTIVITY

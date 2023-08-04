@@ -1,0 +1,208 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiments:
+  CH_0:
+    files:
+      data: CH-feature_0.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_0_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_0_metric_15_CH/
+
+  CH_1:
+    files:
+      data: CH-feature_1.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_1_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_1_metric_15_CH/
+
+  CH_2:
+    files:
+      data: CH-feature_2.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_2_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_2_metric_15_CH/
+
+  CH_3:
+    files:
+      data: CH-feature_3.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_3_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_3_metric_15_CH/
+
+  CH_4:
+    files:
+      data: CH-feature_4.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_4_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_4_metric_15_CH/
+
+  CH_5:
+    files:
+      data: CH-feature_5.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_5_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_5_metric_15_CH/
+
+  CH_6:
+    files:
+      data: CH-feature_6.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_6_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_6_metric_15_CH/
+
+  CH_7:
+    files:
+      data: CH-feature_7.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_7_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_7_metric_15_CH/
+
+  CH_8:
+    files:
+      data: CH-feature_8.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_8_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_8_metric_15_CH/
+
+  CH_9:
+    files:
+      data: CH-feature_9.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_9_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_9_metric_15_CH/
+
+  CH_10:
+    files:
+      data: CH-feature_10.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_10_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_10_metric_15_CH/
+
+  CH_11:
+    files:
+      data: CH-feature_11.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_11_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_11_metric_15_CH/
+
+  CH_12:
+    files:
+      data: CH-feature_12.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_12_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_12_metric_15_CH/
+
+  CH_13:
+    files:
+      data: CH-feature_13.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_13_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_13_metric_15_CH/
+
+  CH_14:
+    files:
+      data: CH-feature_14.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_14_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_14_metric_15_CH/
+
+  CH_15:
+    files:
+      data: CH-feature_15.0_metric_15-04032023.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/topo_15_metric_15_CH/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/topo_15_metric_15_CH/
+
+data:
+  features:
+    - RADIUS # Aggregate hemodynamics
+    - LENGTH
+    - WALL
+    - SHEAR
+    - CIRCUM
+    - FLOW
+    - NODES # Naive network metrics
+    - EDGES
+    - GRADIUS
+    - GDIAMETER
+    - AVG_ECCENTRICITY
+    - AVG_SHORTEST_PATH
+    - AVG_IN_DEGREES
+    - AVG_OUT_DEGREES
+    - AVG_DEGREE
+    - AVG_CLUSTERING
+    - AVG_CLOSENESS
+    - AVG_BETWEENNESS
+    - AVG_CORENESS
+    - GRADIUS:FLOW # Hemodynamic edges
+    - GDIAMETER:FLOW
+    - AVG_ECCENTRICITY:FLOW
+    - AVG_SHORTEST_PATH:FLOW
+    - AVG_CLOSENESS:FLOW
+    - AVG_BETWEENNESS:FLOW
+    - GRADIUS:WALL
+    - GDIAMETER:WALL
+    - AVG_ECCENTRICITY:WALL
+    - AVG_SHORTEST_PATH:WALL
+    - AVG_CLOSENESS:WALL
+    - AVG_BETWEENNESS:WALL
+    - GRADIUS:SHEAR
+    - GDIAMETER:SHEAR
+    - AVG_ECCENTRICITY:SHEAR
+    - AVG_SHORTEST_PATH:SHEAR
+    - AVG_CLOSENESS:SHEAR
+    - AVG_BETWEENNESS:SHEAR
+    - GRADIUS:RADIUS
+    - GDIAMETER:RADIUS
+    - AVG_ECCENTRICITY:RADIUS
+    - AVG_SHORTEST_PATH:RADIUS
+    - AVG_CLOSENESS:RADIUS
+    - AVG_BETWEENNESS:RADIUS
+    - GRADIUS:PRESSURE_AVG
+    - GDIAMETER:PRESSURE_AVG
+    - AVG_ECCENTRICITY:PRESSURE_AVG
+    - AVG_SHORTEST_PATH:PRESSURE_AVG
+    - AVG_CLOSENESS:PRESSURE_AVG
+    - AVG_BETWEENNESS:PRESSURE_AVG
+    - GRADIUS:PRESSURE_DELTA
+    - GDIAMETER:PRESSURE_DELTA
+    - AVG_ECCENTRICITY:PRESSURE_DELTA
+    - AVG_SHORTEST_PATH:PRESSURE_DELTA
+    - AVG_CLOSENESS:PRESSURE_DELTA
+    - AVG_BETWEENNESS:PRESSURE_DELTA
+    - GRADIUS:OXYGEN_AVG
+    - GDIAMETER:OXYGEN_AVG
+    - AVG_ECCENTRICITY:OXYGEN_AVG
+    - AVG_SHORTEST_PATH:OXYGEN_AVG
+    - AVG_CLOSENESS:OXYGEN_AVG
+    - AVG_BETWEENNESS:OXYGEN_AVG
+    - GRADIUS:OXYGEN_DELTA
+    - GDIAMETER:OXYGEN_DELTA
+    - AVG_ECCENTRICITY:OXYGEN_DELTA
+    - AVG_SHORTEST_PATH:OXYGEN_DELTA
+    - AVG_CLOSENESS:OXYGEN_DELTA
+    - AVG_BETWEENNESS:OXYGEN_DELTA
+  response:
+    - ACTIVITY
+    - GROWTH
+    - SYMMETRY

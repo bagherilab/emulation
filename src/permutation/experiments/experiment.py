@@ -115,7 +115,11 @@ class Experiment(ABC):
 
     def _clean_data(self, clean_data_flag: bool) -> None:
         if clean_data_flag:
-            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+            (
+                removed_feature_columns,
+                removed_response_rows,
+                mult_comp_rows,
+            ) = self.loader.clean_data()
 
             self.logger.log(
                 f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
@@ -125,6 +129,10 @@ class Experiment(ABC):
 
             self.logger.log(
                 f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
+            )
+
+            self.logger.log(
+                f"Removed {len(mult_comp_rows)} row(s) from data due to multiple components in the graph"
             )
 
         else:
@@ -329,17 +337,28 @@ class StandardExperiment(Experiment):
 
     def _clean_data(self, clean_data_flag: bool) -> None:
         if clean_data_flag:
-            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+            (
+                removed_feature_columns,
+                removed_response_rows,
+                mult_comp_rows,
+            ) = self.loader.clean_data()
 
-            self.logger.log(
-                f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
-            )
-            for feature in removed_feature_columns:
-                self.logger.log(f"{feature}")
+            if len(mult_comp_rows) > 0:
+                self.logger.log(
+                    f"Removed {len(mult_comp_rows)} row(s) from data due to multiple components in the network"
+                )
 
-            self.logger.log(
-                f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
-            )
+            if len(removed_feature_columns) > 0:
+                self.logger.log(
+                    f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"
+                )
+                for feature in removed_feature_columns:
+                    self.logger.log(f"{feature}")
+
+            if len(removed_response_rows) > 0:
+                self.logger.log(
+                    f"Removed {len(removed_response_rows)} row(s) from data due to missing, infinity, or nan values in the response column"
+                )
 
         else:
             self.logger.log(
@@ -449,7 +468,16 @@ class TrainingQuantityExperiment(Experiment):
 
     def _clean_data(self, clean_data_flag: bool) -> None:
         if clean_data_flag:
-            removed_feature_columns, removed_response_rows = self.loader.clean_data()
+            (
+                removed_feature_columns,
+                removed_response_rows,
+                mult_comp_rows,
+            ) = self.loader.clean_data()
+
+            if len(mult_comp_rows) > 0:
+                self.logger.log(
+                    f"Removed {len(mult_comp_rows)} row(s) from data due to multiple components in the network"
+                )
 
             self.logger.log(
                 f"Removed the following features from the dataset due to missing, infinity, or nan values in the column:"

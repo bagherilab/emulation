@@ -34,6 +34,7 @@ data:
     - AVG_ECCENTRICITY
     - AVG_SHORTEST_PATH
     - AVG_IN_DEGREES
+    - AVG_OUT_DEGREES
     - AVG_DEGREE
     - AVG_CLUSTERING
     - AVG_CLOSENESS
@@ -42,5 +43,4 @@ data:
   response:
     - ACTIVITY
     - GROWTH
-    - CYCLES
     - SYMMETRY

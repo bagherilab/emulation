@@ -65,7 +65,7 @@ class Loader(ABC):
         """Sample n observations"""
 
     @abstractmethod
-    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame, pd.DataFrame]:
         """Handle missing or non-numeric data"""
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
@@ -197,25 +197,40 @@ class CSVLoader(Loader):
         self.seed = seed
         self.stratify = stratify
         self.stratify_labels: Optional[pd.Series] = None
+        self.num_components: Optional[list[Any]] = None
         self._load_data()
         self._split_data(stratify)
 
-    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame, pd.DataFrame]:
         """Handle missing or non-numeric data"""
-        # Removed features columns with bad values
-        _X_copy = self._X.copy()
-        self._X = self._X.loc[:, ~(np.isnan(self._X).any(axis=0) | np.isinf(self._X)).any(axis=0)]
-        removed_feature_columns = _X_copy.columns[~_X_copy.columns.isin(self._X.columns)]
-        removed_feature_columns = removed_feature_columns.values.tolist()
-
-        # Removed response rows with bad values
         full_data = pd.concat([self._X, self._y], axis=1)
+
+        # Remove rows with multiple components
         full_data_copy = full_data.copy()
+        if self.num_components:
+            full_data["COMPONENTS"] = self.num_components
 
-        full_data = full_data[~full_data.isin([np.nan, np.inf, -np.inf]).any(axis=1)]
-        removed_response_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
-
+        full_data = full_data[full_data["COMPONENTS"] == 1]
+        multiple_component_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
         full_data.reset_index(drop=True, inplace=True)
+
+        # Remove response rows with bad values
+        full_data_copy = full_data.copy()
+        full_data = full_data.loc[~full_data[self.response].isin([np.nan, np.inf, -np.inf])]
+        removed_response_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
+        full_data.reset_index(drop=True, inplace=True)
+
+        # Removed features columns with bad values
+        full_data_copy = full_data.copy()
+        full_data = full_data.loc[
+            :, ~(np.isnan(full_data).any(axis=0) | np.isinf(full_data)).any(axis=0)
+        ]
+        removed_feature_columns = full_data_copy.columns[
+            ~full_data_copy.columns.isin(full_data.columns)
+        ]
+        removed_feature_columns = removed_feature_columns.values.tolist()
+        full_data.reset_index(drop=True, inplace=True)
+        print(full_data)
 
         # Remove bad features from feature list
         self.features = [
@@ -225,15 +240,22 @@ class CSVLoader(Loader):
         self._set_working()
         self._split_data(self.stratify)
 
-        return removed_feature_columns, removed_response_rows
+        return (
+            removed_feature_columns,
+            removed_response_rows,
+            multiple_component_rows,
+        )
 
     def _load_data(self, index_col: int = 0) -> None:
         """Load data from csv to _X and _y attributes"""
         data = pd.read_csv(self.path, index_col=index_col)
         data.reset_index(drop=False, inplace=True)
+        if "COMPONENTS" in data.columns:
+            self.num_components = data["COMPONENTS"].tolist()
         self._X, self._y = features_response_split(data, self.features, self.response)
         if self.stratify:
             self.stratify_labels = data[self.stratify]
+
         self._set_working()
 
     def _split_data(self, stratify: Optional[str]) -> None:
