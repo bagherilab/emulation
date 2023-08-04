@@ -144,7 +144,7 @@ class CSVLoaderTests(unittest.TestCase):
         testLoader = CSVLoader(
             path="test",
             features=["col1", "col2", "col3", "col4", "COMPONENTS"],
-            response=["y"],
+            response="y",
             test_size=self.test_size,
             seed=self.seed,
         )

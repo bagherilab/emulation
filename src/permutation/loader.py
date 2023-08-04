@@ -216,9 +216,7 @@ class CSVLoader(Loader):
 
         # Remove response rows with bad values
         full_data_copy = full_data.copy()
-        full_data = full_data[
-            ~full_data[self._y.columns].isin([np.nan, np.inf, -np.inf]).any(axis=1)
-        ]
+        full_data = full_data.loc[~full_data[self.response].isin([np.nan, np.inf, -np.inf])]
         removed_response_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
         full_data.reset_index(drop=True, inplace=True)
 
@@ -232,6 +230,7 @@ class CSVLoader(Loader):
         ]
         removed_feature_columns = removed_feature_columns.values.tolist()
         full_data.reset_index(drop=True, inplace=True)
+        print(full_data)
 
         # Remove bad features from feature list
         self.features = [
