@@ -6,7 +6,10 @@ utils/
 legacy/
 plots/
 stored_results/
+rnn/
+variance_formatted/
 training_vis.ipynb
+variance.ipynb
 
 
 # Editors

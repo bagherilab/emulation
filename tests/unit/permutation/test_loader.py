@@ -132,9 +132,10 @@ class CSVLoaderTests(unittest.TestCase):
         X = pd.DataFrame(
             {
                 "col1": [1, 2, np.nan, 4],
-                "col2": [5, 6, 7, 8],
+                "col2": [5, np.nan, 7, 8],
                 "col3": [9, 10, np.inf, 12],
                 "col4": [13, 14, 15, 16],
+                "COMPONENTS": [1, 1, 1, 1],
                 "y": [1, 2, np.nan, 4],
             }
         )
@@ -142,17 +143,20 @@ class CSVLoaderTests(unittest.TestCase):
 
         testLoader = CSVLoader(
             path="test",
-            features=["col1", "col2", "col3", "col4"],
+            features=["col1", "col2", "col3", "col4", "COMPONENTS"],
             response=["y"],
             test_size=self.test_size,
             seed=self.seed,
         )
 
-        expected_removed_cols = ["col1", "col3"]
+        expected_removed_cols = ["col2"]
         expected_removed_rows = pd.DataFrame(
             {
-                "col2": [7],
+                "col1": [np.nan],
+                "col2": [7.0],
+                "col3": [np.inf],
                 "col4": [15],
+                "COMPONENTS": [1],
                 "y": [np.nan],
             },
             index=[2],
@@ -160,17 +164,20 @@ class CSVLoaderTests(unittest.TestCase):
 
         expected_cleaned = pd.DataFrame(
             {
-                "col2": [5, 6, 8],
+                "col1": [1.0, 2.0, 4.0],
+                "col3": [9.0, 10.0, 12.0],
                 "col4": [13, 14, 16],
+                "COMPONENTS": [1, 1, 1],
                 "y": [1.0, 2.0, 4.0],
             },
             index=[0, 1, 2],
         )
 
-        removed_cols, removed_rows = testLoader.clean_data()
+        removed_cols, removed_rows, mult_comp_rows = testLoader.clean_data()
         cleaned_X, cleaned_y = testLoader.load_working_data()
         cleaned_data = pd.concat([cleaned_X, cleaned_y], axis=1)
 
         self.assertListEqual(removed_cols, expected_removed_cols)
         self.assertTrue(removed_rows.equals(expected_removed_rows))
         self.assertTrue(cleaned_data.equals(expected_cleaned))
+        self.assertTrue(mult_comp_rows.empty)

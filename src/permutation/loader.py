@@ -65,7 +65,7 @@ class Loader(ABC):
         """Sample n observations"""
 
     @abstractmethod
-    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame, pd.DataFrame]:
         """Handle missing or non-numeric data"""
 
     def load_training_data(self) -> Tuple[pd.DataFrame, pd.Series]:
@@ -197,20 +197,29 @@ class CSVLoader(Loader):
         self.seed = seed
         self.stratify = stratify
         self.stratify_labels: Optional[pd.Series] = None
-        self.num_components: Optional[int] = None
+        self.num_components: Optional[list[Any]] = None
         self._load_data()
         self._split_data(stratify)
 
-    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame]:
+    def clean_data(self) -> Tuple[pd.Index, pd.DataFrame, pd.DataFrame]:
         """Handle missing or non-numeric data"""
-        # Remove rows with multiple components
         full_data = pd.concat([self._X, self._y], axis=1)
+
+        # Remove rows with multiple components
         full_data_copy = full_data.copy()
         if self.num_components:
             full_data["COMPONENTS"] = self.num_components
 
         full_data = full_data[full_data["COMPONENTS"] == 1]
         multiple_component_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
+        full_data.reset_index(drop=True, inplace=True)
+
+        # Remove response rows with bad values
+        full_data_copy = full_data.copy()
+        full_data = full_data[
+            ~full_data[self._y.columns].isin([np.nan, np.inf, -np.inf]).any(axis=1)
+        ]
+        removed_response_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
         full_data.reset_index(drop=True, inplace=True)
 
         # Removed features columns with bad values
@@ -222,12 +231,6 @@ class CSVLoader(Loader):
             ~full_data_copy.columns.isin(full_data.columns)
         ]
         removed_feature_columns = removed_feature_columns.values.tolist()
-        full_data.reset_index(drop=True, inplace=True)
-
-        # Remove response rows with bad values
-        full_data_copy = full_data.copy()
-        full_data = full_data[~full_data.isin([np.nan, np.inf, -np.inf]).any(axis=1)]
-        removed_response_rows = full_data_copy[~full_data_copy.index.isin(full_data.index)]
         full_data.reset_index(drop=True, inplace=True)
 
         # Remove bad features from feature list

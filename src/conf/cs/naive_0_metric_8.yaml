@@ -43,5 +43,4 @@ data:
   response:
     - ACTIVITY
     - GROWTH
-    - CYCLES
     - SYMMETRY
