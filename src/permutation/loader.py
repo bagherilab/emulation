@@ -230,7 +230,6 @@ class CSVLoader(Loader):
         ]
         removed_feature_columns = removed_feature_columns.values.tolist()
         full_data.reset_index(drop=True, inplace=True)
-        print(full_data)
 
         # Remove bad features from feature list
         self.features = [
