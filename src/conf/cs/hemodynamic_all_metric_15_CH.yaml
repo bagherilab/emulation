@@ -5,7 +5,7 @@ defaults:
   - models/mlp
   - _self_
 experiments:
-  CH_0:
+  COUPLED-CHX-0:
     files:
       data: CH-feature_0.0_metric_15-04032023.csv
     paths:
@@ -13,7 +13,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_0_metric_15_CH/
 
-  CH_1:
+  COUPLED-CHX-1:
     files:
       data: CH-feature_1.0_metric_15-04032023.csv
     paths:
@@ -21,7 +21,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_1_metric_15_CH/
 
-  CH_2:
+  COUPLED-CHX-2:
     files:
       data: CH-feature_2.0_metric_15-04032023.csv
     paths:
@@ -29,7 +29,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_2_metric_15_CH/
 
-  CH_3:
+  COUPLED-CHX-3:
     files:
       data: CH-feature_3.0_metric_15-04032023.csv
     paths:
@@ -37,7 +37,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_3_metric_15_CH/
 
-  CH_4:
+  COUPLED-CHX-4:
     files:
       data: CH-feature_4.0_metric_15-04032023.csv
     paths:
@@ -53,7 +53,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_5_metric_15_CH/
 
-  CH_6:
+  COUPLED-CHX-6:
     files:
       data: CH-feature_6.0_metric_15-04032023.csv
     paths:
@@ -61,7 +61,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_6_metric_15_CH/
 
-  CH_7:
+  COUPLED-CHX-7:
     files:
       data: CH-feature_7.0_metric_15-04032023.csv
     paths:
@@ -69,7 +69,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_7_metric_15_CH/
 
-  CH_8:
+  COUPLED-CHX-8:
     files:
       data: CH-feature_8.0_metric_15-04032023.csv
     paths:
@@ -77,7 +77,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_8_metric_15_CH/
 
-  CH_9:
+  CCOUPLED-CHX-9:
     files:
       data: CH-feature_9.0_metric_15-04032023.csv
     paths:
@@ -85,7 +85,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_9_metric_15_CH/
 
-  CH_10:
+  COUPLED-CHX-10:
     files:
       data: CH-feature_10.0_metric_15-04032023.csv
     paths:
@@ -93,7 +93,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_10_metric_15_CH/
 
-  CH_11:
+  COUPLED-CHX-11:
     files:
       data: CH-feature_11.0_metric_15-04032023.csv
     paths:
@@ -101,7 +101,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_11_metric_15_CH/
 
-  CH_12:
+  COUPLED-CHX-12:
     files:
       data: CH-feature_12.0_metric_15-04032023.csv
     paths:
@@ -109,7 +109,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_12_metric_15_CH/
 
-  CH_13:
+  COUPLED-CHX-13:
     files:
       data: CH-feature_13.0_metric_15-04032023.csv
     paths:
@@ -117,7 +117,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_13_metric_15_CH/
 
-  CH_14:
+  COUPLED-CHX-14:
     files:
       data: CH-feature_14.0_metric_15-04032023.csv
     paths:
@@ -125,7 +125,7 @@ experiments:
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_14_metric_15_CH/
 
-  CH_15:
+  COUPLED-CHX-15:
     files:
       data: CH-feature_15.0_metric_15-04032023.csv
     paths:
