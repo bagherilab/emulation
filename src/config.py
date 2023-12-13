@@ -26,9 +26,7 @@ def main(config: DictConfig) -> None:
                     experiment_name=f"{experiment_name}-{response}",
                     export_dir=experiment_cfg.paths.results,
                     log_dir=experiment_cfg.paths.log,
-                    data_path=os.path.join(
-                        experiment_cfg.paths.data, experiment_cfg.files.data
-                    ),
+                    data_path=os.path.join(experiment_cfg.paths.data, experiment_cfg.files.data),
                     features=cfg.data.features,
                     response=response,
                     stratify=stratify,
@@ -39,9 +37,7 @@ def main(config: DictConfig) -> None:
                     experiment_name=f"{experiment_name}-{response}",
                     export_dir=experiment_cfg.paths.results,
                     log_dir=experiment_cfg.paths.log,
-                    data_path=os.path.join(
-                        experiment_cfg.paths.data, experiment_cfg.files.data
-                    ),
+                    data_path=os.path.join(experiment_cfg.paths.data, experiment_cfg.files.data),
                     features=cfg.data.features,
                     response=response,
                     stratify=stratify,
@@ -49,9 +45,7 @@ def main(config: DictConfig) -> None:
                 )
 
             for model, hparam_cfg in cfg.models.items():
-                temp_list = assign_hyperparameters.assign_hyperparameters(
-                    hparam_cfg, sobol_power
-                )
+                temp_list = assign_hyperparameters.assign_hyperparameters(hparam_cfg, sobol_power)
                 model_list = assign_models.assign_models_from_list(temp_list, model)
                 experiment.add_models(model_list)
 

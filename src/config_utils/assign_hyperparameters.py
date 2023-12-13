@@ -107,9 +107,7 @@ def include_permutations(
     df["temp"] = pd.Series([permutations] * len(df))
     temp_df = df.explode("temp")
     temp_df.reset_index(inplace=True, drop=True)
-    df_with_permutations = temp_df.join(
-        pd.DataFrame([*temp_df.temp], temp_df.index, param_names)
-    )
+    df_with_permutations = temp_df.join(pd.DataFrame([*temp_df.temp], temp_df.index, param_names))
     df_with_permutations.drop(columns=["temp"], inplace=True)
     return df_with_permutations
 
@@ -179,9 +177,7 @@ def _handle_continuous_config(param_cfg: DictConfig, sobol_power: int) -> pd.Dat
     return fixed_df
 
 
-def _handle_discrete_config(
-    param_cfg: DictConfig, hparam_df: pd.DataFrame
-) -> pd.DataFrame:
+def _handle_discrete_config(param_cfg: DictConfig, hparam_df: pd.DataFrame) -> pd.DataFrame:
     """
     Reads in discrete parameters from config file and appends permutations
     of them to the hyperparameter dataframe
@@ -201,9 +197,7 @@ def _handle_discrete_config(
     return with_perm_df
 
 
-def _handle_static_config(
-    param_cfg: DictConfig, hparam_df: pd.DataFrame
-) -> pd.DataFrame:
+def _handle_static_config(param_cfg: DictConfig, hparam_df: pd.DataFrame) -> pd.DataFrame:
     """
     Reads in static parameters from config file and appends them to the hyperparameter dataframe
 
