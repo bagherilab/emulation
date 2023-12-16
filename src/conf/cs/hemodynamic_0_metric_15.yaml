@@ -12,7 +12,7 @@ experiments:
       log: ${hydra:runtime.cwd}/logs/ARCADE/topo_0_metric_15_C/
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/topo_0_metric_15_C/
-  COUPLED-CHX:
+  COUPLED-CH:
     files:
       data: CH-feature_0.0_metric_15-04032023.csv
     paths:
