@@ -1,0 +1,82 @@
+defaults:
+  - models/mlr
+  - models/rf
+  - models/svr
+  - models/mlp
+  - _self_
+experiments:
+  REPR-LEARNING_32d_0:
+    files:
+      data: full_data.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/repr_learning_128/32_0/
+      data: ${hydra:runtime.cwd}/data/repr_learning_128/32_0/
+      results: ${hydra:runtime.cwd}/results/repr_learning_128/32_0/
+  REPR-LEARNING_32d_1:
+    files:
+      data: full_data.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/repr_learning_128/32_1/
+      data: ${hydra:runtime.cwd}/data/repr_learning_128/32_1/
+      results: ${hydra:runtime.cwd}/results/repr_learning_128/32_1/
+  REPR-LEARNING_32d_2:
+    files:
+      data: full_data.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/repr_learning_128/32_2/
+      data: ${hydra:runtime.cwd}/data/repr_learning_128/32_2/
+      results: ${hydra:runtime.cwd}/results/repr_learning_128/32_2/
+  REPR-LEARNING_32d_3:
+    files:
+      data: full_data.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/repr_learning_128/32_3/
+      data: ${hydra:runtime.cwd}/data/repr_learning_128/32_3/
+      results: ${hydra:runtime.cwd}/results/repr_learning_128/32_3/
+  REPR-LEARNING_32d_4:
+    files:
+      data: full_data.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/repr_learning_128/32_4/
+      data: ${hydra:runtime.cwd}/data/repr_learning_128/32_4/
+      results: ${hydra:runtime.cwd}/results/repr_learning_128/32_4/
+
+data:
+  features:
+    - dim_0
+    - dim_1
+    - dim_2
+    - dim_3
+    - dim_4
+    - dim_5
+    - dim_6
+    - dim_7
+    - dim_8
+    - dim_9
+    - dim_10
+    - dim_11
+    - dim_12
+    - dim_13
+    - dim_14
+    - dim_15
+    - dim_16
+    - dim_17
+    - dim_18
+    - dim_19
+    - dim_20
+    - dim_21
+    - dim_22
+    - dim_23
+    - dim_24
+    - dim_25
+    - dim_26
+    - dim_27
+    - dim_28
+    - dim_29
+    - dim_30
+    - dim_31
+
+  response:
+    - activity
+    - growth
+    - symmetry

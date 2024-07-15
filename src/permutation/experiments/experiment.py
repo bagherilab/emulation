@@ -183,6 +183,7 @@ class Experiment(ABC):
 
         for algorithm, runner_list in self._models.items():
             for runner in runner_list:
+                print(runner.model.hparams)
                 runner.cross_validation()
                 progress_counter += 1
                 self.logger.log(f"Progress: {progress_counter} of {self._n_models} - {runner.id}")
@@ -330,7 +331,7 @@ class StandardExperiment(Experiment):
             pass
         self.train_models()
         self.test_models()
-        self.permutation_testing()
+        # self.permutation_testing()
 
     def _log_initialization(self) -> None:
         self.logger.log(f"(Standard Experiment) {self.name} initialized.")

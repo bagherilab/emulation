@@ -236,6 +236,7 @@ class CSVLoader(Loader):
             feature for feature in self.features if feature not in removed_feature_columns
         ]
         self._X, self._y = features_response_split(full_data, self.features, self.response)
+
         self._set_working()
         self._split_data(self.stratify)
 

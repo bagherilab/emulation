@@ -6,9 +6,7 @@ mlp:
       search: log
   discrete:
     activation:
-      - identity
       - logistic
-      - tanh
       - relu
     hidden_layer_sizes:
       - (5,)
@@ -17,9 +15,6 @@ mlp:
       - (25,)
       - (25, 25)
       - (25, 50)
-      - (50,)
-      - (50, 25)
-      - (50, 50)
   static:
-    solver: lbfgs
-    max_iter: 1000
+    solver: adam
+    max_iter: 2000
