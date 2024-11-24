@@ -49,6 +49,29 @@ class Exporter:
         dir_path = f"{self.export_path}/{self.experiment}/{model}/{stage.name}"
         self._save_df(dir_path, filename, dataframe)
 
+    def make_json_serializable(self, data):
+        """
+        Recursively checks if all elements in a dictionary are JSON-serializable.
+        If not, converts non-serializable elements to strings.
+        
+        Parameters:
+        - data (dict): Dictionary of parameters to check.
+
+        Returns:
+        - dict: JSON-serializable dictionary.
+        """
+        if isinstance(data, dict):
+            return {key: self.make_json_serializable(value) for key, value in data.items()}
+        elif isinstance(data, list):
+            return [self.make_json_serializable(item) for item in data]
+        try:
+            # Attempt to serialize to JSON
+            json.dumps(data)
+            return data
+        except (TypeError, OverflowError):
+            # If not serializable, convert to string
+            return str(data)
+
     def _save_df(self, dir_path: str, name: str, df: pd.DataFrame | pd.Series) -> None:
         """Validates save path and then saves a Dataframe as a CSV file"""
         validate_dir(dir_path)
@@ -67,7 +90,8 @@ class Exporter:
         )
         with open(dir_path, "w", encoding="UTF-8") as outfile:
             if runner.model.hparams:
-                json.dump(runner.model.hparams.as_dict(), outfile)
+                serialized_hp = self.make_json_serializable(runner.model.hparams.as_dict())
+                json.dump(serialized_hp, outfile)
 
     def save_predictions(self, model: str, runner: Runner) -> None:
         """Saves the model predictions as a CSV file"""

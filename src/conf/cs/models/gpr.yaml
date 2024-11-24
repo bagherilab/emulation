@@ -13,7 +13,3 @@ gpr:
       - 3
     kernel:
       - DotProduct + WhiteKernel
-      - RBF
-      - Matern
-      - RationalQuadratic
-      - Exponential  

@@ -71,9 +71,7 @@ class GPReg(AbstractSKLearnModel):
             kernel_name = hparams_dict.get("kernel")
             kernel = map_kernel(kernel_name)
             hparams_dict['kernel'] = kernel
-            print(hparams_dict)
-            print(hparams)
-            hparams = HParams(**hparams_dict)
+            hparams = HParams(param_dict=hparams_dict)
         else:
             hparams_dict = {'kernel': kernel} if kernel else {}
 
