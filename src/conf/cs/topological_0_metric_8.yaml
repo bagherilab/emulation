@@ -1,8 +1,5 @@
 defaults:
-  - models/mlr
-  - models/rf
-  - models/svr
-  - models/mlp
+  - models/gpr
   - _self_
 experiments:
   COUPLED-C:

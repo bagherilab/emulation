@@ -1,0 +1,19 @@
+gpr:
+  continuous:
+    alpha:
+      type: float
+      range: [1e-10, 1e-6]
+      search: log
+
+  discrete:
+    n_restarts_optimizer:
+      - 0
+      - 1
+      - 2
+      - 3
+    kernel:
+      - DotProduct + WhiteKernel
+      - RBF
+      - Matern
+      - RationalQuadratic
+      - Exponential  

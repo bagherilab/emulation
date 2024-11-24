@@ -51,7 +51,10 @@ class AbstractSKLearnModel(ABC):
         """
         model = cls()
         model.hparams = hparams
-
+        print(model.hparams)
+        print(model)
+        print(model_dependency)
+        #asd()
         pipeline_list = []
 
         if preprocessing_dependencies:
