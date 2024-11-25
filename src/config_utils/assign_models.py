@@ -4,10 +4,11 @@ from permutation.models.mlr import MLR
 from permutation.models.rf import RF
 from permutation.models.svr import SVReg
 from permutation.models.mlp import MLP
+from permutation.models.mdn import MDNReg
 from permutation.models.modelprotocol import Model
 from permutation.models.hyperparameters import HParams
 
-MODEL_DEPENDENCIES = {"mlr": MLR, "rf": RF, "svr": SVReg, "mlp": MLP}
+MODEL_DEPENDENCIES = {"mlr": MLR, "rf": RF, "svr": SVReg, "mlp": MLP, "mdn": MDNReg}
 
 
 def _get_correct_model(model_type: str, hparams: HParams) -> Model:

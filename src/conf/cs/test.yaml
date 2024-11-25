@@ -1,0 +1,16 @@
+defaults:
+  - models/mdn
+  - _self_
+experiments:
+  TEST-MDN:
+    files:
+      data: test_data.csv
+    paths:
+      log: ${hydra:runtime.cwd}/logs/ARCADE/test/
+      data: ${hydra:runtime.cwd}/data/ARCADE/
+      results: ${hydra:runtime.cwd}/results/ARCADE/test/
+data:
+  features:
+    - X_train
+  response:
+    - y_train

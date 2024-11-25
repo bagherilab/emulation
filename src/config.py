@@ -52,7 +52,17 @@ def main(config: DictConfig) -> None:
             experiment.save_train_test()
             experiment.save_manifest()
             experiment.run()
-
-
+            model = experiment._best_models['MDN'].model.model
+            test_points = [-1, 0, 1]
+            print("\nExample predictions at specific points:")
+            import torch
+            for x_val in test_points:
+                x = torch.tensor([[x_val]], dtype=torch.float32)
+                with torch.no_grad():
+                    pi, mu, sigma = model.forward(x)
+                print(f"\nx = {x_val}")
+                print(f"Mixing coefficients (π): {pi.numpy().flatten()}")
+                print(f"Means (μ): {mu.numpy().flatten()}")
+                print(f"Standard deviations (σ): {sigma.numpy().flatten()}")
 if __name__ == "__main__":
     main()

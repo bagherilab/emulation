@@ -1,25 +1,19 @@
-mlp:
+mdn:
   continuous:
-    alpha:
+    learning_rate: 
       type: float
-      range: [0.0001, 1]
+      range: [0.001, 0.01]
       search: log
+
   discrete:
-    activation:
-      - identity
-      - logistic
-      - tanh
-      - relu
-    hidden_layer_sizes:
-      - (5,)
-      - (5,5)
-      - (5,10)
-      - (25,)
-      - (25, 25)
-      - (25, 50)
-      - (50,)
-      - (50, 25)
-      - (50, 50)
+    hidden_dim:
+      - 16
+    num_gaussians:
+      - 2
+    output_dim:
+      - 1
+
   static:
-    solver: lbfgs
-    max_iter: 1000
+    epochs: 500
+
+
