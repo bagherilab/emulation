@@ -4,16 +4,19 @@ mdn:
       type: float
       range: [0.001, 0.01]
       search: log
-
-  discrete:
     hidden_dim:
-      - 16
+      type: int
+      range: [4, 16]
+      search: linear
+    num_hidden_layers:
+      type: int
+      range: [1, 4]
+      search: linear
     num_gaussians:
-      - 2
-    output_dim:
-      - 1
-
+      type: int
+      range: [1, 8]
+      search: linear
   static:
-    epochs: 500
-
+    epochs: 200
+    output_dim: 1
 

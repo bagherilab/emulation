@@ -13,7 +13,13 @@ from permutation.models.hyperparameters import HParams
 
 
 class MDN(nn.Module):
-    def __init__(self, hidden_dim=1, output_dim=1, num_gaussians=1, learning_rate=0.001, epochs=1000):
+    def __init__(self,
+                 hidden_dim=1,
+                 num_hidden_layers=1,
+                 output_dim=1,
+                 num_gaussians=1,
+                 learning_rate=0.001,
+                 epochs=1000):
         super(MDN, self).__init__()
         self.hidden = nn.Sequential(
             nn.LazyLinear(hidden_dim),
@@ -21,9 +27,17 @@ class MDN(nn.Module):
             nn.Linear(hidden_dim, hidden_dim),
             nn.ReLU(),
         )
+        # Create hidden layers dynamically using Sequential
+        layers = [nn.LazyLinear(hidden_dim), nn.ReLU()]
+        for _ in range(num_hidden_layers - 1):
+            layers.append(nn.Linear(hidden_dim, hidden_dim))
+            layers.append(nn.ReLU())
+
+
+        self.hidden = nn.Sequential(*layers)
         self.pi_layer = nn.Linear(hidden_dim, num_gaussians)  # Mixing coefficients
-        self.mu_layer = nn.Linear(hidden_dim, num_gaussians * output_dim)  # Means
-        self.sigma_layer = nn.Linear(hidden_dim, num_gaussians * output_dim)  # Std deviations
+        self.mu_layer = nn.Linear(hidden_dim, num_gaussians * output_dim)
+        self.sigma_layer = nn.Linear(hidden_dim, num_gaussians * output_dim)
         self.num_gaussians = num_gaussians
         self.output_dim = output_dim
         self.optimizer = optim.Adam(self.parameters(), lr=learning_rate)
@@ -41,7 +55,7 @@ class MDN(nn.Module):
         y = y.unsqueeze(1) if len(y.shape) == 2 else y.unsqueeze(1).unsqueeze(-1)
         gaussian_prob = torch.exp(-0.5 * ((y - mu) / sigma) ** 2) / (sigma * np.sqrt(2 * np.pi))
         weighted_prob = pi * torch.prod(gaussian_prob, dim=2)
-        loss = -torch.log(torch.sum(weighted_prob, dim=1) + 1e-6).mean()  # Avoid log(0) with 1e-6
+        loss = -torch.log(torch.sum(weighted_prob, dim=1) + 1e-6).mean()
         return loss
 
 
@@ -71,9 +85,9 @@ class MDN(nn.Module):
         return predictions.numpy()
     
     def score(self, X, y, sample_weight=None):
-        """Compute the R^2 score (default for regression in scikit-learn)."""
-        predictions = self.predict(X)  # Call the predict method
-        return r2_score(y, predictions, sample_weight=sample_weight)  # Use R^2 as the scoring metric
+        """Compute the R^2 score."""
+        predictions = self.predict(X)
+        return r2_score(y, predictions, sample_weight=sample_weight)
     
 
 class MDNReg(AbstractSKLearnModel):
@@ -99,6 +113,8 @@ class MDNReg(AbstractSKLearnModel):
         preprocessing_dependencies: Optional[Iterable[tuple[str, TransformerMixin]]] = None,
     ) -> Model:
         """Set up model from config files and superclass."""
+        print(hparams)
+        print("="*15)
         if preprocessing_dependencies is None:
             preprocessing_dependencies = []
         return super()._set_model(

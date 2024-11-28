@@ -52,6 +52,7 @@ def main(config: DictConfig) -> None:
             experiment.save_train_test()
             experiment.save_manifest()
             experiment.run()
+            """
             model = experiment._best_models['MDN'].model.model
             test_points = [-1, 0, 1]
             print("\nExample predictions at specific points:")
@@ -64,5 +65,6 @@ def main(config: DictConfig) -> None:
                 print(f"Mixing coefficients (π): {pi.numpy().flatten()}")
                 print(f"Means (μ): {mu.numpy().flatten()}")
                 print(f"Standard deviations (σ): {sigma.numpy().flatten()}")
+            """
 if __name__ == "__main__":
     main()

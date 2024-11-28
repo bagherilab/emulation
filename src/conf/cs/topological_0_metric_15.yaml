@@ -1,8 +1,5 @@
 defaults:
-  - models/mlr
-  - models/rf
-  - models/svr
-  - models/mlp
+  - models/mdn
   - _self_
 experiments:
   COUPLED-C:
@@ -12,13 +9,6 @@ experiments:
       log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_15_C/
       data: ${hydra:runtime.cwd}/data/ARCADE/
       results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_15_C/
-  COUPLED-CH:
-    files:
-      data: CH-feature_0.0_metric_15-04032023.csv
-    paths:
-      log: ${hydra:runtime.cwd}/logs/ARCADE/naive_0_metric_15_CH/
-      data: ${hydra:runtime.cwd}/data/ARCADE/
-      results: ${hydra:runtime.cwd}/results/ARCADE/naive_0_metric_15_CH/
 data:
   features:
     - RADIUS # Aggregate hemodynamics
