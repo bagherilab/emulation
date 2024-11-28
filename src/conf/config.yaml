@@ -2,7 +2,7 @@ defaults:
   - cs: MISSING
   - _self_
 
-sobol_power: 1
+sobol_power: 4
 stratify: LAYOUT
 quantity_experiment: false
 clean_data: true

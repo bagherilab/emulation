@@ -2,14 +2,13 @@ gpr:
   continuous:
     alpha:
       type: float
-      range: [1e-10, 1e-6]
+      range: [1e-4, 1e-1]
       search: log
+    n_restarts_optimizer:
+      type: int
+      range: [0, 10]
+      search: linear
 
   discrete:
-    n_restarts_optimizer:
-      - 0
-      - 1
-      - 2
-      - 3
     kernel:
-      - DotProduct + WhiteKernel
+      - Matern

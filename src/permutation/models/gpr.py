@@ -1,13 +1,12 @@
 from typing import Optional, Iterable
 
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, WhiteKernel, Matern, RationalQuadratic, DotProduct
+from sklearn.gaussian_process.kernels import RBF, WhiteKernel, Matern, RationalQuadratic, DotProduct, ConstantKernel
 from sklearn.base import BaseEstimator, TransformerMixin
 
 from permutation.models.modelprotocol import Model
 from permutation.models.sklearnmodel import AbstractSKLearnModel
 from permutation.models.hyperparameters import HParams
-from sklearn.gaussian_process.kernels import RBF, WhiteKernel, Matern, RationalQuadratic, DotProduct
 
 def map_kernel(kernel_name: str):
     """
@@ -27,7 +26,7 @@ def map_kernel(kernel_name: str):
     elif kernel_name == "RBF":
         return RBF(length_scale=1.0)
     elif kernel_name == "Matern":
-        return Matern(nu=1.5)
+        return ConstantKernel(1.0, (1e-3, 1e3)) * Matern(length_scale=1.0, length_scale_bounds=(1e-2, 1e2))
     elif kernel_name == "RationalQuadratic":
         return RationalQuadratic(alpha=1.0, length_scale=1.0)
     elif kernel_name == "Exponential":
