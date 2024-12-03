@@ -1,9 +1,10 @@
+import random
 import numpy as np
 import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF, Matern, ConstantKernel as C
+from sklearn.gaussian_process.kernels import RBF, Matern, WhiteKernel, ConstantKernel as C
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
@@ -31,7 +32,7 @@ OUTPUT_MAPPING = {"ACTIVITY": 0, "GROWTH": 1, "SYMMETRY": 2}
 # Load data
 data_path = "../../data/ARCADE/C-feature_0.0_metric_15-04032023.csv"
 data = pd.read_csv(data_path)
-output_names = ["ACTIVITY"]#, "GROWTH", "SYMMETRY"]
+output_names = ["ACTIVITY", "GROWTH", "SYMMETRY"]
 features = [
     "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW", 
     "NODES", "EDGES", "GRADIUS", "GDIAMETER", "AVG_ECCENTRICITY", 
@@ -72,128 +73,89 @@ spatial_features = [
     "AVG_ECCENTRICITY:INVERSE_DISTANCE", "AVG_SHORTEST_PATH:INVERSE_DISTANCE", 
     "AVG_CLOSENESS:INVERSE_DISTANCE", "AVG_BETWEENNESS:INVERSE_DISTANCE"
 ]
-features = spatial_features
-#features = ["NODES", "EDGES"]
-# Input features and outputs
-# Remove rows with NaN or infinite values
+selected_features_indices = [2,0,17,6,7,3,18,4,11,15]
+features = np.array(features)#[selected_features_indices]
+selected_features = features
 
-data = clean_data(data, output_names[0])
+#features = spatial_features
 
-X = data[features].values  # Inputs
-y = data[output_names].values  # Outputs
-
-
-# Step 1: Split data into 75% training and 25% test
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
-
-# Step 2: Split the training set into 75% training and 25% validation
-X_train_final, X_val, y_train_final, y_val = train_test_split(X_train, y_train, test_size=0.25, random_state=42)
-
-scaler = StandardScaler()
-X_train = scaler.fit_transform(X_train)
-X_test = scaler.transform(X_test)
-
-# Define the GP kernel
 kernel = C(1.0, (1e-3, 1e3)) * RBF(length_scale=1.0, length_scale_bounds=(1e-2, 1e2))
-kernel = C(1.0, (1e-3, 1e3)) * Matern(length_scale=1.0, length_scale_bounds=(1e-2, 1e2))
-
-# Train a separate GP for each output using cross-validation
-
-# Step 3: Perform 5-fold cross-validation on the training set
+kernel = C(1.0, (1e-3, 1e3)) * Matern(length_scale=1, length_scale_bounds=(1e-2, 1e2), nu=1.5) + WhiteKernel(noise_level=1e-2, noise_level_bounds=(1e-4, 1e-1))
 train = True
-if train:
-    kf = None
-    if kf is not None:
-        kf = KFold(n_splits=5, shuffle=True, random_state=42)
-        gps = []
-        cv_scores = []
 
-        for i in range(y_train_final.shape[1]):  # Train a GP for each output (ACTIVITY, GROWTH, SYMMETRY)
-            fold_scores = []
-            for train_idx, val_idx in kf.split(X_train_final):
-                # Split the data into training and validation sets for this fold
-                X_train_fold, X_val_fold = X_train_final[train_idx], X_train_final[val_idx]
-                y_train_fold, y_val_fold = y_train_final[train_idx, i], y_train_final[val_idx, i]
-                
-                # Train the GP on the current fold
-                gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=1e-6)
-                gp.fit(X_train_fold, y_train_fold)
-                
-                # Evaluate on the validation fold
-                y_val_pred, y_val_std = gp.predict(X_val_fold, return_std=True)
-                fold_score = np.mean((y_val_pred - y_val_fold) ** 2)  # Mean Squared Error
-                fold_scores.append(fold_score)
-            
-            # Store the GP model and cross-validation score
-            gps.append(gp)
-            cv_scores.append(np.mean(fold_scores))
-        # Print cross-validation scores
-        for name, score in zip(output_names, cv_scores):
-            print(f"Cross-validation MSE for {name}: {score:.4f}")
-    else:
-        gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=2e-2)
+feature_selection_results = {}
+for iteration in range(1):#(len(features)):
+    print("="*10 + f"Random Feature Set {iteration+1}" + "="*10)
+    #selected_features = random.sample(features, random.randint(2, 3))
+    #X = data[selected_features].values
+    selected_features = np.array(features)#[:iteration+1]
+    X = data[selected_features].values  # Inputs
+    y = data[output_names].values  # Outputs
+
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    scaler = StandardScaler()
+    X_train = scaler.fit_transform(X_train)
+    X_test = scaler.transform(X_test)
+    y_train = scaler.fit_transform(y_train)
+    y_test = scaler.transform(y_test)
+    
+    if train:
+        gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=3e-1)
         gp.fit(X_train, y_train)
-        gps = [gp]
-else:
-    gps = [joblib.load('gp.pkl')]
+    else:
+        gp = joblib.load('gp.pkl')
 
+    # joblib.dump(gp, 'gp.pkl')
 
-# Step 4: Final evaluation on the test set
-# Select the GP model with the lowest cross-validation score
-gp = gps[0]  # GP model for "ACTIVITY"
-# save the model
-joblib.dump(gp, 'gp.pkl')
+    y_pred, y_pred_std = gp.predict(X_test, return_std=True)
+    y_pred_train, y_pred_std_train = gp.predict(X_train, return_std=True)
+    # Convert back to original scale
+    
+    y_pred = scaler.inverse_transform(y_pred)
+    y_pred_std = scaler.inverse_transform(y_pred_std)
+    y_pred_train = scaler.inverse_transform(y_pred_train)
+    y_pred_std_train = scaler.inverse_transform(y_pred_std_train)
+    y_train = scaler.inverse_transform(y_train)
+    y_test = scaler.inverse_transform(y_test)
 
-y_pred, y_pred_std = gp.predict(X_test, return_std=True)
-y_pred_train, y_pred_std_train = gp.predict(X_train, return_std=True)
-for i, name in enumerate(output_names[:1]):
-    r2_train = r2_score(y_train[:, i], y_pred_train[:, i])
-    r_train = np.corrcoef(y_train[:, i], y_pred_train[:, i])[0, 1]
-    mse_train = mean_squared_error(y_train[:, i], y_pred_train[:, i])
-    r2 = r2_score(y_test[:, i], y_pred[:, i])
-    r = np.corrcoef(y_test[:, i], y_pred[:, i])[0, 1]
-    mse = mean_squared_error(y_test[:, i], y_pred[:, i])
+    for i, name in enumerate(output_names[:1]):
+        r2_train = r2_score(y_train[:, i], y_pred_train[:, i])
+        r_train = np.corrcoef(y_train[:, i], y_pred_train[:, i])[0, 1]
+        mse_train = mean_squared_error(y_train[:, i], y_pred_train[:, i])
+        r2_test = r2_score(y_test[:, i], y_pred[:, i])
+        r_test = np.corrcoef(y_test[:, i], y_pred[:, i])[0, 1]
+        mse_test = mean_squared_error(y_test[:, i], y_pred[:, i])
+        # Save results
+        feature_selection_results[f"Feature Set {iteration+1}"] = {
+            "Selected Features": selected_features,
+            "R² Train": f"{r2_train:.3f}",
+            "R² Test": f"{r2_test:.3f}",
+            "MSE Train": f"{mse_train:.3f}",
+            "MSE Test": f"{mse_test:.3f}",
+        }
 
-    print("="*10 + "TRAIN" + "="*10)
-    print(f"R-squared for {name}: {r2_train:.4f}")
-    print(f"R for {name}: {r_train:.4f}")
-    print(f"MSE for {name}: {mse_train:.4f}")
-    print(f"Std for {name}: {y_pred_std_train[i]}")
-    print("="*10 + "TEST" + "="*10)
-    print(f"R-squared for {name}: {r2}")
-    print(f"R for {name}: {r:.4f}")
-    print(f"MSE for {name}: {mse:.4f}")
-    print(f"Std for {name}: {y_pred_std[i]}")
+    # Plot a parity plot for train and test data
+    output_name = output_names[0]
+    output_index = OUTPUT_MAPPING[output_name]
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+    ax.scatter(y_train[:, output_index], y_pred_train[:, output_index], label="Train")
+    ax.scatter(y_test[:, output_index], y_pred[:, output_index], label="Test")
+    ax.set_title(f"{output_name} (R^2 Train: {r2_train:.3f}, R^2 Test: {r2_test:.3f})")
+    ax.set_xlabel("True")
+    ax.set_ylabel("Predicted")
+    ax.legend()
+    ax.set_xlim(-1, 1)
+    ax.set_ylim(-1, 1)
+    plt.tight_layout()
 
-# Create a DataFrame with required columns for three outputs
-results_df = pd.DataFrame({
-    "ACTIVITY_true": y_test[:, 0],
-    "ACTIVITY_pred": y_pred[:, 0],
-    "ACTIVITY_std": y_pred_std[:, 0],
-    "GROWTH_true": y_test[:, 1],
-    "GROWTH_pred": y_pred[:, 1],
-    "GROWTH_std": y_pred_std[:, 1],
-    "SYMMETRY_true": y_test[:, 2],
-    "SYMMETRY_pred": y_pred[:, 2],
-    "SYMMETRY_std": y_pred_std[:, 2],
-})
-# Save to CSV
-results_df.to_csv("activity_predictions.csv", index=False)
-# print(results_df.head())
+    # Save the plot
+    selected_features_combined = "_".join(selected_features)
+    plt.savefig(f"parity_plot_{selected_features_combined}.png")
 
-# Plot a parity plot for train and test data
-output_name = output_names[0]
-output_index = OUTPUT_MAPPING[output_name]
-fig, ax = plt.subplots(1, 1, figsize=(6, 6))
-ax.scatter(y_train[:, output_index], gp.predict(X_train)[:, output_index], label="Train")
-ax.scatter(y_test[:, output_index], y_pred[:, output_index], label="Test")
-ax.set_title(output_name)
-ax.set_xlabel("True")
-ax.set_ylabel("Predicted")
-ax.legend()
-ax.set_xlim(-1, 1)
-ax.set_ylim(-1, 1)
-plt.tight_layout()
+results_df = pd.DataFrame.from_dict(feature_selection_results, orient="index")
+results_df.sort_values(by="R² Test", ascending=False, inplace=True)
 
-# Save the plot
-plt.savefig("parity_plot.png")
+# Save results to a CSV
+results_df.to_csv("feature_selection_results.csv", index=False)
+print(results_df.head(1))
