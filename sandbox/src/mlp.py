@@ -8,85 +8,7 @@ from sklearn.gaussian_process.kernels import RBF, Matern, WhiteKernel, ConstantK
 from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
-
-def plot_parity_with_uncertainty(
-    y_true_train, y_pred_train, y_std_train, 
-    y_true_test, y_pred_test, y_std_test,
-    xlim=(-3, 3), ylim=(-3, 3),
-    train_r2=None, test_r2=None,
-    filename="parity_plot_with_smooth_band.png"
-):
-    """
-    Plots parity plots with uncertainty bands for training and test data.
-
-    Parameters:
-    - y_true_train: True values for the training data.
-    - y_pred_train: Predicted values for the training data.
-    - y_std_train: Predicted standard deviations for the training data.
-    - y_true_test: True values for the test data.
-    - y_pred_test: Predicted values for the test data.
-    - y_std_test: Predicted standard deviations for the test data.
-    - output_name: Name of the output variable being plotted (string).
-    - xlim: Tuple specifying x-axis limits (default: (-2, 2)).
-    - ylim: Tuple specifying y-axis limits (default: (-2, 2)).
-    - filename: Name of the file to save the plot (default: "parity_plot_with_smooth_band.png").
-    """
-    # Sort data points for smooth connections
-    sorted_indices_train = np.argsort(y_true_train[:, 0])
-    y_true_train_sorted = y_true_train[sorted_indices_train, 0]
-    y_pred_train_sorted = y_pred_train[sorted_indices_train, 0]
-    y_std_train_sorted = y_std_train[sorted_indices_train, 0]
-
-    sorted_indices_test = np.argsort(y_true_test[:, 0])
-    y_true_test_sorted = y_true_test[sorted_indices_test, 0]
-    y_pred_test_sorted = y_pred_test[sorted_indices_test, 0]
-    y_std_test_sorted = y_std_test[sorted_indices_test, 0]
-
-    # Create subplots
-    fig, ax = plt.subplots(1, 2, figsize=(12, 6))
-
-    # Train data parity plot
-    ax[0].plot(y_true_train_sorted, y_pred_train_sorted, label="Predicted", color="blue")
-    ax[0].fill_between(
-        y_true_train_sorted,
-        y_pred_train_sorted - y_std_train_sorted,
-        y_pred_train_sorted + y_std_train_sorted,
-        color="blue",
-        alpha=0.2,
-        label="Uncertainty"
-    )
-    ax[0].scatter(y_true_train[:, 0], y_pred_train[:, 0], label="Train Data", color="blue", alpha=0.6)
-    ax[0].plot(xlim, xlim, 'k--', label="Parity Line")
-    ax[0].set_title(f"Parity Plot - Train Data (r2 = {train_r2:.3f})")
-    ax[0].set_xlabel("True Values")
-    ax[0].set_ylabel("Predicted Values")
-    ax[0].legend()
-    ax[0].set_xlim(xlim)
-    ax[0].set_ylim(ylim)
-
-    # Test data parity plot
-    ax[1].plot(y_true_test_sorted, y_pred_test_sorted, label="Predicted", color="green")
-    ax[1].fill_between(
-        y_true_test_sorted,
-        y_pred_test_sorted - y_std_test_sorted,
-        y_pred_test_sorted + y_std_test_sorted,
-        color="green",
-        alpha=0.2,
-        label="Uncertainty"
-    )
-    ax[1].scatter(y_true_test[:, 0], y_pred_test[:, 0], label="Test Data", color="green", alpha=0.6)
-    ax[1].plot(xlim, xlim, 'k--', label="Parity Line")
-    ax[1].set_title(f"Parity Plot - Test Data (r2 = {test_r2:.3f})")
-    ax[1].set_xlabel("True Values")
-    ax[1].set_ylabel("Predicted Values")
-    ax[1].legend()
-    ax[1].set_xlim(xlim)
-    ax[1].set_ylim(ylim)
-
-    # Final layout adjustments and save the figure
-    plt.tight_layout()
-    plt.savefig(filename)
-
+from sklearn.neural_network import MLPRegressor
 
 def clean_data(full_data, response):
     """Handle missing or non-numeric data"""
@@ -159,7 +81,7 @@ selected_features = features
 #features = spatial_features
 
 kernel = C(1.0, (1e-3, 1e3)) * RBF(length_scale=1.0, length_scale_bounds=(1e-2, 1e2))
-kernel = C(1.0, (1e-3, 1e3)) * Matern(length_scale=1, length_scale_bounds=(1e-2, 1e2), nu=1.5) #+ WhiteKernel(noise_level=1e-2, noise_level_bounds=(1e-4, 1e-1))
+kernel = C(1.0, (1e-3, 1e3)) * Matern(length_scale=1, length_scale_bounds=(1e-2, 1e2), nu=1.5) + WhiteKernel(noise_level=1e-2, noise_level_bounds=(1e-4, 1e-1))
 train = True
 
 feature_selection_results = {}
@@ -178,25 +100,26 @@ for iteration in range(1):#(len(features)):
     X_test = scaler.transform(X_test)
     y_train = scaler.fit_transform(y_train)
     y_test = scaler.transform(y_test)
+    
     if train:
-        gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=3e-1)
-        gp.fit(X_train, y_train)
-    else:
-        gp = joblib.load('gp.pkl')
+        mlp = MLPRegressor(hidden_layer_sizes=(5, 10),
+                           activation="logistic",
+                           alpha=0.316,
+                           solver="lbfgs",
+                           max_iter=1000,
+                           random_state=42)
+        mlp.fit(X_train, y_train)
 
-    # joblib.dump(gp, 'gp.pkl')
-
-    y_pred, y_pred_std = gp.predict(X_test, return_std=True)
-    y_pred_train, y_pred_std_train = gp.predict(X_train, return_std=True)
+    y_pred = mlp.predict(X_test)
+    y_pred_train = mlp.predict(X_train)
     # Convert back to original scale
     """
     y_pred = scaler.inverse_transform(y_pred)
-    y_pred_std = scaler.inverse_transform(y_pred_std)
     y_pred_train = scaler.inverse_transform(y_pred_train)
-    y_pred_std_train = scaler.inverse_transform(y_pred_std_train)
     y_train = scaler.inverse_transform(y_train)
     y_test = scaler.inverse_transform(y_test)
     """
+
     for i, name in enumerate(output_names[:1]):
         r2_train = r2_score(y_train[:, i], y_pred_train[:, i])
         r_train = np.corrcoef(y_train[:, i], y_pred_train[:, i])[0, 1]
@@ -212,16 +135,7 @@ for iteration in range(1):#(len(features)):
             "MSE Train": f"{mse_train:.3f}",
             "MSE Test": f"{mse_test:.3f}",
         }
-    plot_parity_with_uncertainty(y_train,
-                                 y_pred_train,
-                                 y_pred_std_train,
-                                 y_test,
-                                 y_pred,
-                                 y_pred_std,
-                                 train_r2=r2_train,
-                                 test_r2=r2_test,
-                                 )
-    asd()
+
     # Plot a parity plot for train and test data
     output_name = output_names[0]
     output_index = OUTPUT_MAPPING[output_name]
@@ -232,17 +146,20 @@ for iteration in range(1):#(len(features)):
     ax.set_xlabel("True")
     ax.set_ylabel("Predicted")
     ax.legend()
-    ax.set_xlim(-1, 1)
-    ax.set_ylim(-1, 1)
+    ax.set_xlim(-3, 3)
+    ax.set_ylim(-3, 3)
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    ax.plot(xlim, xlim, 'k--', label="Parity Line")
     plt.tight_layout()
 
     # Save the plot
     selected_features_combined = "_".join(selected_features)
-    plt.savefig(f"parity_plot_{selected_features_combined}.png")
+    plt.savefig(f"parity_plot.png")#_{selected_features_combined}.png")
 
 results_df = pd.DataFrame.from_dict(feature_selection_results, orient="index")
 results_df.sort_values(by="R² Test", ascending=False, inplace=True)
 
 # Save results to a CSV
-results_df.to_csv("feature_selection_results.csv", index=False)
+#results_df.to_csv("feature_selection_results.csv", index=False)
 print(results_df.head(1))
