@@ -7,10 +7,9 @@ def distance_function(y_obs, y_sim=0):
     """
     Distance measure between observed and simulated outputs.
     """
-    sigma_sim = np.std(y_sim)
-    if sigma_sim == 0:  # Handle edge case for zero variance
-        sigma_sim = 1e-6
+    return np.sum(np.abs(y_obs - y_sim))
     return np.sum(((y_obs - y_sim) ** 2))
+
 
 # ABC algorithm
 def abc(data, y_sims, y_obs, epsilon):
@@ -33,38 +32,44 @@ def abc(data, y_sims, y_obs, epsilon):
 
         # Compute the distance between observed and simulated outputs
         distance = distance_function(y_obs, y_sim)
-
         # Accept or reject based on epsilon
         if distance <= epsilon:
-            accepted_parameters.append(row)
+            accepted_parameters.append(y_sim[0])
 
-    return pd.DataFrame(accepted_parameters)
+    return accepted_parameters
 
 def main():
     # Load ABM data
-    data_path = "../data/ARCADE/C-feature_0.0_metric_15-04032023.csv"
+    data_path = "../../data/ARCADE/C-feature_0.0_metric_15-04032023.csv"
     data = pd.read_csv(data_path)
     input_feature_names = ["NODES", "EDGES", "GRADIUS"]
     input_feature_names = ["ACTIVITY"]
-    predicted_output = ["ACTIVITY", "GROWTH", "SYMMETRY"]
+    predicted_output = ["ACTIVITY"]#, "GROWTH", "SYMMETRY"]
     input_features = data[input_feature_names].values
     y_sims = data[predicted_output].values
-    fig, ax = plt.subplots(1, 3, figsize=(15, 5), sharey=True)
-    for i, feature in enumerate(predicted_output):
-        ax[i].hist(data[feature], bins=50)
-        ax[i].set_title(feature)
-    plt.savefig("y_sims.png")
+    fig, ax = plt.subplots(1, 2, figsize=(10, 5), sharey=True)
+    _, bins, patch = ax[0].hist(y_sims, bins=20)
+    ax[0].set_title("Prior - Activity")
+    ax[0].set_xlim([-1, 1])
 
-    y_obs = 1
+    y_obs = 0.25
     print(f"Number of samples: {len(data)}")
-    return 0
-    # ABC setup
-    epsilon = 500
+    epsilon = 0.25
 
-    # Run ABC
     posterior_samples = abc(input_features, y_sims, y_obs, epsilon)
     # posterior_samples.to_csv("posterior_samples.csv", index=False)
     print(f"Number of accepted samples: {len(posterior_samples)}")
+    # Plot the accepted samples
+    ax[1].hist(posterior_samples, bins=bins)
+    ax[1].set_title("Posterior - Activity")
+    ax[1].axvline(x=y_obs, color="red", linestyle="--", label="Observed")
+    # Plot eplison
+    ax[1].axvline(x=y_obs + epsilon, color="black", linestyle="--", label="Epsilon")
+    ax[1].axvline(x=y_obs - epsilon, color="black", linestyle="--")
+    ax[1].legend()
+    ax[1].set_xlim([-1, 1])
+    plt.tight_layout()
+    plt.savefig("posterior_samples.png")
 
 if __name__ == "__main__":
     main()

@@ -1,12 +1,14 @@
 import numpy as np
 import pandas as pd
 import random
+import matplotlib.pyplot as plt
 
 # Define distance function based on the paper
-def distance_function(y_obs, y_sim):
+def distance_function(y_obs, y_sim, weight=1.0):
     """
     Distance measure between observed and simulated outputs.
     """
+    return weight * np.sum(np.abs(y_obs - y_sim))
     return np.sum(((y_obs - y_sim) ** 2))
 
 # Define a log-likelihood function
@@ -14,7 +16,7 @@ def log_likelihood(y_sim, y_obs):
     """
     Calculate the log-likelihood based on the distance function.
     """
-    distance = distance_function(y_obs, y_sim)
+    distance = distance_function(y_obs, y_sim, 10)
     return -distance  # Negative because we maximize log-likelihood
 
 # MCMC sampling function
@@ -58,8 +60,8 @@ def mcmc(data, y_sims, y_obs, n_iterations, proposal_std=1.0):
             # Store the accepted sample
             samples.append(np.append(current_theta, proposal_y_sim))
     # Remove duplicates in the samples
-    samples = list(set(tuple(row) for row in samples))
-    return pd.DataFrame(samples, columns=["NODES", "EDGES", "GRADIUS", "ACTIVITY", "GROWTH", "SYMMETRY"])
+    #samples = list(set(tuple(row) for row in samples))
+    return pd.DataFrame(samples, columns=["NODES", "EDGES", "GRADIUS", "ACTIVITY"])
 
 def main():
     # Load ABM data
@@ -69,12 +71,12 @@ def main():
     # Extract inputs (theta) and outputs (y)
     input_feature_names = ["NODES", "EDGES", "GRADIUS"]
     # input_feature_names = ["ACTIVITY"]
-    predicted_output = ["ACTIVITY", "GROWTH", "SYMMETRY"]
+    predicted_output = ["ACTIVITY"]#, "GROWTH", "SYMMETRY"]
     input_features = data[input_feature_names].values
     y_sims = data[predicted_output].values
 
     # Observed value
-    y_obs = [-1.0, -10, 0]
+    y_obs = [1]#, -10, 0]
 
     # Run MCMC
     n_iterations = 10000
@@ -86,6 +88,14 @@ def main():
     # Print summary of posterior samples
     print(f"Number of samples: {len(posterior_samples)}")
     print(posterior_samples.describe())
+    # Plot the accepted samples activity
+    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+    _, bins, patch = ax[0].hist(y_sims, bins=20)
+    ax[0].set_title("Prior - Activity")
+
+    ax[1].hist(posterior_samples["ACTIVITY"], bins=bins)
+    ax[1].set_title("Posterior - Activity")
+    plt.savefig("posterior_mcmc.png")
 
 if __name__ == "__main__":
     main()

@@ -11,7 +11,7 @@ variance_formatted/
 overfit/
 training_vis.ipynb
 variance.ipynb
-
+*.png
 
 # Editors
 .vscode/
