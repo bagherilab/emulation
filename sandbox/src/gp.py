@@ -111,6 +111,7 @@ OUTPUT_MAPPING = {"ACTIVITY": 0, "GROWTH": 1, "SYMMETRY": 2}
 # Load data
 data_path = "../../data/ARCADE/C-feature_0.0_metric_15-04032023.csv"
 data = pd.read_csv(data_path)
+data = data[data["KEY"] == "C_Lava"]
 output_names = ["ACTIVITY", "GROWTH", "SYMMETRY"]
 features = [
     "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW", 
@@ -173,6 +174,8 @@ for iteration in range(1):#(len(features)):
 
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+    print("X_train, X_test, y_train, y_test")
+    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
     scaler = StandardScaler()
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
