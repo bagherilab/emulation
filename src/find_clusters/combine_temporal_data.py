@@ -24,7 +24,8 @@ def load_data(file_pattern, suffix_filter):
         data = pd.read_csv(file)
         data['TIME'] = time_point  # Add the TIME column
         all_data.append(data)
-
     # Combine all data into a single DataFrame
     combined_data = pd.concat(all_data, ignore_index=True)
+    # Sort the data by TIME
+    combined_data.sort_values(by='TIME', inplace=True)
     return combined_data

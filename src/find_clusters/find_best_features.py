@@ -138,37 +138,34 @@ def visualize_features_response(data, time_point, features, response_name, label
     plt.savefig("combined_visualization.png")
     plt.show()
 
-def visualize_vasculature_over_time(data, vasculature_type, features, label_column):
-    # Filter data for the selected vasculature type
-    data_filtered = data[data[label_column] == vasculature_type].copy()
-    
+def visualize_multiple_vasculatures_over_time(data, vasculature_types, features, label_column):
+    # Filter data for the selected vasculature types
+    data_filtered = data[data[label_column].isin(vasculature_types)].copy()
+
     # Remove columns with excessive inf/-inf values
     threshold = 0.2
     columns_to_drop = [col for col in data_filtered.columns if ((data_filtered[col] == np.inf) | (data_filtered[col] == -np.inf)).mean() >= threshold]
     data_filtered = data_filtered.drop(columns=columns_to_drop)
-    
+
     # Replace inf/-inf with NaN and drop rows with NaN
     data_filtered = data_filtered.replace([float('inf'), float('-inf')], float('nan')).dropna(axis=0)
-    # Encode time points as labels
-    time_points = data_filtered['TIME'].unique()
-    time_points.sort()  # Ensure time points are sorted
-    
+
+    # Reset the index
+    data_filtered = data_filtered.reset_index(drop=True)
+
     # Standardize features
     X = data_filtered[features]
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
-    
+
     # Perform PCA
     pca = PCA(n_components=2)
     reduced_features = pca.fit_transform(X)
-    
-    # Extract time labels for coloring
-    time_labels = data_filtered['TIME'].astype(str)  # Convert to string for color mapping
-    
+
     # PCA Explained Variance
     print("PCA Explained Variance Ratio:")
     print(pca.explained_variance_ratio_)
-    
+
     # Feature importance (loadings for PC1)
     pc1_loadings = pca.components_[0]
     feature_importance = pd.DataFrame({
@@ -178,20 +175,38 @@ def visualize_vasculature_over_time(data, vasculature_type, features, label_colu
     }).sort_values(by="Absolute Loading", ascending=False)
     print("Feature Importance Rankings:")
     print(feature_importance)
-    
-    # Define colormap for time points
+
+    # Define colormap for time points and markers for vasculature types
     cmap = plt.cm.viridis
     norm = plt.Normalize(vmin=min(data_filtered['TIME']), vmax=max(data_filtered['TIME']))
-    colors = cmap(norm(data_filtered['TIME']))
-    
-    # PCA Scatter Plot
+    markers = ['o', 's', '^', 'D', 'P', 'X']  # Add more markers if needed
+
+    # Plot PCA scatter for multiple vasculature types
     plt.figure(figsize=(10, 7))
-    scatter = plt.scatter(reduced_features[:, 0], reduced_features[:, 1], c=data_filtered['TIME'], cmap=cmap, s=50)
-    colorbar = plt.colorbar(scatter, label="Time")
+    for i, vasculature in enumerate(vasculature_types):
+        subset = data_filtered[data_filtered[label_column] == vasculature]
+        reduced_subset = reduced_features[subset.index]  # Indices now align after reset_index
+        plt.scatter(
+            reduced_subset[:, 0], reduced_subset[:, 1],
+            c=subset['TIME'], cmap=cmap, norm=norm, s=50,
+            marker=markers[i % len(markers)], label=vasculature
+        )
+
+    # Add colorbar and legend
+    colorbar = plt.colorbar(label="Time")
+    plt.legend(title="Vasculature Type")
     plt.xlabel("PCA Component 1")
     plt.ylabel("PCA Component 2")
-    plt.title(f"PCA Visualization of {vasculature_type} Over Time")
-    plt.savefig(f"pca_{vasculature_type}_over_time.png")
+    plt.title("PCA Visualization of Multiple Vasculature Types Over Time")
+    plt.savefig("pca_multiple_vasculatures_over_time.png")
+    plt.show()
+
+    # Feature Correlation Heatmap for all selected vasculatures
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(data_filtered[features].corr(), annot=True, fmt=".2f", cmap='coolwarm', cbar=True)
+    plt.title("Feature Correlation Heatmap")
+    plt.savefig("feature_correlation_multiple_vasculatures.png")
+    plt.show()
 
 
 
@@ -212,12 +227,11 @@ def main():
     data_path_pattern = os.path.join(os.path.dirname(__file__), "../../data/ARCADE/C-feature_*.csv")
     suffix_filter = "_15-04032023.csv"  # Specify the suffix to filter files
     data = load_data(data_path_pattern, suffix_filter)
+    data = data[(data['LAYOUT'] == 'Savav') | (data['LAYOUT'] == 'Lav')]
     time_point = 15.0
     response_name = "ACTIVITY"
-    #pca_visualization(data, time_point, features, label_column=label_column)
-    #visualize_response(data, time_point, response_name, label_column)
-    #visualize_features_response(data, time_point, features, response_name, label_column)
-    vasculature_type = "C_Savav"
-    visualize_vasculature_over_time(data, vasculature_type, features, label_column)
+    visualize_features_response(data, time_point, features, response_name, label_column)
+    vasculature_types = ["C_Savav", "C_Lav"]
+    #visualize_multiple_vasculatures_over_time(data, vasculature_types, features, label_column)
 if __name__ == "__main__":
     main()

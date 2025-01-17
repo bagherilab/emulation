@@ -40,6 +40,9 @@ def cluster_analysis_with_ground_truth(data, time_point, features, label_column)
     cm = confusion_matrix(ground_truth_labels, cluster_labels)
     plt.figure(figsize=(8, 5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=range(optimal_clusters), yticklabels=label_encoder.classes_)
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            plt.text(j + 0.5, i + 0.5, cm[i, j], ha='center', va='center', color='black')
     plt.xlabel("Predicted Clusters")
     plt.ylabel("Ground Truth")
     plt.title("Confusion Matrix")
@@ -61,7 +64,7 @@ def cluster_analysis_with_ground_truth(data, time_point, features, label_column)
 
 def main():
     features = [
-        "KEY", "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW", 
+        "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW", 
         "NODES", "EDGES", "GRADIUS", "GDIAMETER", "AVG_ECCENTRICITY", 
         "AVG_SHORTEST_PATH", "AVG_IN_DEGREES", "AVG_OUT_DEGREES", 
         "AVG_DEGREE", "AVG_CLUSTERING", "AVG_CLOSENESS", 
@@ -69,16 +72,24 @@ def main():
     ]
     label_column = "KEY"
     features = [
-        "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW"]
+        "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW", "NODES", "EDGES"]
     # Define the pattern to locate the files and filter suffix
     data_path_pattern = os.path.join(os.path.dirname(__file__), "../../data/ARCADE/C-feature_*.csv")
     suffix_filter = "_15-04032023.csv"  # Specify the suffix to filter files
     data = load_data(data_path_pattern, suffix_filter)
-    #print(data.head())  # Show the first few rows of the combined DataFrame
+    # Print number of rows
+    data = data[(data['LAYOUT'] == 'Savav') | (data['LAYOUT'] == 'Lav')]
+    # add graph density = nodes/edges
+    data['DENSITY'] = data['NODES'] / data['EDGES']
+    # print mean density of Lav and Savav
+    print(data.groupby('LAYOUT')['DENSITY'].agg(['mean', 'std']))
+    print(data.groupby('LAYOUT')['NODES'].agg(['mean', 'std']))
+    print(data.groupby('LAYOUT')['EDGES'].agg(['mean', 'std']))
+    print(data.head())  # Show the first few rows of the combined DataFrame
     #print(data['TIME'].unique())  # Display the unique time points
     # Analyze clusters for TIME=0.0 with ground truth comparison
     clustered_data = cluster_analysis_with_ground_truth(data, time_point=0.0, features=features, label_column=label_column)
-    print(clustered_data.head())  # View the clustered data
+    #print(clustered_data.head())  # View the clustered data
 
 
 if __name__ == '__main__':
