@@ -2,6 +2,18 @@ import numpy as np
 import pandas as pd
 import random
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import LabelEncoder
+
+column_names = [
+    "KEY",
+    "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW", 
+    "NODES", "EDGES", "GRADIUS", "GDIAMETER", "AVG_ECCENTRICITY", 
+    "AVG_SHORTEST_PATH", "AVG_IN_DEGREES", "AVG_OUT_DEGREES", 
+    "AVG_DEGREE", "AVG_CLUSTERING", "AVG_CLOSENESS", 
+    "AVG_BETWEENNESS", "AVG_CORENESS"
+]
 
 # Define distance function based on the paper
 def distance_function(y_obs, y_sim, weight=1.0):
@@ -61,22 +73,27 @@ def mcmc(data, y_sims, y_obs, n_iterations, proposal_std=1.0):
             samples.append(np.append(current_theta, proposal_y_sim))
     # Remove duplicates in the samples
     #samples = list(set(tuple(row) for row in samples))
-    return pd.DataFrame(samples, columns=["NODES", "EDGES", "GRADIUS", "ACTIVITY"])
+    return pd.DataFrame(samples, columns= column_names + ["ACTIVITY"])
 
 def main():
     # Load ABM data
-    data_path = "../../data/ARCADE/C-feature_0.0_metric_15-04032023.csv"
+    data_path = "../../data/ARCADE/C-feature_15.0_metric_15-04032023.csv"
     data = pd.read_csv(data_path)
+    data = data[data["COMPONENTS"] == 1]
+    threshold = 0.2
+    columns_to_drop = [col for col in data.columns if ((data[col] == np.inf) | (data[col] == -np.inf)).mean() >= threshold]
+    data = data.drop(columns=columns_to_drop)
 
     # Extract inputs (theta) and outputs (y)
-    input_feature_names = ["NODES", "EDGES", "GRADIUS"]
+    input_feature_names = column_names #["NODES", "EDGES", "GRADIUS"]
     # input_feature_names = ["ACTIVITY"]
     predicted_output = ["ACTIVITY"]#, "GROWTH", "SYMMETRY"]
     input_features = data[input_feature_names].values
+    
     y_sims = data[predicted_output].values
 
     # Observed value
-    y_obs = [1]#, -10, 0]
+    y_obs = [0.25]#, -10, 0]
 
     # Run MCMC
     n_iterations = 10000
@@ -89,12 +106,64 @@ def main():
     print(f"Number of samples: {len(posterior_samples)}")
     print(posterior_samples.describe())
     # Plot the accepted samples activity
-    fig, ax = plt.subplots(1, 2, figsize=(10, 5))
+    fig, ax = plt.subplots(1, 3, figsize=(15, 5))
     _, bins, patch = ax[0].hist(y_sims, bins=20)
     ax[0].set_title("Prior - Activity")
-
+    ax[0].set_xlim([-1, 1])
+    ax[0].set_xlabel("Activity")
+    ax[0].set_ylabel("Number of samples")
     ax[1].hist(posterior_samples["ACTIVITY"], bins=bins)
-    ax[1].set_title("Posterior - Activity")
+    ax[1].set_title("Posterior - Activity (MCMC)")
+    ax[1].set_xlim([-1, 1])
+    ax[1].set_xlabel("Activity")
+    ax[1].axvline(y_obs[0], color="red", linestyle="--", label="Target activity")
+    ax[1].legend()
+
+    pca = PCA(n_components=2)
+    scaler = StandardScaler()
+    features = scaler.fit_transform(input_features[:, 1:])
+    label_encoder = LabelEncoder()
+    labels = label_encoder.fit_transform(input_features[:, 0])
+    reduced_features = pca.fit_transform(features)
+    categories = label_encoder.classes_
+    markers = ['o', 's', 'D', '^', 'v', '<', '>', 'p', '*', 'h', 'H', '+', 'x', 'd', '|', '_']
+    unique_labels = np.unique(labels)
+    cmap = plt.cm.viridis
+    # drop duplicates
+    posterior_samples = posterior_samples.drop_duplicates(subset=input_feature_names)
+    posterior_reduced_features = pca.transform(scaler.transform(posterior_samples[input_feature_names].values[:, 1:]))
+    posterior_labels = label_encoder.transform(posterior_samples[input_feature_names].values[:, 0])
+
+    for i, label in enumerate(unique_labels):
+        ax[2].scatter(reduced_features[labels == label, 0],
+                      reduced_features[labels == label, 1], 
+                      marker=markers[i % len(markers)],
+                      label=f"{categories[label]}", 
+                      facecolors='none',
+                      edgecolors=cmap(i / len(unique_labels))
+                      )
+        ax[2].scatter(posterior_reduced_features[posterior_labels == label, 0], 
+                      posterior_reduced_features[posterior_labels == label, 1],
+                      marker=markers[i % len(markers)],
+                      facecolors=cmap(i / len(unique_labels)),
+                      edgecolors='none', alpha=0.8
+                      )
+
+    # Create custom legends
+    handles1 = [plt.Line2D([0], [0], marker=markers[i % len(markers)], color='w', label=categories[label],
+                           markerfacecolor='none', markeredgecolor=cmap(i / len(unique_labels))) 
+                for i, label in enumerate(unique_labels)]
+    handles2 = [plt.Line2D([0], [0], marker='o', color='w', label='Prior', markerfacecolor='none', markeredgecolor='k'),
+                plt.Line2D([0], [0], marker='o', color='w', label='Posterior', markerfacecolor='k', markeredgecolor='none', alpha=0.5)]
+
+    legend1 = ax[2].legend(handles=handles1, title="Vasculature type", loc='upper right')
+    ax[2].add_artist(legend1)
+    ax[2].legend(handles=handles2, title="Distribution", loc='lower right')
+    ax[2].set_title("PCA - Vasculature distribution")
+    ax[2].set_xlabel("PC1")
+    ax[2].set_ylabel("PC2")
+    plt.tight_layout()
+
     plt.savefig("posterior_mcmc.png")
 
 if __name__ == "__main__":

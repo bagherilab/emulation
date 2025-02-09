@@ -51,7 +51,8 @@ def main():
     _, bins, patch = ax[0].hist(y_sims, bins=20)
     ax[0].set_title("Prior - Activity")
     ax[0].set_xlim([-1, 1])
-
+    ax[0].set_xlabel("Activity")
+    ax[0].set_ylabel("Number of samples")
     y_obs = 0.25
     print(f"Number of samples: {len(data)}")
     epsilon = 0.25
@@ -61,15 +62,17 @@ def main():
     print(f"Number of accepted samples: {len(posterior_samples)}")
     # Plot the accepted samples
     ax[1].hist(posterior_samples, bins=bins)
-    ax[1].set_title("Posterior - Activity")
+    ax[1].set_title("Posterior - Activity (ABC)")
     ax[1].axvline(x=y_obs, color="red", linestyle="--", label="Observed")
     # Plot eplison
     ax[1].axvline(x=y_obs + epsilon, color="black", linestyle="--", label="Epsilon")
     ax[1].axvline(x=y_obs - epsilon, color="black", linestyle="--")
     ax[1].legend()
     ax[1].set_xlim([-1, 1])
+    ax[1].set_xlabel("Activity")
+
     plt.tight_layout()
-    plt.savefig("posterior_samples.png")
+    plt.savefig("posterior_abc.png")
 
 if __name__ == "__main__":
     main()

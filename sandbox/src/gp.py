@@ -5,9 +5,10 @@ import joblib
 import matplotlib.pyplot as plt
 from sklearn.gaussian_process import GaussianProcessRegressor
 from sklearn.gaussian_process.kernels import RBF, Matern, WhiteKernel, ConstantKernel as C
-from sklearn.model_selection import train_test_split, KFold
 from sklearn.metrics import mean_squared_error, r2_score
+from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 def plot_parity_with_uncertainty(
     y_true_train, y_pred_train, y_std_train, 
@@ -88,24 +89,6 @@ def plot_parity_with_uncertainty(
     plt.savefig(filename)
 
 
-def clean_data(full_data, response):
-    """Handle missing or non-numeric data"""
-
-    # Remove rows with multiple components
-    full_data = full_data[full_data["COMPONENTS"] == 1]
-    full_data.reset_index(drop=True, inplace=True)
-
-    # Remove response rows with bad values
-    full_data = full_data.loc[~full_data[response].isin([np.nan, np.inf, -np.inf])]
-    full_data.reset_index(drop=True, inplace=True)
-
-    # Removed features columns with bad values
-    numeric_cols = full_data.select_dtypes(include=[np.number]).columns
-    full_data = full_data.loc[
-        :, ~(np.isnan(full_data[numeric_cols]).any(axis=0) | np.isinf(full_data[numeric_cols])).any(axis=0)
-    ]
-    return full_data
-
 OUTPUT_MAPPING = {"ACTIVITY": 0, "GROWTH": 1, "SYMMETRY": 2}
 
 # Load data
@@ -120,6 +103,7 @@ features = [
     "AVG_DEGREE", "AVG_CLUSTERING", "AVG_CLOSENESS", 
     "AVG_BETWEENNESS", "AVG_CORENESS"
 ]
+features = ["RADIUS"]
 spatial_features = [
     "RADIUS", "LENGTH", "WALL", "SHEAR", "CIRCUM", "FLOW", 
     "NODES", "EDGES", "GRADIUS", "GDIAMETER", "AVG_ECCENTRICITY", 
@@ -182,7 +166,7 @@ for iteration in range(1):#(len(features)):
     y_train = scaler.fit_transform(y_train)
     y_test = scaler.transform(y_test)
     if train:
-        gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=3e-1)
+        gp = GaussianProcessRegressor(kernel=kernel, n_restarts_optimizer=10, alpha=3e-6)
         gp.fit(X_train, y_train)
     else:
         gp = joblib.load('gp.pkl')
@@ -191,7 +175,48 @@ for iteration in range(1):#(len(features)):
 
     y_pred, y_pred_std = gp.predict(X_test, return_std=True)
     y_pred_train, y_pred_std_train = gp.predict(X_train, return_std=True)
-    # Convert back to original scale
+    # Plot GP prediction function with uncertainty
+    fig, ax = plt.subplots(1, 1, figsize=(6, 6))
+    plot_pca = False
+    if plot_pca:
+        pca = PCA(n_components=1)  # Focus on PC1 for plotting
+        pca_X_train = pca.fit_transform(X_train)
+        pca_X_test = pca.transform(X_test)
+        # Generate uniform points in the PC1 space
+        pc1_min, pc1_max = pca_X_train.min(), pca_X_train.max()
+        pc1_uniform = np.linspace(pc1_min, pc1_max, 50).reshape(-1, 1)
+        # Map uniform points back to the original feature space
+        X_uniform = pca.inverse_transform(pc1_uniform)
+        # Get GP predictions (mean and standard deviation) for the uniform points
+        y_p, y_std = gp.predict(X_uniform, return_std=True)
+
+        # Plot GP prediction with uncertainty
+        # Scatter plot for training data in PC1
+        print(pca_X_train.shape, y_train.shape)
+        ax.scatter(pca_X_train[:, 0], y_train[:, 0], label="Train Data", color="blue", alpha=0.6)
+        ax.scatter(pca_X_test[:, 0], y_test[:, 0], label="Test Data", color="green", alpha=0.6)
+
+        # GP prediction mean
+        ax.scatter(pc1_uniform, y_p[:, 0], label="GP Prediction", color="red", linewidth=2)
+        ax.plot(pc1_uniform, y_p[:, 0], label="GP Prediction", color="red", linewidth=2)
+        # Customize the plot
+        ax.set_title("GP Prediction with Uncertainty")
+        ax.set_xlabel("Principal Component 1 (PC1)")
+        ax.set_ylabel("Prediction")
+    else:
+        x = np.linspace(-3, 3, 1000).reshape(-1, 1)
+        y_p = gp.predict(x)
+        ax.scatter(X_train, y_train[:, 0], label="Train")
+        ax.scatter(X_test, y_test[:, 0], label="Test")
+        ax.plot(x, y_p[:, 0], label="Prediction", color="red")
+        ax.set_title("GP Prediction")
+        ax.set_xlabel("RADIUS")
+        ax.set_ylabel("Prediction")
+
+    ax.legend()
+
+    plt.tight_layout()
+    plt.savefig("gp.png")
     """
     y_pred = scaler.inverse_transform(y_pred)
     y_pred_std = scaler.inverse_transform(y_pred_std)
